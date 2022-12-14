@@ -34,9 +34,9 @@ struct XRTC_ALARM_SETTINGS {
 
 struct XRTC_TIMER_SETTINGS {
   uint8_t Value;
-      bool InterruptMode   : 1;
-      bool InterruptEnable : 1;
-      bool Enable          : 1;
+     bool InterruptMode   : 1;
+     bool InterruptEnable : 1;
+     bool Enable          : 1;
   uint8_t ClockFrequency  : 2;
 };
 
@@ -242,7 +242,7 @@ public:
 
   bcddatetime_t getBcdDateTimeNow (void);
   time_t getEpochNow (void);
-    time_t getCenturyEpochNow (void);
+  time_t getCenturyEpochNow (void);
   bool adjustBcdDateTime (const bcddatetime_t t_bcd);
   bool adjustEpoch (const time_t t_time);
   bool adjustBcdDate (const bcddate_t t_bcd_date);

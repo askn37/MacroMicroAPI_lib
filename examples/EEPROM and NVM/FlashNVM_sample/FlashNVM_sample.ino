@@ -13,13 +13,13 @@
 
 #if (INTERNAL_SRAM_SIZE < 256)
   #error This MCU not supported
-	#include BUILD_STOP
+  #include BUILD_STOP
 #endif
 
 struct nvm_store_t {
   uint32_t count;
   char datetime[26];
-	uint16_t magic;
+  uint16_t magic;
 };
 
 extern const uint8_t* __data_load_end;
@@ -47,9 +47,9 @@ void setup (void) {
   struct nvm_store_t nvm_buffer;
   memcpy_PF(&nvm_buffer, pgm_get_far_address(nvm_store), sizeof(nvm_buffer));
 
-	/* Before NVM check */
+  /* Before NVM check */
   if (nvm_buffer.magic != 0xABCD) {
-		Serial.println(F("*reinit*"));
+    Serial.println(F("*reinit*"));
     // Serial.print(F(" before=0x")).println(nvm_buffer.magic, HEX);
     strcpy(nvm_buffer.datetime, __DATE__ " " __TIME__);
     nvm_buffer.count = 0;
@@ -58,16 +58,14 @@ void setup (void) {
   Serial.print(F(" datetime=")).println(nvm_buffer.datetime);
   Serial.print(F(" count=")).println(nvm_buffer.count, DEC);
 
-	/* Fix new parameter */
+  /* Fix new parameter */
   nvm_buffer.count++;
-
-	/* Fix new parameter */
 
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     if ( FlashNVM::page_erase(&nvm_store, sizeof(nvm_buffer))
-		  && FlashNVM::page_update(&nvm_store, &nvm_buffer, sizeof(nvm_buffer))
-		)    Serial.println(F("[success]"));
-		else Serial.println(F("*failed*"));
+      && FlashNVM::page_update(&nvm_store, &nvm_buffer, sizeof(nvm_buffer))
+    )    Serial.println(F("[success]"));
+    else Serial.println(F("*failed*"));
   }
 }
 
@@ -78,10 +76,10 @@ void loop (void) {
   Serial.println(F("<Going reset>"));
   Serial.flush();
 
-	/* Watch Dog Timer delay after reset */
+  /* Watch Dog Timer delay after reset */
   loop_until_bit_is_clear(WDT_STATUS, WDT_SYNCBUSY_bp);
   _PROTECTED_WRITE(WDT_CTRLA, WDT_PERIOD_8CLK_gc);
-	for (;;);
+  for (;;);
 }
 
 // end of code

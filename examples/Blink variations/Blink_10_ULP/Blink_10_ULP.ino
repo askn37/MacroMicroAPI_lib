@@ -1,5 +1,5 @@
 /**
- * @file Blink_1_ULP.ino
+ * @file Blink_10_ULP.ino
  * @author askn (K.Sato) multix.jp
  * @brief
  * @version 0.1
@@ -11,7 +11,7 @@
 
 #if !defined(PORTMUX_EVSYSROUTEA)
   #error This MCU not supported
-	#include "BUILD_STOP"
+  #include "BUILD_STOP"
 #endif
 
 int main (void) {
@@ -28,8 +28,8 @@ int main (void) {
   EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;
 
   TCA0_SPLIT_CTRLD = TCA_SPLIT_SPLITM_bm;
-	TCA0_SPLIT_LPER = UINT8_MAX;
-	TCA0_SPLIT_LCMP0 = UINT8_MAX / 2;
+  TCA0_SPLIT_LPER = UINT8_MAX;
+  TCA0_SPLIT_LCMP0 = UINT8_MAX / 2;
   TCA0_SPLIT_CTRLA = TCA_SPLIT_ENABLE_bm | TCA_SPLIT_CLKSEL_DIV4_gc;
 
   set_sleep_mode(SLEEP_MODE_IDLE);

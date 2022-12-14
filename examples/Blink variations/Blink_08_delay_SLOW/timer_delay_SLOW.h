@@ -11,8 +11,8 @@
 #pragma once
 
 #if (F_CPU < 4096L)
-  #error "Minimum supported F_CPU is 4096L"
-  #include "BUILD_STOP"
+  #error Minimum supported F_CPU is 4096L
+  #include BUILD_STOP
 #endif
 
 #ifdef delay

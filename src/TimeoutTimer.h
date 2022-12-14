@@ -32,8 +32,8 @@
 extern "C" void yield (void);
 
 struct TimeoutTimer_work_t {
-    uint16_t counter;
-    jmp_buf* context;
+  uint16_t counter;
+  jmp_buf* context;
 };
 
 #if defined(HAVE_RTC) && !defined(USED_RTC)
@@ -70,11 +70,11 @@ struct TimeoutTimer_work_t {
 
 #else
   #error Illegal __TIMEOUT_CLKFREQ spec
-    #include BUILD_STOP
+  #include BUILD_STOP
 #endif
 
 namespace TimeoutTimer {
-    extern TimeoutTimer_work_t __worker;
+  extern TimeoutTimer_work_t __worker;
   __attribute__((noreturn)) void abort (void);
   void __setup (uint16_t __ticks, jmp_buf *__return, volatile TimeoutTimer_work_t &__before);
   void __cleanup (volatile TimeoutTimer_work_t *__before);
@@ -86,7 +86,7 @@ namespace TimeoutTimer {
   uint32_t micros_left (void);
   void delay_ticks (uint16_t _ticks);
   void sleep_cpu_ticks (uint32_t _ticks);
-    bool interval_check_ticks (uint32_t &_ticks, uint16_t _interval = 0);
+  bool interval_check_ticks (uint32_t &_ticks, uint16_t _interval = 0);
 }
 
 #define TIMEOUT_BLOCK(MS) \

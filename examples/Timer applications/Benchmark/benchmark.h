@@ -12,7 +12,7 @@
 #pragma once
 
 namespace Benchmark {
-    uint32_t test (void(*_testfunc)(void));
+  uint32_t test (void(*_testfunc)(void));
 }
 
 // end of code
