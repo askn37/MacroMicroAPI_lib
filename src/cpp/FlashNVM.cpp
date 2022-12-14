@@ -36,12 +36,12 @@ namespace FlashNVM {
     do {
       loop_until_bit_is_clear(NVMCTRL_STATUS, NVMCTRL_FBUSY_bp);
       __asm__ __volatile__ (
-          "MOV     ZL, %A1 \n"    // set (LO) R30
-          "MOV     ZH, %B1 \n"    // set (HI) R31
+        "MOV     ZL, %A1 \n"    // set (LO) R30
+        "MOV     ZH, %B1 \n"    // set (HI) R31
     #if defined(HAVE_RAMPZ)
-          "STS     %2, %C1 \n"    // RAMPZ <- (HH)
+        "STS     %2, %C1 \n"    // RAMPZ <- (HH)
     #endif
-          "CALL    %0"            // SPM Z+ (dummy write)
+        "CALL    %0"            // SPM Z+ (dummy write)
         :
         : "p" (PROGMEM_START + 2) // spm_zp()
         , "r" (_page_top)

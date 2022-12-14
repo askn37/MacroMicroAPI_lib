@@ -94,7 +94,7 @@ namespace TimeoutTimer {
   jmp_buf __context;setjmp(__context)==0\
   ?(TimeoutTimer::__setup(timeout_millis_to_ticks(MS),&__context,__before),true)\
   :(TimeoutTimer::__cleanup(&__before),false);}));__ext;\
-    (__extension__({if(__ext)TimeoutTimer::abort();})))
+  (__extension__({if(__ext)TimeoutTimer::abort();})))
 
 #define delay_timer(MS) \
   __extension__({TimeoutTimer::delay_ticks(timeout_millis_to_ticks(MS));})

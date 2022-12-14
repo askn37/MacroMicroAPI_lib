@@ -195,8 +195,8 @@ L_RETI: RETI                    ; leave interrupt
     ::"p" (_SFR_MEM_ADDR(RTC_INTFLAGS))
     , "p" (_SFR_MEM_ADDR(TimeoutTimer::__worker.counter))
     , "p" (_SFR_MEM_ADDR(TimeoutTimer::__worker.context))
-        , "n" (RTC_OVF_bp)
-        , "n" (RTC_CMP_bp)
+    , "n" (RTC_OVF_bp)
+    , "n" (RTC_CMP_bp)
   );
 }
 

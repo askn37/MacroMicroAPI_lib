@@ -150,8 +150,8 @@ __TaskChanger_detach_task:
       /* スタック最上位は 終わったタスクを片付ける処理の番地（BigEndian） */
       uint16_t __temp;
       __asm__ __volatile__ ( R"#ASM#(
-          LDI     %A0, lo8(pm(__TaskChanger_detach_task)) ;
-          LDI     %B0, hi8(pm(__TaskChanger_detach_task)) ;
+        LDI     %A0, lo8(pm(__TaskChanger_detach_task)) ;
+        LDI     %B0, hi8(pm(__TaskChanger_detach_task)) ;
         )#ASM#"
         : "=r" (__temp)
       );
