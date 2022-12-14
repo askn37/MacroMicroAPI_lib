@@ -19,12 +19,12 @@ void setup (void) {
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
   Serial.print(F(" EEPROM_START=")).println(EEPROM_START, HEX);
   Serial.print(F(" DATETIME="));
-	if (*((char*)&_date_time + EEPROM_START) == -1) {
-		Serial.println(F("<noinit>"));
-	}
-	else {
-		Serial.println((char*)&_date_time + EEPROM_START);
-	}
+  if (*((char*)&_date_time + EEPROM_START) == -1) {
+    Serial.println(F("<noinit>"));
+  }
+  else {
+    Serial.println((char*)&_date_time + EEPROM_START);
+  }
 
   uint32_t _count = eeprom_read_dword((uint32_t*)&_reset_count);
   Serial.print(F(" COUNT=")).println(_count++, DEC);
@@ -42,13 +42,13 @@ void loop (void) {
   Serial.println(F("<Going reset>"));
   Serial.flush();
 
-	/* software reset */
-	// _PROTECTED_WRITE(RSTCTRL_SWRR, 1);
+  /* software reset */
+  // _PROTECTED_WRITE(RSTCTRL_SWRR, 1);
 
-	/* Watch Dog Timer delay after reset */
+  /* Watch Dog Timer delay after reset */
   loop_until_bit_is_clear(WDT_STATUS, WDT_SYNCBUSY_bp);
   _PROTECTED_WRITE(WDT_CTRLA, WDT_PERIOD_8CLK_gc);
-	for (;;);
+  for (;;);
 }
 
 // end of code

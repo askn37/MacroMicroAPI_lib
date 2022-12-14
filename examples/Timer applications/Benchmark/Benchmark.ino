@@ -33,7 +33,7 @@ ISR(RTC_PIT_vect) {
 /* 被テスト関数 : 例えばdelay関数 */
 __attribute__((noinline))
 void delay_test (void) {
-	delay_millis(500);
+  delay_millis(500);
 }
 
 void setup (void) {
