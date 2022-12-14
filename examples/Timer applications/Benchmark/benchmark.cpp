@@ -17,7 +17,7 @@
 
 #if !defined(TCB_CASCADE_bm)
   #error This MCU not supported
-    #include "BUILD_STOP"
+    #include BUILD_STOP
 #endif
 
 namespace Benchmark {

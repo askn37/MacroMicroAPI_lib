@@ -1,5 +1,5 @@
 /**
- * @file Blink_1_ULP.ino
+ * @file Blink_10_ULP.ino
  * @author askn (K.Sato) multix.jp
  * @brief
  * @version 0.1

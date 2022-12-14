@@ -14,11 +14,13 @@
 #if (INTERNAL_SRAM_SIZE < 256)
   #error This MCU not supported
   #include BUILD_STOP
+  #include BUILD_STOP
 #endif
 
 struct nvm_store_t {
   uint32_t count;
   char datetime[26];
+  uint16_t magic;
   uint16_t magic;
 };
 
@@ -59,12 +61,16 @@ void setup (void) {
   Serial.print(F(" count=")).println(nvm_buffer.count, DEC);
 
   /* Fix new parameter */
+  /* Fix new parameter */
   nvm_buffer.count++;
 
   /* Fix new parameter */
 
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     if ( FlashNVM::page_erase(&nvm_store, sizeof(nvm_buffer))
+      && FlashNVM::page_update(&nvm_store, &nvm_buffer, sizeof(nvm_buffer))
+    )    Serial.println(F("[success]"));
+    else Serial.println(F("*failed*"));
       && FlashNVM::page_update(&nvm_store, &nvm_buffer, sizeof(nvm_buffer))
     )    Serial.println(F("[success]"));
     else Serial.println(F("*failed*"));
@@ -79,8 +85,10 @@ void loop (void) {
   Serial.flush();
 
   /* Watch Dog Timer delay after reset */
+  /* Watch Dog Timer delay after reset */
   loop_until_bit_is_clear(WDT_STATUS, WDT_SYNCBUSY_bp);
   _PROTECTED_WRITE(WDT_CTRLA, WDT_PERIOD_8CLK_gc);
+  for (;;);
   for (;;);
 }
 

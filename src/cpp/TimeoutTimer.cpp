@@ -147,17 +147,17 @@ namespace TimeoutTimer {
 
 /* interrupt base code */
 /*
-    ISR(RTC_CNT_vect) {
-        uint8_t _f = RTC_INTFLAGS;
-        RTC_INTFLAGS = _f;
-        if (_f & RTC_OVF_bm)
-            TimeoutTimer::__worker.counter++;
-        if ((_f & RTC_CMP_bm) && TimeoutTimer::__worker.context != 0) {
-            __asm__ __volatile__ ("CALL L_RETI");
-            TimeoutTimer::abort();
-        }
+ISR(RTC_CNT_vect) {
+    uint8_t _f = RTC_INTFLAGS;
+    RTC_INTFLAGS = _f;
+    if (_f & RTC_OVF_bm)
+        TimeoutTimer::__worker.counter++;
+    if ((_f & RTC_CMP_bm) && TimeoutTimer::__worker.context != 0) {
+        __asm__ __volatile__ ("CALL L_RETI");
+        TimeoutTimer::abort();
     }
-    __asm__ __volatile__ ("L_RETI: RETI");
+}
+__asm__ __volatile__ ("L_RETI: RETI");
 */
 
 ISR(RTC_CNT_vect, ISR_NAKED) {
