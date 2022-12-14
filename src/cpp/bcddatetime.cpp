@@ -81,8 +81,8 @@ time_t bcdTimeToSeconds (const bcdtime_t bcd_time) {
   uint8_t t_day  = btod(_BCDT(bcd_time)->bytes[3]);
   return (86400UL * (uint32_t)t_day
            + 3600UL * (uint32_t)t_hour
-                 +   60UL * (uint32_t)t_min
-                 +          (uint32_t)t_sec);
+           +   60UL * (uint32_t)t_min
+           +          (uint32_t)t_sec);
 }
 
 //

@@ -22,7 +22,7 @@
   #include "Blink_06_PFM_28P.cpp"
 
 #else
-  #error "This MCU model not supported"
+  #error This MCU model not supported
 
 #endif
 

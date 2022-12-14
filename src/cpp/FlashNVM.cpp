@@ -54,7 +54,7 @@ namespace FlashNVM {
       _page_top += PROGMEM_PAGE_SIZE;
       _page_size -= PROGMEM_PAGE_SIZE;
     } while (_page_size != 0);
-        nvm_ctrl(NVMCTRL_CMD_NONE_gc);
+    nvm_ctrl(NVMCTRL_CMD_NONE_gc);
     return nvmstat();
   }
 
@@ -87,7 +87,7 @@ namespace FlashNVM {
     #endif
       : "r31", "r30"
     );
-        nvm_ctrl(NVMCTRL_CMD_NONE_gc);
+    nvm_ctrl(NVMCTRL_CMD_NONE_gc);
     return nvmstat();
   }
 
@@ -97,7 +97,7 @@ namespace FlashNVM {
 #elif (NVMCTRL_VER == 1)
 
   bool spm_support_check (void) {
-      // Serial.print(F(" MAGICNUMBER=0x")).println(*((uint32_t*)(MAPPED_PROGMEM_START + 2)), HEX);
+    // Serial.print(F(" MAGICNUMBER=0x")).println(*((uint32_t*)(MAPPED_PROGMEM_START + 2)), HEX);
     return ((uint16_t)&__vectors > 0) &&
       (*((uint32_t*)(MAPPED_PROGMEM_START + 2)) == 0xE99DC009);
   }
@@ -105,7 +105,7 @@ namespace FlashNVM {
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size) {
     nvmptr_t _page_top = (nvmptr_t)_page_addr + MAPPED_PROGMEM_START;
     do {
-            nvmwrite(_page_top, 0xFF);
+      nvmwrite(_page_top, 0xFF);
       nvmctrl(NVMCTRL_CMD_PAGEERASE_gc);
       if (_page_size <= PROGMEM_PAGE_SIZE) break;
       _page_top += PROGMEM_PAGE_SIZE;
@@ -115,21 +115,21 @@ namespace FlashNVM {
   }
 
   bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size) {
-        uint8_t* _data_top = (uint8_t*)_data_addr;
-        uint8_t _buff_off = (nvmptr_t)_page_addr & (PROGMEM_PAGE_SIZE - 1);
+    uint8_t* _data_top = (uint8_t*)_data_addr;
+    uint8_t _buff_off = (nvmptr_t)_page_addr & (PROGMEM_PAGE_SIZE - 1);
     nvmptr_t _page_top = (nvmptr_t)_page_addr + MAPPED_PROGMEM_START - _buff_off;
-        uint8_t buffer[PROGMEM_PAGE_SIZE];
-        while (_save_size) {
-            memset(&buffer, 0xFF, PROGMEM_PAGE_SIZE);
-            do {
-                buffer[_buff_off] = *((uint8_t*)_data_top++);
-            } while (--_save_size > 0 && ++_buff_off < PROGMEM_PAGE_SIZE);
-            _buff_off = 0;
-            do {
-                nvmwrite(_page_top++, buffer[_buff_off]);
-            } while (++_buff_off < PROGMEM_PAGE_SIZE);
-            nvmctrl(NVMCTRL_CMD_PAGEWRITE_gc);
-        }
+    uint8_t buffer[PROGMEM_PAGE_SIZE];
+    while (_save_size) {
+      memset(&buffer, 0xFF, PROGMEM_PAGE_SIZE);
+      do {
+          buffer[_buff_off] = *((uint8_t*)_data_top++);
+      } while (--_save_size > 0 && ++_buff_off < PROGMEM_PAGE_SIZE);
+      _buff_off = 0;
+      do {
+          nvmwrite(_page_top++, buffer[_buff_off]);
+      } while (++_buff_off < PROGMEM_PAGE_SIZE);
+      nvmctrl(NVMCTRL_CMD_PAGEWRITE_gc);
+    }
     return nvmstat();
   }
 

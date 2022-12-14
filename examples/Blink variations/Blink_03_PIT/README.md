@@ -12,8 +12,6 @@
 - modernAVR世代
   - AVR Dx系統
 
-> reduceAVR世代では動作しない
-
 ## Blinkの要件
 
 - 1秒経過毎に出力信号を正負反転（Duty比50%の 0.5Hz周波数信号出力）
@@ -85,7 +83,7 @@ ISR(RTC_PIT_vect) {
 ```
 
 割込内でなすべき処理は完結するので、主ループにおいては何もする必要はない。
-なので```SLEEP_MODE_PWR_DOWN```指定でCPUを深い休止状態に置いてもよく
+なので`SLEEP_MODE_PWR_DOWN`指定でCPUを深い休止状態に置いてもよく
 割込発生で目覚めるたびに再度休止させれば結果的に何もしないようにできる。
 
 この例では分周比を変更することで、以下の周波数の周期割込を実現できる。
@@ -121,11 +119,8 @@ RTC_CLKSEL = RTC_CLKSEL_OSC1K_gc;
 // RTC_CLKSEL = RTC_CLKSEL_INT1K_gc;
 ```
 
-しかしこれはRTC周辺機能の全体設定が変わってしまうので
-使用目的によってはあまり好ましいことではないだろう。
-代替案については
-[Blink_04_PIT_sleep.ino](../Blink_04_PIT_sleep/README.md)
-を参照のこと。
+しかしこれはRTC周辺機能の全体設定が変わってしまうので使用目的によってはあまり好ましいことではないだろう。
+代替案については[Blink_04_PIT_sleep.ino](../Blink_04_PIT_sleep/)を参照のこと。
 
 ## 著作表示
 

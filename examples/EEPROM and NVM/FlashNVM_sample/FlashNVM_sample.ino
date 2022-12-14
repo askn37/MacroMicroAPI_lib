@@ -48,7 +48,9 @@ void setup (void) {
   memcpy_PF(&nvm_buffer, pgm_get_far_address(nvm_store), sizeof(nvm_buffer));
 
   /* Before NVM check */
+  /* Before NVM check */
   if (nvm_buffer.magic != 0xABCD) {
+    Serial.println(F("*reinit*"));
     Serial.println(F("*reinit*"));
     // Serial.print(F(" before=0x")).println(nvm_buffer.magic, HEX);
     strcpy(nvm_buffer.datetime, __DATE__ " " __TIME__);
@@ -61,6 +63,7 @@ void setup (void) {
   /* Fix new parameter */
   nvm_buffer.count++;
 
+  /* Fix new parameter */
   /* Fix new parameter */
 
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {

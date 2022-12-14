@@ -32,9 +32,9 @@
 
 #if !defined(NVMCTRL_VER) || \
     !defined(__AVR_XMEGA__) || \
-    ((__AVR_ARCH__ != 102) && \
-     (__AVR_ARCH__ != 103) && \
-     (__AVR_ARCH__ != 104))
+           ((__AVR_ARCH__ != 102) && \
+            (__AVR_ARCH__ != 103) && \
+            (__AVR_ARCH__ != 104))
   #error CPU not supported by this target
   #include BUILD_STOP
 #endif
@@ -47,19 +47,19 @@ namespace FlashNVM {
  **************************/
 #if (NVMCTRL_VER == 2)
   bool spm_support_check (void);
-    inline bool nvmstat (void) {
+  inline bool nvmstat (void) {
     return NVMCTRL_STATUS == 0;
-    }
+  }
   void nvm_ctrl (uint8_t _nvm_cmd = NVMCTRL_CMD_NONE_gc);
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size = PROGMEM_PAGE_SIZE);
   inline bool page_erase (const void* _page_addr, size_t _page_size = PROGMEM_PAGE_SIZE) {
-      return page_erase_PF ((const nvmptr_t)_page_addr, _page_size);
+    return page_erase_PF ((const nvmptr_t)_page_addr, _page_size);
   }
 
   bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size);
   inline bool page_update (const void* _page_addr, const void* _data_addr, size_t _save_size) {
-      return page_update_PF ((const nvmptr_t)_page_addr, _data_addr, _save_size);
+    return page_update_PF ((const nvmptr_t)_page_addr, _data_addr, _save_size);
   }
 
 /**************************
@@ -67,25 +67,25 @@ namespace FlashNVM {
  **************************/
 #elif (NVMCTRL_VER == 1)
 
-    typedef void (*nvmctrl_t) (uint8_t _nvm_cmd);
-    typedef void (*nvmwrite_t) (uint16_t _address, uint8_t _data);
+  typedef void (*nvmctrl_t) (uint8_t _nvm_cmd);
+  typedef void (*nvmwrite_t) (uint16_t _address, uint8_t _data);
 
-    const nvmctrl_t nvmctrl = (nvmctrl_t)((PROGMEM_START + 4) >> 1);
-    const nvmwrite_t nvmwrite = (nvmwrite_t)((PROGMEM_START + 2) >> 1);
+  const nvmctrl_t nvmctrl = (nvmctrl_t)((PROGMEM_START + 4) >> 1);
+  const nvmwrite_t nvmwrite = (nvmwrite_t)((PROGMEM_START + 2) >> 1);
 
   bool spm_support_check (void);
     inline bool nvmstat (void) {
     return NVMCTRL_STATUS == 0;
-    }
+  }
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size = PROGMEM_PAGE_SIZE);
   inline bool page_erase (const void* _page_addr, size_t _page_size = PROGMEM_PAGE_SIZE) {
-      return page_erase_PF ((const nvmptr_t)_page_addr, _page_size);
+    return page_erase_PF ((const nvmptr_t)_page_addr, _page_size);
   }
 
   bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size);
   inline bool page_update (const void* _page_addr, const void* _data_addr, size_t _save_size) {
-      return page_update_PF ((const nvmptr_t)_page_addr, _data_addr, _save_size);
+    return page_update_PF ((const nvmptr_t)_page_addr, _data_addr, _save_size);
   }
 
 #endif
