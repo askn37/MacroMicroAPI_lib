@@ -140,7 +140,7 @@ uint32_t micros (void) {
 ## 遅延ループ
 
 遅延ループ`Timer::delay()`の実装も
-[Blink_02_delay.ino](../Blink_02_delay/README.md)
+[Blink_02_delay.ino](../Blink_02_delay/)
 にはない特別な配慮が必要だ。
 
 ```diff
