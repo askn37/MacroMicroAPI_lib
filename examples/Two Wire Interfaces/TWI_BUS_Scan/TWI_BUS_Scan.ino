@@ -73,7 +73,7 @@ void twi_addr_found (uint8_t _addr) {
     case 0x70 :             _message = F("ENV  QMP6988 or HUB PCA9548A"); break;
     case 0x76 : case 0x77 : _message = F("ENV  BME280 or BMP280 or HUB PCA9548A"); break;
     case 0x71 : case 0x72 : case 0x73 : case 0x74 :
-		case 0x75 :             _message = F("HUB PCA9548A"); break;
+    case 0x75 :             _message = F("HUB PCA9548A"); break;
   }
   if (_message != nullptr) Serial.println(P(_message));
   else Serial.ln();

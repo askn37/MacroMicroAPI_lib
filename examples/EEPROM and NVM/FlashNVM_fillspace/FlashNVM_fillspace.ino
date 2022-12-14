@@ -13,7 +13,7 @@
 
 #if (INTERNAL_SRAM_SIZE < 256)
   #error This MCU not supported
-	#include BUILD_STOP
+  #include BUILD_STOP
 #endif
 
 /*
@@ -29,7 +29,7 @@ extern const uint8_t* __nvmem_end;
 struct nvm_store_t {
   uint32_t count;
   char datetime[26];
-	uint16_t magic;
+  uint16_t magic;
 };
 
 /* AVR DA/DB/DD/EA */
@@ -93,8 +93,8 @@ const struct nvm_store_t nvm_store4[NVM_STORE1] PGM_ALIGN NVM = { {0, __DATE__ "
 
 void setup (void) {
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
-	Serial.print(F("F_CPU=")).println(F_CPU, DEC);
-	// Serial.print(F("BAUD=")).println(Serial.is_baud(), DEC);
+  Serial.print(F("F_CPU=")).println(F_CPU, DEC);
+  // Serial.print(F("BAUD=")).println(Serial.is_baud(), DEC);
   Serial.print(F(" MAPPED_PROGMEM_START=0x")).println(MAPPED_PROGMEM_START, HEX);
   Serial.print(F(" MAPPED_PROGMEM_END=0x")).println(MAPPED_PROGMEM_END, HEX);
   Serial.print(F(" PROGMEM_PAGE_SIZE=")).println(PROGMEM_PAGE_SIZE, DEC);
@@ -120,7 +120,7 @@ void setup (void) {
   memcpy_PF(&nvm_buffer, pgm_get_far_address(nvm_store0[NVM_STORE0-1]), sizeof(nvm_buffer));
 
   if (nvm_buffer.magic != 0xABCD) {
-		Serial.println(F("*reinitialization*"));
+    Serial.println(F("*reinitialization*"));
     Serial.print(F(" before=0x")).println(nvm_buffer.magic, HEX);
     strcpy(nvm_buffer.datetime, __DATE__ " " __TIME__);
     nvm_buffer.count = 0;
@@ -135,15 +135,15 @@ void setup (void) {
   #if defined(HAVE_RAMPZ)
     /* over 17bit address (over 64KiB) */
     if ( FlashNVM::page_erase_PF(pgm_get_far_address(nvm_store0[NVM_STORE0-1]), sizeof(nvm_buffer))
-		  && FlashNVM::page_update_PF(pgm_get_far_address(nvm_store0[NVM_STORE0-1]), &nvm_buffer, sizeof(nvm_buffer))
-		)    Serial.println(F("[update success]"));
-		else Serial.println(F("*update failed*"));
+      && FlashNVM::page_update_PF(pgm_get_far_address(nvm_store0[NVM_STORE0-1]), &nvm_buffer, sizeof(nvm_buffer))
+    )    Serial.println(F("[update success]"));
+    else Serial.println(F("*update failed*"));
   #else
     /* under 16bit address (under 64KiB) */
     if ( FlashNVM::page_erase(&nvm_store0[NVM_STORE0-1], sizeof(nvm_buffer))
-		  && FlashNVM::page_update(&nvm_store0[NVM_STORE0-1], &nvm_buffer, sizeof(nvm_buffer))
-		)    Serial.println(F("[update success]"));
-		else Serial.println(F("*update failed*"));
+      && FlashNVM::page_update(&nvm_store0[NVM_STORE0-1], &nvm_buffer, sizeof(nvm_buffer))
+    )    Serial.println(F("[update success]"));
+    else Serial.println(F("*update failed*"));
   #endif
   }
 }
@@ -155,10 +155,10 @@ void loop (void) {
   Serial.println(F("<Going reset>"));
   Serial.flush();
 
-	/* Watch Dog Timer delay after reset */
+  /* Watch Dog Timer delay after reset */
   loop_until_bit_is_clear(WDT_STATUS, WDT_SYNCBUSY_bp);
   _PROTECTED_WRITE(WDT_CTRLA, WDT_PERIOD_8CLK_gc);
-	for (;;);
+  for (;;);
 }
 
 // end of code

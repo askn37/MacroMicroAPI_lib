@@ -15,13 +15,13 @@
 #include "timer_delay.h"
 
 void setup (void) {
-	pinModeMacro(LED_BUILTIN, OUTPUT);
-	Timer::init();
+  pinModeMacro(LED_BUILTIN, OUTPUT);
+  Timer::init();
 }
 
 void loop (void) {
-	digitalWriteMacro(LED_BUILTIN, TOGGLE);
-	Timer::delay(1000);
+  digitalWriteMacro(LED_BUILTIN, TOGGLE);
+  Timer::delay(1000);
 }
 
 // end of code

@@ -28,7 +28,7 @@ void setup (void) {
 }
 
 void loop (void) {
-	digitalWriteMacro(LED_BUILTIN, TOGGLE);
+  digitalWriteMacro(LED_BUILTIN, TOGGLE);
   Serial.print(F("0:")).println(TimeoutTimer::millis_left(), DEC);
   Serial.flush();
   delay(1000);
