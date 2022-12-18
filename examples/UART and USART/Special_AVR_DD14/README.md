@@ -232,8 +232,10 @@ pinModeMacro(PIN_PF7, OUTPUT);                  // EVOUTF==PF7を出力方向
 
 ## サンプルスケッチ
 
-`USART1`の`Serial1A`代替選択に`PC1:TXD` `PC3:TXD`端子を設定して、
+`USART1`の`Serial1A`代替選択に`PC1:RXD` `PC3:TXD`端子を設定して、
 エコーバックする例を示す。無論複電圧でも動作する。
+
+> `PC2:XCK`が残っているので同期動作も設定可。
 
 ```c
 /* for AVR_DD14 */
