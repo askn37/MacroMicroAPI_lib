@@ -52,13 +52,13 @@ namespace FlashNVM {
   }
   void nvm_ctrl (uint8_t _nvm_cmd = NVMCTRL_CMD_NONE_gc);
 
-  bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size = PROGMEM_PAGE_SIZE);
-  inline bool page_erase (const void* _page_addr, size_t _page_size = PROGMEM_PAGE_SIZE) {
+  bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size = 1);
+  inline bool page_erase_P (const void* _page_addr, size_t _page_size = 1) {
     return page_erase_PF ((const nvmptr_t)_page_addr, _page_size);
   }
 
   bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size);
-  inline bool page_update (const void* _page_addr, const void* _data_addr, size_t _save_size) {
+  inline bool page_update_P (const void* _page_addr, const void* _data_addr, size_t _save_size) {
     return page_update_PF ((const nvmptr_t)_page_addr, _data_addr, _save_size);
   }
 
@@ -78,13 +78,13 @@ namespace FlashNVM {
     return NVMCTRL_STATUS == 0;
   }
 
-  bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size = PROGMEM_PAGE_SIZE);
-  inline bool page_erase (const void* _page_addr, size_t _page_size = PROGMEM_PAGE_SIZE) {
+  bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size = 1);
+  inline bool page_erase_P (const void* _page_addr, size_t _page_size = 1) {
     return page_erase_PF ((const nvmptr_t)_page_addr, _page_size);
   }
 
   bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size);
-  inline bool page_update (const void* _page_addr, const void* _data_addr, size_t _save_size) {
+  inline bool page_update_P (const void* _page_addr, const void* _data_addr, size_t _save_size) {
     return page_update_PF ((const nvmptr_t)_page_addr, _data_addr, _save_size);
   }
 

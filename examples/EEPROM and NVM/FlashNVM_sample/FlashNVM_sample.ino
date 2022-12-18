@@ -67,8 +67,8 @@ void setup (void) {
   /* Fix new parameter */
 
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    if ( FlashNVM::page_erase(&nvm_store, sizeof(nvm_buffer))
-      && FlashNVM::page_update(&nvm_store, &nvm_buffer, sizeof(nvm_buffer))
+    if ( FlashNVM::page_erase_P(&nvm_store, sizeof(nvm_buffer))
+      && FlashNVM::page_update_P(&nvm_store, &nvm_buffer, sizeof(nvm_buffer))
     )    Serial.println(F("[success]"));
     else Serial.println(F("*failed*"));
   }

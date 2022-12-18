@@ -19,7 +19,7 @@ namespace FlashNVM {
 #if (NVMCTRL_VER == 2)
 
   bool spm_support_check (void) {
-      // Serial.print(F(" MAGICNUMBER=0x")).println(pgm_read_dword(PROGMEM_START + 2), HEX);
+    // Serial.print(F(" MAGICNUMBER=0x")).println(pgm_read_dword(PROGMEM_START + 2), HEX);
     return ((uint16_t)&__vectors > 0) &&
       (pgm_read_dword(PROGMEM_START + 2) == 0x950895F8);
   }
@@ -122,17 +122,16 @@ namespace FlashNVM {
     while (_save_size) {
       memset(&buffer, 0xFF, PROGMEM_PAGE_SIZE);
       do {
-          buffer[_buff_off] = *((uint8_t*)_data_top++);
+        buffer[_buff_off] = *((uint8_t*)_data_top++);
       } while (--_save_size > 0 && ++_buff_off < PROGMEM_PAGE_SIZE);
       _buff_off = 0;
       do {
-          nvmwrite(_page_top++, buffer[_buff_off]);
+        nvmwrite(_page_top++, buffer[_buff_off]);
       } while (++_buff_off < PROGMEM_PAGE_SIZE);
       nvmctrl(NVMCTRL_CMD_PAGEWRITE_gc);
     }
     return nvmstat();
   }
-
 #endif
 }
 
