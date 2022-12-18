@@ -140,8 +140,8 @@ void setup (void) {
     else Serial.println(F("*update failed*"));
   #else
     /* under 16bit address (under 64KiB) */
-    if ( FlashNVM::page_erase(&nvm_store0[NVM_STORE0-1], sizeof(nvm_buffer))
-      && FlashNVM::page_update(&nvm_store0[NVM_STORE0-1], &nvm_buffer, sizeof(nvm_buffer))
+    if ( FlashNVM::page_erase_P(&nvm_store0[NVM_STORE0-1], sizeof(nvm_buffer))
+      && FlashNVM::page_update_P(&nvm_store0[NVM_STORE0-1], &nvm_buffer, sizeof(nvm_buffer))
     )    Serial.println(F("[update success]"));
     else Serial.println(F("*update failed*"));
   #endif
