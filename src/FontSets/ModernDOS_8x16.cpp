@@ -8,8 +8,6 @@
  * @copyright Copyright (c) 2022
  *
  */
-
-#include <avr/pgmspace.h>
 #include <FontSets.h>
 
 const uint8_t moderndos_8x16 [] PROGMEM = {

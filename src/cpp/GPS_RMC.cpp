@@ -1,5 +1,5 @@
 /**
- * @file GPS_RMS.cpp
+ * @file GPS_RMC.cpp
  * @author askn (K.Sato) multix.jp
  * @brief
  * @version 0.1
@@ -8,11 +8,11 @@
  * @copyright Copyright (c) 2022
  *
  */
-#include "../GPS_RMS.h"
+#include "../GPS_RMC.h"
 #include <api/btools.h>
 #include <string.h>
 
-int GPS_RMS_Class::indexof (const char* _src, const char _val, size_t _limit) {
+int GPS_RMC_Class::indexof (const char* _src, const char _val, size_t _limit) {
   size_t _index = 0;
   while (_index < _limit) {
     if (_val == _src[_index]) return _index;
@@ -21,37 +21,37 @@ int GPS_RMS_Class::indexof (const char* _src, const char _val, size_t _limit) {
   return -1;
 }
 
-bool GPS_RMS_Class::update (void* _buffer, size_t _limit) {
-    int _index;
-    uint8_t* _p = (uint8_t*)_buffer;
-    /* '$' を探す */
-    while ((_index = indexof((const char*)_p, '$', _limit)) >= 0) {
-      /* その位置からヘッダが一致するか調べる */
-      if (strncmp((const char*)_p + 3, "RMC,", 4) == 0
-        /* 改行を検出 */
-        && (_index = indexof((const char*)_p, '\n', _limit) ) >= 0
-        /* 見つけたらチェックサムをテスト */
-        && testCheckSum(_p, _index - 1)) {
-        /* パーサーへ渡す */
-        return parseNMEA(_p, _index);
-      }
-      _limit--;
-      _p++;
+bool GPS_RMC_Class::update (void* _buffer, size_t _limit) {
+  int _index;
+  uint8_t* _p = (uint8_t*)_buffer;
+  /* '$' を探す */
+  while ((_index = indexof((const char*)_p, '$', _limit)) >= 0) {
+    /* その位置からヘッダが一致するか調べる */
+    if (strncmp((const char*)_p + 3, "RMC,", 4) == 0
+      /* 改行を検出 */
+      && (_index = indexof((const char*)_p, '\n', _limit) ) >= 0
+      /* 見つけたらチェックサムをテスト */
+      && testCheckSum(_p, _index - 1)) {
+      /* パーサーへ渡す */
+      return parseNMEA(_p, _index);
     }
-    return false;
+    _limit--;
+    _p++;
+  }
+  return false;
 }
 
-gpsdata_t GPS_RMS_Class::getData (void) { return gpsdata; }
+gpsdata_t GPS_RMC_Class::getData (void) { return gpsdata; }
 
-uint8_t GPS_RMS_Class::calcCheckSum (void* _buffer, size_t _limit) {
+uint8_t GPS_RMC_Class::calcCheckSum (void* _buffer, size_t _limit) {
   return bcc8((uint8_t*)_buffer, _limit) ^ ('$' ^ '*');
 }
 
-bool GPS_RMS_Class::testCheckSum (void* _buffer, size_t _limit) {
+bool GPS_RMC_Class::testCheckSum (void* _buffer, size_t _limit) {
   return calcCheckSum(_buffer, _limit - 2) == stob((char*)((uint16_t)_buffer + _limit - 2));
 }
 
-bool GPS_RMS_Class::parseNMEA (void* _buffer, size_t _limit) {
+bool GPS_RMC_Class::parseNMEA (void* _buffer, size_t _limit) {
   uint8_t* _ptr = (uint8_t*)_buffer;
   uint8_t* _end = (uint8_t*)_buffer + _limit;
   uint8_t _column = 0;

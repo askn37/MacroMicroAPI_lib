@@ -9,6 +9,7 @@
  *
  */
 #pragma once
+#include <avr/pgmspace.h>
 
 #ifdef __cplusplus
 extern "C" {

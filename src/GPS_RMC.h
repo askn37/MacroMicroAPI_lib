@@ -1,5 +1,5 @@
 /**
- * @file GPS_RMS.h
+ * @file GPS_RMC.h
  * @author askn (K.Sato) multix.jp
  * @brief
  * @version 0.1
@@ -24,7 +24,7 @@ struct gpsdata_t {
   } update;
 };
 
-class GPS_RMS_Class {
+class GPS_RMC_Class {
 private:
   gpsdata_t gpsdata;
   int indexof (const char* _src, const char _val, size_t _limit);
