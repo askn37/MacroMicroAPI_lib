@@ -4,7 +4,9 @@
 
 - 協調的マルチタスクの実装。
 
-関連する時間関連機能については `<TimeoutTimer.h>` ライブラリを参照のこと。
+関連する時間関連機能については
+[`<TimeoutTimer.h>`](https://github.com/askn37/askn37.github.io/wiki/TimeoutTimer)
+ライブラリを参照のこと。
 
 ## 対象AVR
 
@@ -53,7 +55,8 @@ void task3 (void) { while(true) yield(); }
 改めて再登録されかつ呼び出されるまで再び実行権を得ることはない。
 
 `<TaskChanger.h>`はインクルードされた時点で
-`<TimeoutTimer.h>`ライブラリも有効化する。
+[`<TimeoutTimer.h>`](https://github.com/askn37/askn37.github.io/wiki/TimeoutTimer)
+ライブラリも有効化する。
 そしてそちらの `TimeoutTimer::delay_ticks()` は
 遅延待機中に `yield()` を呼ぶようになっているので、
 次のような記述ができる。
@@ -192,7 +195,7 @@ RTC_PITCTRLA = RTC_PITEN_bm | RTC_PERIOD_CYC512_gc;
 ### void TaskChanger::attach_task_3rd (volatile char \__local_stack[], size_t \__local_stack_size, void (*\__start_task)())
 
 第1〜第3タスクのそれぞれにローカルスタックメモリ先頭番地と、その量と、タスク実行関数（void型）を関連付ける。
-ローカルスタックメモリの確保には `volatile` 宣言を必要とする。
+ローカルスタックメモリの確保には`volatile`宣言を必要とし、かつグローバル空間に置かなければならない。
 必要量はタスク実行内容に依存するが、完全に満足できる量でなければならない。
 
 ```c
@@ -235,7 +238,7 @@ TaskChanger::detach_task_1st();
 ### bool TaskChanger::joined_task_3rd (void)
 
 対応するタスクが終了しているならば、真を返す。
-該当エントリは未使用なので `attach_task_XXX` を再利用できる。
+該当エントリは未使用なので`attach_task_XXX`を再利用できる。
 
 ```c
 if ( TaskChanger::joined_task_1st() ) {
@@ -255,7 +258,7 @@ if ( TaskChanger::joined_task_1st() ) {
 引数にローカルスタックメモリ先頭番地を与えると、
 個々のタスクの現在のスタック残量（byte）を計算して返す。
 
-参照されるのは `yield()` が呼ばれた時に保存されたスタックポインタなので、
+参照されるのは`yield()`が呼ばれた時に保存されたスタックポインタなので、
 結果はタスク切換に必要な最低量からの余裕値である。
 ローカルスタックメモリ初期量はこれを目安に判断するとよいが、
 あまりタイトに切り詰めると割込等による観測範囲外のスタック消費で溢れる場合もある。
