@@ -8,7 +8,6 @@
  * @copyright Copyright (c) 2022
  *
  */
-
 #include <FlashNVM.h>
 
 #if (INTERNAL_SRAM_SIZE < 256)
@@ -50,7 +49,6 @@ void setup (void) {
   /* Before NVM check */
   /* Before NVM check */
   if (nvm_buffer.magic != 0xABCD) {
-    Serial.println(F("*reinit*"));
     Serial.println(F("*reinit*"));
     // Serial.print(F(" before=0x")).println(nvm_buffer.magic, HEX);
     strcpy(nvm_buffer.datetime, __DATE__ " " __TIME__);

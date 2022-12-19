@@ -8,7 +8,6 @@
  * @copyright Copyright (c) 2022
  *
  */
-
 #include <FlashNVM.h>
 
 #if (INTERNAL_SRAM_SIZE < 256)

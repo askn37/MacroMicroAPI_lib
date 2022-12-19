@@ -10,9 +10,11 @@
  */
 #pragma once
 #include <avr/io.h>
+#include <avr/pgmspace.h>
+#include <api/memspace.h>
 #include <stddef.h>
 
-#if defined(RAMZ)
+#if defined(RAMPZ)
   /* 128KiB model */
   typedef int32_t nvmptr_t;
   #define HAVE_RAMPZ
