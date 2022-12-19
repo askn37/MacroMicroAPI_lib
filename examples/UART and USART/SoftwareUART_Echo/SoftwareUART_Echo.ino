@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2022
  *
  */
-#include "SoftwareUART.h"
+#include <SoftwareUART.h>
 
 SoftwareUART_Class SoftSerial = {PIN_USART0_TXD, PIN_USART0_RXD};
 
@@ -21,7 +21,7 @@ void setup (void) {
 
 void loop (void) {
   size_t length;
-  char buff[INTERNAL_SRAM_SIZE / 2];
+  char buff[INTERNAL_SRAM_SIZE / 4];
   length = SoftSerial.readBytes(&buff, sizeof(buff), '\n');
   if (length) {
     SoftSerial.write(&buff, length);
