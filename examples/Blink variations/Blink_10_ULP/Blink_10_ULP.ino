@@ -11,7 +11,7 @@
 
 #if !defined(PORTMUX_EVSYSROUTEA)
   #error This MCU not supported
-  #include "BUILD_STOP"
+  #include BUILD_STOP
 #endif
 
 int main (void) {
