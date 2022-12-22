@@ -80,9 +80,17 @@ time_t bcdTimeToSeconds (const bcdtime_t bcd_time) {
   uint8_t t_hour = btod(_BCDT(bcd_time)->bytes[2]) % 24;
   uint8_t t_day  = btod(_BCDT(bcd_time)->bytes[3]);
   return (86400UL * (uint32_t)t_day
-           + 3600UL * (uint32_t)t_hour
-           +   60UL * (uint32_t)t_min
-           +          (uint32_t)t_sec);
+         + 3600UL * (uint32_t)t_hour
+         +   60UL * (uint32_t)t_min
+         +          (uint32_t)t_sec);
+}
+time_t bcdTimeToEpoch (const bcdtime_t bcd_time) {
+  uint8_t t_sec  = btod(_BCDT(bcd_time)->bytes[0]) % 60;
+  uint8_t t_min  = btod(_BCDT(bcd_time)->bytes[1]) % 60;
+  uint8_t t_hour = btod(_BCDT(bcd_time)->bytes[2]) % 24;
+  return ( 3600UL * (uint32_t)t_hour
+         +   60UL * (uint32_t)t_min
+         +          (uint32_t)t_sec);
 }
 
 //
@@ -126,11 +134,11 @@ time_t mjdToEpoch (const date_t mjd) {
 //
 time_t bcdToEpoch (const bcddate_t bcd_date, const bcdtime_t bcd_time) {
   return (86400UL * (bcdDateToMjd(bcd_date) - 40587UL)
-                  + bcdTimeToSeconds(bcd_time));
+                  + bcdTimeToEpoch(bcd_time));
 }
 time_t bcdDateTimeToEpoch (const bcddatetime_t bcddatetime) {
   return (86400UL * (bcdDateToMjd(bcddatetime.date) - 40587UL)
-                  + bcdTimeToSeconds(bcddatetime.time));
+                  + bcdTimeToEpoch(bcddatetime.time));
 }
 
 //

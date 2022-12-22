@@ -46,7 +46,7 @@ void loop (void) {
 
 ## 解説
 
-これは[Blink_03_PIT.ino](../Blink_03_PIT/)の変種で
+これは[[PIT周期割込で"Blink"実演]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_03_PIT)の変種で
 指定時間のあいだ CPUを休止状態に置く`sleep_ms()`を実装したものだ。
 
 `PIT`は最長1Hz（またはOSC1K選択時に1/32Hz）までしか割込周期を設定できないため

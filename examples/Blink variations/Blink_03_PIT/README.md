@@ -120,7 +120,7 @@ RTC_CLKSEL = RTC_CLKSEL_OSC1K_gc;
 ```
 
 しかしこれはRTC周辺機能の全体設定が変わってしまうので使用目的によってはあまり好ましいことではないだろう。
-代替案については[Blink_04_PIT_sleep.ino](../Blink_04_PIT_sleep/)を参照のこと。
+代替案については[[PIT周期割込＋CPU休止で"Blink"実演]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_04_PIT_sleep)を参照されたい。
 
 ## 著作表示
 

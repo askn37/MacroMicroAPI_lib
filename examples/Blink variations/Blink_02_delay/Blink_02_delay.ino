@@ -11,7 +11,6 @@
 
 /* select use timer peripheral */
 #define USE_TIMER_DELAY HAVE_TCB0
-
 #include "timer_delay.h"
 
 void setup (void) {

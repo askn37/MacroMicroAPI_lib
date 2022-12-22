@@ -25,7 +25,6 @@ void setup (void) {
 
   Wire.initiate(TWI_SM);
 
-  XRTC.update();
   if (!XRTC.update()) {
     Serial.println(F("Failed XRTC"));
     for (;;);
