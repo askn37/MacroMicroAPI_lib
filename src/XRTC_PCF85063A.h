@@ -269,7 +269,7 @@ public:
   bool activeTimer (const bool t_enable, const bool t_interrupt);
   bool clearTimerFlag (void);
   inline bool startPeriodTimer (const uint16_t t_seconds) { return startCountdownTimer(t_seconds, true); }
-  bool startCountdownTimer (const uint16_t t_seconds, const bool t_enable_pluse = true);
+  bool startCountdownTimer (const uint16_t t_seconds, const bool t_enable_pluse = false);
   XRTC_TIMER_SETTINGS getTimerValues (void);
   bool activateTimer (const XRTC_TIMER_SETTINGS t_settings);
 

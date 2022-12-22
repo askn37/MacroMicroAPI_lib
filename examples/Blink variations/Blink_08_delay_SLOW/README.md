@@ -12,8 +12,11 @@
 - modernAVR世代
   - AVR Dx系統
 
-これは[Blink_02_delay.ino](../Blink_02_delay/)の変種で
-`OSC32K`内蔵発振器による`F_CPU=32768`駆動に対応した版である。\
+これは
+[[TCB計時機で"Blink"実演]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_02_delay)
+の変種で`RTC`を用い、
+`TCB`計時器に変えて
+`OSC32K`内蔵発振器による`F_CPU=32768`駆動に対応した版である。
 最低動作速度`F_CPU=4096`以上で機能する。
 
 ## Blinkの要件
@@ -39,9 +42,9 @@ void loop (void) {
 
 ## 解説
 
-\<timer_delay_SLOW.h\>は
+`<timer_delay_SLOW.h>`は
 Arduino互換APIの`delay()`とおおむね同等の実装を行う。
-[Blink_02_delay.ino](../Blink_02_delay/README.md)
+原典である[Blink_02_delay.ino](../Blink_02_delay)
 との違いは計時器資源として`RTC`周辺機能を使うことだ。
 これによって従前の最低対応速度 1Mhzより遅い CPUクロック設定に対応している。
 これの基本動作速度は`CLK_RTC=32768`なので
@@ -54,7 +57,7 @@ Arduino互換APIの`delay()`とおおむね同等の実装を行う。
 `CLK_RTC=1024`とする。
 この場合の時間粒度は`976.5us`だ。
 そしてこれ以上動作速度を下げる設定はできないため、
-周辺機能クロックの下限は`F_CPU=4096`である。
+周辺機能クロック`CLK_PER`の下限は`F_CPU=4096`である。
 
 ## 割込実装
 
@@ -140,7 +143,7 @@ uint32_t micros (void) {
 ## 遅延ループ
 
 遅延ループ`Timer::delay()`の実装も
-[Blink_02_delay.ino](../Blink_02_delay/)
+[Blink_02_delay.ino](../Blink_02_delay)
 にはない特別な配慮が必要だ。
 
 ```diff
@@ -173,7 +176,7 @@ uint32_t micros (void) {
 必要最小限のカウント変数処理でも数十サイクル以上を見込まねばならないので、
 相対的にその負担が増すからだ。
 `F_CPU=512`動作クロック設定での超低速駆動ともなるとなおさらで、
-割込の使用はほぼ障害対応用途に限られねばならない。
+割込の使用はほぼ障害対応用途に限られなければならない。
 
 ## 著作表示
 

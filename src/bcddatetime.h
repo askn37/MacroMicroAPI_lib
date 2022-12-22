@@ -63,7 +63,7 @@ typedef union {
     uint8_t hour;
     uint8_t wday;
   } col;
-  bcdtime_t bcd;
+  bcdtime_t time;
 } bcdt_t;
 #define _BCDT(p) ((bcdt_t*)&(p))
 
@@ -76,7 +76,7 @@ typedef union {
     uint8_t month;
     uint16_t year;
   } col;
-  bcddate_t bcd;
+  bcddate_t date;
 } bcdd_t;
 #define _BCDD(p) ((bcdd_t*)&(p))
 
@@ -96,14 +96,20 @@ extern time_t bcdDateTimeToEpoch (const bcddatetime_t);
 
 extern bcddatetime_t bcdDateTime24to12 (const bcddatetime_t);
 extern bcddatetime_t bcdDateTime12to24 (const bcddatetime_t);
-extern bcdtime_t bcdTime24to12 (const bcdtime_t);
-extern bcdtime_t bcdTime12to24 (const bcdtime_t);
 
 //
 // bcd date to
 //
 extern date_t bcdDateToMjd (const bcddate_t);
 extern uint8_t bcdDateToWeekday (const bcddate_t);
+
+//
+// bcd time to
+//
+extern time_t bcdTimeToEpoch (const bcdtime_t);
+extern time_t bcdTimeToSeconds (const bcdtime_t);
+extern bcdtime_t bcdTime24to12 (const bcdtime_t);
+extern bcdtime_t bcdTime12to24 (const bcdtime_t);
 
 //
 // mjd to
@@ -121,11 +127,6 @@ extern bcddate_t epochToBcdDate (const time_t);
 extern bcdtime_t epochToBcdTime (const time_t);
 extern bcdtime_t epochToBcdDayTime (const time_t);
 extern uint8_t epochToWeekday (const time_t);
-
-//
-// bcd time to
-//
-extern time_t bcdTimeToSeconds (const bcdtime_t);
 
 #ifdef __cplusplus
 }
