@@ -52,7 +52,7 @@ TCA0_SPLIT_CTRLA = TCA_SPLIT_ENABLE_bm | TCA_SPLIT_CLKSEL_DIV1024_gc;
 
 - 16bit幅3ch または 8bit幅6ch の PWM信号出力が可能
 - システムクロックを受けて分周比は1,2,4,8,16,64,256,1024から選択可能\
-（32,128,512は設定がない）
+（32,128,512は選択不能）
 
 といった設定ができる。
 複数チャネル出力ができるが周期幅は3チャネルセットで共通の設定となり、個別には変更できない。
@@ -180,6 +180,24 @@ OUTが1になる組み合わせのビットフラグを
 > 直接選べない場合は一旦外部物理ポートに向けて出力してEVSYSで折り返す。
 > この場合は代償として外部物理ポートをひとつ消費する。
 
+### CCL_TRUTH_n_bm
+
+ルックアップテーブルは`SEL0`〜`SEL2`の3bitマルチプレクサ入力が
+どの状態になったら出力を`1`にするか決める。
+指定シンボルの`n`に入る`0`〜`7`の数値は、3bitビット入力の論理和に等しい。
+使用しない`SELn`入力には常に`0`が入力されるものとして考える。
+
+|SEL2|SEL1|SEL0|TRUTH|
+|-|-|-|-|
+|0|0|0|CCL_TRUTH_0_bm
+|0|0|1|CCL_TRUTH_1_bm
+|0|1|0|CCL_TRUTH_2_bm
+|0|1|1|CCL_TRUTH_3_bm
+|1|0|0|CCL_TRUTH_4_bm
+|1|0|1|CCL_TRUTH_5_bm
+|1|1|0|CCL_TRUTH_6_bm
+|1|1|1|CCL_TRUTH_7_bm
+
 ## PWM周期の算出
 
 さてふたつの計時器に与えるPWM周期長`PER`はどのように求めたら良いか。
@@ -284,7 +302,7 @@ LED点滅にフリッカーを感じるだろうことも見て取れる。
 
 `LUT0_OUT`は`EVSYS`に（外部ポートへの出力を有効にしなくとも）
 直接分配されているので、そのまま他の事象入力に流し込むことが出来る。
-`LED_BUILTIN=PIN_PA7=EVOUTA_ALT1`へ配給するには次のようにする。
+`LED_BUILTIN == PIN_PA7 == EVOUTA_ALT1`へ配給するには次のようにする。
 
 ```c
 PORTMUX_EVSYSROUTEA = PORTMUX_EVOUTA_ALT1_gc;       // PIN_PA7 <-- EVOUTA
@@ -293,11 +311,11 @@ EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;     // --> EVOUTA
 // pinModeMacro(PIN_PA7, OUTPUT); // 不要
 ```
 
-- `PIN_PA7`を`pinMode()`で設定する必要はない。
+- `PIN_PA7`を`pinMode()`で出力に設定する必要はない。
 `EVSYS_USER*`を設定すると該当出力先は強制的に`OUTPUT`方向となる。
 - 逆に`EVSYS`は入力側の外部ポート設定を自動では`INPUT`許可とはしない。
 
-> tinyAVR-0/1/2の 14pin/20pin品種では`LUT1_OUT=LED_BUILTIN`なのでこの項に該当しない。
+> tinyAVR-0/1/2の 14pin/20pin品種では`LUT1_OUT == LED_BUILTIN`なのでこの項に該当しない。
 
 ## 信号出力補足
 
@@ -343,12 +361,12 @@ CCL_CTRLA |= CCL_ENABLE_bm;
 
 tinyAVR-0/1系統の特に 8pin品種では
 前述の機能をすべてそのまま利用できるわけではない。
-PORTMUXもEVSYSも、使い方や記述方法が異なる。
+`PORTMUX`も`EVSYS`も、使い方や記述方法が異なる。
 
 このため
-`LED_BUILTIN=PIN_PA3`へ
+`LED_BUILTIN == PIN_PA3`へ
 PFM信号を出力するために
-`EVOUT0=PIN_PA2`を一旦経由し、
+`EVOUT0 == PIN_PA2`を一旦経由し、
 ポート割込を使って LEDを駆動するように書く。
 
 ```c
@@ -360,7 +378,7 @@ EVSYS_ASYNCUSER8 = EVSYS_ASYNCUSER0_ASYNCCH0_gc; // EVOUT0(非同期チャネル
 ```
 
 > 割込を使うので他の実装よりCPU占有率は不利だ。\
-> これは`LUT0_OUT==PA6`がLEDならば不要だが
+> これは`LUT0_OUT == PA6`がLEDならば不要だが
 `PIN_PA6`は普通`USART0_TXD`でも使われるため
 ブートローダー経由書込時に問題を生じるだろう。
 

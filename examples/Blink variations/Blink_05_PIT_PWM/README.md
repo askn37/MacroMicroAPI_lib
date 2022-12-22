@@ -12,11 +12,11 @@
 - modernAVR世代
   - AVR Dx系統
 
-すべてをハードウェア周辺機能だけで全制御しCPU本体の処理ループや割込は使用しない。\
+すべてをハードウェア周辺機能だけで全制御しCPU本体の処理ループや割込は __使用しない。__\
 LED出力は PIN_PA7==EVOUTA_ALT1であると仮定。
 28pin以上の品種で動作する。
 
-> tinyAVR-0/1世代は EVSYS制御に互換性がないためここでは取り上げない。
+> tinyAVR-0/1世代は`EVSYS`制御に互換性がないためここでは取り上げない。
 
 ## Blinkの要件
 
@@ -26,7 +26,7 @@ LED出力は PIN_PA7==EVOUTA_ALT1であると仮定。
 
 ## スケッチ記述
 
-動作を解りやすく示すために第2のLED（PIN_PA6）も使用する。
+動作を解りやすく示すために第2のLED（`PIN_PA6`）も使用する。
 
 ```c
 void setup (void) {
@@ -50,32 +50,35 @@ void loop (void) {
 
 2個のLEDをそれぞれ異なる方法で駆動する。
 一方は主ループで時間遅延による普通のLチカ、
-もう一方は PITの周期出力を事象システムを介して直接Lチカする。
+もう一方は`PIT`の周期出力を事象システムを介して直接Lチカする。
 それぞれは完全に独立しており、互いに影響を及ぼさないので
 異なる周期でLチカさせることが出来る。
 
-PIT用の LED（LED_BUILTIN）は`PIN_PA7`を示し、
+`PIT`用の`LED_BUILTIN`は`PIN_PA7`を示し、
 かつこれは`EVOUTA`信号出力ポートであるものとする。
 
 ### RTC_PITの設定
 
 していることはふたつしかない。
-RTC周辺機能ブロックへのクロック配給に 1kHz内蔵発振器を選択し、
-RTC_PIT周辺機能を有効化するだけである。
+`RTC`周辺機能ブロックへのクロック配給に 1kHz内蔵発振器を選択し、
+`RTC_PIT`周辺機能を有効化するだけである。
 このクロックはDuty比50:50を持つ。
 
 ```c
+/* RTC制御を変更して良いかの状態確認：可能になるまでポーリング */
+loop_until_bit_is_clear(RTC_STATUS, RTC_CTRLABUSY_bp);
+
 /* クロック元に OSC1K を選択 */
 RTC_CLKSEL = RTC_CLKSEL_OSC1K_gc;
 
-/* 周辺機能有効化 */
+/* PIT周辺機能有効化 */
 RTC_PITCTRLA = RTC_PITEN_bm;
 ```
 
 ### EVSYSの設定
 
 `EVSYS`事象システム周辺機能では、
-RTC_PITから送られた`OSC1K`クロックを2048分周して
+`RTC_PIT`から送られた`OSC1K`クロックを2048分周して
 `EVOUTA`へ分配する。
 Duty比は維持されるから`EVOUTA`は
 `1/1024/2048==0.5Hz`周期でON/OFFを繰り返すことになる。
@@ -88,8 +91,8 @@ EVSYS_CHANNEL0 = EVSYS_CHANNEL0_RTC_PIT_DIV2048_gc;
 EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;
 ```
 
-> tinyAVR-0/1ではEVSYS記述方法が異なる。\
-> tinyAVR-0ではEVSYSにPIT分周クロックを入力する機能がない。
+> tinyAVR-0/1では`EVSYS`記述方法が異なる。\
+> tinyAVR-0では`EVSYS`に`PIT`分周クロックを入力する機能がない。
 
 ### PORTMUXの設定
 
@@ -101,7 +104,7 @@ EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;
 PORTMUX_EVSYSROUTEA = PORTMUX_EVOUTA_ALT1_gc;
 ```
 
-> tinyAVR-0/1ではEVOUT設定方法が異なる。
+> tinyAVR-0/1では`EVOUT`設定方法が異なる。
 
 ## 完全ハードウェア周辺機能駆動
 
@@ -116,7 +119,7 @@ CPUが休止状態で停止しようとも、無限ループしていようと�
 点滅周期がゆっくりとずれていく様子が観察できるだろう。
 
 より高度なハードウェア周辺機能独立制御については
-[Blink_06_PFM.ino](../Blink_06_PFM/)
+[[PFM信号を生成して"Blink"実演（ホタル点滅：CPU不使用）]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_06_PFM)
 でも触れているので参照すると良い。
 
 ## 著作表示
