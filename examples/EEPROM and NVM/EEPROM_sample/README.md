@@ -141,7 +141,8 @@ eeprom_update_float(&_eeprom_float, _float);
 
 ```c
 /* USERROWアドレス割り付け例 : USER_SIGNATURES_SIZE は使用可能な最大サイズ */
-uint8_t _userrow[USER_SIGNATURES_SIZE] __attribute__((".user_signatures"));
+/* 短縮属性表現は用意されていない */
+uint8_t _userrow[USER_SIGNATURES_SIZE] __attribute__((section(".user_signatures")));
 ```
 
 > `eeprom_update_*`でスケッチ内から書き換えることは可能。\
