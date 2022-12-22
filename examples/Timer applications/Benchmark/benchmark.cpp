@@ -38,23 +38,23 @@ namespace Benchmark {
       EVSYS_USERTCB1COUNT = EVSYS_USER_CHANNEL5_gc;
 
       /* TCB1は計数捕獲周波数測定動作かつ連結上位 */
-            TCB1_EVCTRL = TCB_CAPTEI_bm;
+      TCB1_EVCTRL = TCB_CAPTEI_bm;
       TCB1_CTRLB = TCB_CNTMODE_FRQ_gc;
       TCB1_CTRLA = TCB_RUNSTDBY_bm | TCB_CASCADE_bm | TCB_CLKSEL_EVENT_gc | TCB_ENABLE_bm;
 
       /* TCB0は計数捕獲周波数測定動作かつ連結下位 */
       /* CLK元は主クロック（F_CPU）*/
-            TCB0_EVCTRL = TCB_CAPTEI_bm;
+      TCB0_EVCTRL = TCB_CAPTEI_bm;
       TCB0_CTRLB = TCB_CNTMODE_FRQ_gc;
       TCB0_CTRLA = TCB_RUNSTDBY_bm | TCB_CLKSEL_DIV1_gc | TCB_ENABLE_bm;
     }
 
     /* テスト計測 : テスト関数1回分の実効クロックを得る */
-        EVSYS_SWEVENTA = EVSYS_SWEVENTA_4_bm;	/* 計数捕獲（リセット）*/
-        _testfunc();
-        EVSYS_SWEVENTA = EVSYS_SWEVENTA_4_bm;	/* 計数捕獲 */
-        _CAPS32(_count)->words[0] = TCB0_CCMP;
-        _CAPS32(_count)->words[1] = TCB1_CCMP;
+    EVSYS_SWEVENTA = EVSYS_SWEVENTA_4_bm;	/* 計数捕獲（リセット）*/
+    _testfunc();
+    EVSYS_SWEVENTA = EVSYS_SWEVENTA_4_bm;	/* 計数捕獲 */
+    _CAPS32(_count)->words[0] = TCB0_CCMP;
+    _CAPS32(_count)->words[1] = TCB1_CCMP;
 
     /* EVSYS(1)+RCALL(4)+RET(2) に要するオーバーヘッドを引く */
     /* これは6クロック未満になることはない（なる場合はインライン最適化を受けている）*/

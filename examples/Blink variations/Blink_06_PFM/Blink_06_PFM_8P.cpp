@@ -33,13 +33,13 @@ void setup (void) {
 
   TCA0_SPLIT_CTRLD = TCA_SPLIT_SPLITM_bm;
   TCA0_SPLIT_LPER = periodic - 1;
-  TCA0_SPLIT_LCMP1 = harfperi;															// --> WOA1
+  TCA0_SPLIT_LCMP1 = harfperi;                              // --> WOA1
   TCA0_SPLIT_CTRLA = TCA_SPLIT_ENABLE_bm
                    | TCA_SPLIT_CLKSEL_DIV1024_gc;
 
   TCB0_CCMP = (harfperi << 8) | periodic;
-  TCB0_CTRLB = TCB_CNTMODE_PWM8_gc;		                      // --> WOB0
-  TCB0_CTRLA = TCB_ENABLE_bm | TCB_CLKSEL_TCA0_gc;		      // <-- CLK_TCA
+  TCB0_CTRLB = TCB_CNTMODE_PWM8_gc;                         // --> WOB0
+  TCB0_CTRLA = TCB_ENABLE_bm | TCB_CLKSEL_TCA0_gc;          // <-- CLK_TCA
 
   set_sleep_mode(SLEEP_MODE_IDLE);
   sleep_enable();
