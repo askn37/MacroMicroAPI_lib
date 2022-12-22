@@ -34,8 +34,8 @@ void setup (void) {
                                      | TCA_SPLIT_CLKSEL_DIV1024_gc;
 
   TCB1_CCMP = (harfperi << 8) | periodic;
-  TCB1_CTRLB = TCB_CNTMODE_PWM8_gc;		                      // --> WOB1
-  TCB1_CTRLA = TCB_ENABLE_bm | TCB_CLKSEL_TCA0_gc;		      // <-- CLK_TCA
+  TCB1_CTRLB = TCB_CNTMODE_PWM8_gc;                         // --> WOB1
+  TCB1_CTRLA = TCB_ENABLE_bm | TCB_CLKSEL_TCA0_gc;          // <-- CLK_TCA
 
   set_sleep_mode(SLEEP_MODE_IDLE);
   sleep_enable();
