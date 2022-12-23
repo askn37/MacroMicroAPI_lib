@@ -2,7 +2,7 @@
 
 このサンプルスケッチは以下について記述している；
 
-- EEPROM領域の初期化・読み出し・書換え
+- EEPROM領域の初期化・読み出し・書き換え
 
 ## 対象AVR
 
@@ -160,7 +160,7 @@ void setup (void) {
     Serial.println(F("<noinit>"));
   }
   uint32_t _count = eeprom_read_dword(&_reset_count);
-  Serial.print(F(" COUNT=")).println(_count++, DEC);
+  Serial.print(F("COUNT=")).println(_count++, DEC);
   eeprom_update_dword(&_reset_count, _count);
   Serial.flush();
 }
