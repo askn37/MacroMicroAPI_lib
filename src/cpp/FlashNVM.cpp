@@ -34,21 +34,21 @@ namespace FlashNVM {
     nvm_ctrl(NVMCTRL_CMD_NONE_gc);  // stop control
     nvm_ctrl(NVMCTRL_CMD_FLPER_gc); // flash page erase command
     do {
-      loop_until_bit_is_clear(NVMCTRL_STATUS, NVMCTRL_FBUSY_bp);
-      __asm__ __volatile__ (
-        "MOV     ZL, %A1 \n"    // set (LO) R30
-        "MOV     ZH, %B1 \n"    // set (HI) R31
-    #if defined(HAVE_RAMPZ)
-        "STS     %2, %C1 \n"    // RAMPZ <- (HH)
-    #endif
-        "CALL    %0"            // SPM Z+ (dummy write)
-        :
-        : "p" (PROGMEM_START + 2) // spm_zp()
-        , "r" (_page_top)
-    #if defined(HAVE_RAMPZ)
-        , "p" (&RAMPZ)
-    #endif
-        : "r31", "r30"
+    loop_until_bit_is_clear(NVMCTRL_STATUS, NVMCTRL_FBUSY_bp);
+    __asm__ __volatile__ (
+      "MOV     ZL, %A1 \n"      // set (LO) R30
+      "MOV     ZH, %B1 \n"      // set (HI) R31
+  #if defined(HAVE_RAMPZ)
+      "STS     %2, %C1 \n"      // RAMPZ <- (HH)
+  #endif
+      "CALL    %0"              // SPM Z+ (dummy write)
+      :
+      : "p" (PROGMEM_START + 2) // spm_zp()
+      , "r" (_page_top)
+  #if defined(HAVE_RAMPZ)
+      , "p" (&RAMPZ)
+  #endif
+      : "r31", "r30"
       );
       if (_page_size <= PROGMEM_PAGE_SIZE) break;
       _page_top += PROGMEM_PAGE_SIZE;
@@ -65,27 +65,27 @@ namespace FlashNVM {
     nvm_ctrl(NVMCTRL_CMD_NONE_gc); // stop control
     nvm_ctrl(NVMCTRL_CMD_FLWR_gc); // flash page erase command
     __asm__ __volatile__ (
-        "MOV     ZL, %A1  \n"   // set (LO) R30
-        "MOV     ZH, %B1  \n"   // set (HI) R31
-    #if defined(HAVE_RAMPZ)
-        "STS     %4, %C1  \n"   // RAMPZ <- (HH)
-    #endif
-        "L_%=:"
-        "LD      R0, X+  \n"
-        "LD      R1, X+  \n"
-        "CALL    %0      \n"    // SPM Z+ (dummy write)
-        "SBIW    %3, 1   \n"
-        "BRNE    L_%=    \n"
-        "CLR     __zero_reg__"
-      :
-      : "p" (PROGMEM_START + 2) // spm_zp()
-      , "r" (_page_top)
-      , "x" (_data_top)
-      , "w" (_save_size)
-    #if defined(HAVE_RAMPZ)
-      , "p" (&RAMPZ)
-    #endif
-      : "r31", "r30"
+      "MOV     ZL, %A1 \n"      // set (LO) R30
+      "MOV     ZH, %B1 \n"      // set (HI) R31
+  #if defined(HAVE_RAMPZ)
+      "STS     %4, %C1 \n"      // RAMPZ <- (HH)
+  #endif
+      "1:"
+      "LD      R0, X+  \n"
+      "LD      R1, X+  \n"
+      "CALL    %0      \n"      // SPM Z+ (dummy write)
+      "SBIW    %3, 1   \n"
+      "BRNE    1b      \n"
+      "CLR     __zero_reg__"
+    :
+    : "p" (PROGMEM_START + 2)   // spm_zp()
+    , "r" (_page_top)
+    , "x" (_data_top)
+    , "w" (_save_size)
+  #if defined(HAVE_RAMPZ)
+    , "p" (&RAMPZ)
+  #endif
+    : "r31", "r30"
     );
     nvm_ctrl(NVMCTRL_CMD_NONE_gc);
     return nvmstat();
