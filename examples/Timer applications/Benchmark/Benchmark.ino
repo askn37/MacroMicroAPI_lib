@@ -38,25 +38,26 @@ void delay_test (void) {
 
 void setup (void) {
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
+  Benchmark::init();
 }
 
 void loop (void) {
   Serial.print(F("F_CPU=")).println(F_CPU, DEC);
-  Serial.print(F("Call test: "));
+  Serial.print(F("Call test:"));
 
   /* 被テスト関数を割り込み禁止で実行・計測する */
-  uint32_t clock;
+  uint32_t clk_per;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    // clock = Benchmark::test(RTC_PIT_vect);
-    clock = Benchmark::test(delay_test);
+    // clk_per = Benchmark::test(RTC_PIT_vect);
+    clk_per = Benchmark::test(delay_test);
   }
   /* CPU実行サイクル数が戻るので実時間に換算する */
-  float clk_per = clock / (F_CPU / 1000000.0);
+  float per_us = clk_per / (F_CPU / 1000000.0);
 
   /* テスト計測結果表示 */
-  Serial.print(clock, DEC, 9).print(F(" clk "));
-  Serial.print(clk_per, 3, 12).print(F(" us "));
-  Serial.print(clk_per / 1000.0, 3, 9).println(F(" ms"));
+  Serial.print(clk_per, DEC, 10).print(F(" clk"));
+  Serial.print(per_us, 3, 12).print(F(" us"));
+  Serial.print(per_us / 1000.0, 3, 10).println(F(" ms"));
 
   /* 終了 : Enterで再試行 */
   Serial.println(F("<Hit ENTER Retry>"));
