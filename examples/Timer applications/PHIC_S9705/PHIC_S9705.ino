@@ -23,7 +23,7 @@
 void setup (void) {
   pinModeMacro(PIN_PD2, INPUT);
   Serial.begin(CONSOLE_BAUD);
-  Serial.println(F("LX,kHz,CNT"));
+  Serial.println(F("\n\n\n\n"));
 
   /* TCB0の計数を捕獲する */
   /* DIV2048 == 16 Hz 周期 */

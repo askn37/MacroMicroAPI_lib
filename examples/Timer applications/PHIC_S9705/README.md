@@ -142,7 +142,7 @@ float _lx = _khz / 0.5;
 void setup (void) {
   pinModeMacro(PIN_PD2, INPUT);
   Serial.begin(CONSOLE_BAUD);
-  Serial.println(F("LX,kHz,CNT"));
+  Serial.println(F("\n\n\n\n"));
   EVSYS_CHANNEL2 = EVSYS_CHANNEL2_RTC_PIT_DIV2048_gc;
   EVSYS_USERTCB0CAPT = EVSYS_USER_CHANNEL2_gc;
   EVSYS_CHANNEL3 = EVSYS_CHANNEL3_PORTD_PIN2_gc;
@@ -164,6 +164,8 @@ void loop (void) {
   Serial.print(F(",CNT=")).println(_CMP);
 }
 ```
+
+![ProtImage](https://askn37.github.io/img/S9705%20Prot.png)
 
 ### megaAVR-0 や tinyAVR-0/1 系統の場合
 
