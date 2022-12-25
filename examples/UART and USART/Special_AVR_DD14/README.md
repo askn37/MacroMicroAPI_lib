@@ -1,6 +1,6 @@
 # Special_AVR_DD14.ino
 
-AVR_DD14/20 での USART1->TXD 代替方法
+AVR_DD14/20品種での USART1_TXD 端子代替方法の実演
 
 ## 対象AVR
 
