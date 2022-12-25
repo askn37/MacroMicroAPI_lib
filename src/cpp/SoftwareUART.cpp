@@ -90,6 +90,7 @@ size_t SoftwareUART_Class::readBytes (void* _buffer, size_t _limit, char _termin
     #elif defined(EVSYS_ASYNCSTROBE)
       EVSYS_ASYNCSTROBE = _swevent;
     #endif
+      _swevent = 0;
       /* b0 採取時間まで待つ */
       _busy_loop_4_16(_bit_start);
       uint8_t _count = 8, _bits = 0;

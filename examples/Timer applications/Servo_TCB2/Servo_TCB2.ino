@@ -2,62 +2,62 @@
  * @file Servo_TCB2.ino
  * @author askn (K.Sato) multix.jp
  * @brief
- * @version 0.1
- * @date 2022-10-29
+ * @version 0.2
+ * @date 2022-12-24
  *
  * @copyright Copyright (c) 2022
  *
  */
 
+/**
+ * FS0403 Servo motor wiring : FUTABA / JS Type Connector
+ *
+ * ORANGE <-- PIN_PC0 (TCB2 WO DEFAULT)
+ *    RED <-- IOREF (4.8V-6.0V)
+ *  BROWN --> GND
+ *
+ * Please insert two freewheel diode
+ *
+ *        CATHODE ANODE
+ * ORANGE ------|<|---- GND
+ *    RED ------|<|---- GND
+ */
+
+#include <stdlib.h>
+
 /* PWM Servo neutral position = 1500 us */
-#define POSITION_MIN     ( 900L * (F_CPU / 2000000L))
-#define POSITION_NEUTRAL (1500L * (F_CPU / 2000000L))
-#define POSITION_MAX     (2100L * (F_CPU / 2000000L))
+#define POSITION_MIN     ( 900L * (F_CPU / 2000000L)) /*  30 deg min right */
+#define POSITION_NEUTRAL (1500L * (F_CPU / 2000000L)) /*  90 deg neutral   */
+#define POSITION_MAX     (2100L * (F_CPU / 2000000L)) /* 150 deg max left  */
 
 void setup (void) {
-
-  /* サーボ制御出力:初期状態HIGH */
-  // digitalWrite(PIN_PC0, HIGH);
+  /* サーボ制御出力 */
   pinMode(PIN_PC0, OUTPUT);
 
-  /* シリアルプロッタ表示 */
-  // Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
+  Serial.begin(CONSOLE_BAUD);
+  Serial.println(F("input: -60 ~ 60[Hit enter] : 0 is neutral position."));
 
   /* TCB計時器 : TCB2 WO -> PIN_PC0 */
   TCB2_CCMP = POSITION_NEUTRAL;
   TCB2_CTRLB = TCB_CCMPEN_bm | TCB_CNTMODE_SINGLE_gc;
   TCB2_CTRLA = TCB_ENABLE_bm | TCB_CLKSEL_DIV2_gc;
-  TCB2_EVCTRL = TCB_EDGE_bm;
   loop_until_bit_is_clear(TCB2_STATUS, TCB_RUN_bp);
-
-  /* ADC0 VREF=VDD */
-  VREF_ADC0REF = VREF_REFSEL_VDD_gc;
-
-  /* ADC0 sense AIN1=PIN_PD1 */
-  ADC0_MUXPOS = ADC_MUXPOS_AIN1_gc;
-  ADC0_MUXNEG = ADC_MUXNEG_GND_gc;
-  ADC0_CTRLD = ADC_INITDLY_DLY16_gc | ADC_SAMPDLY_DLY2_gc;
-  ADC0_CTRLC = ADC_PRESC_DIV16_gc;
-  ADC0_CTRLA = ADC_FREERUN_bm | ADC_RESSEL_10BIT_gc | ADC_ENABLE_bm;
-  ADC0_COMMAND = ADC_STCONV_bm;
 }
 
 void loop (void) {
-
-  ADC0_INTFLAGS = ADC_RESRDY_bm;
-  loop_until_bit_is_set(ADC0_INTFLAGS, ADC_RESRDY_bp);
-  int _position = map(ADC0_RES, 0, 1023, POSITION_MIN, POSITION_MAX);
-
-  /* TCB経時器再始動 */
-  TCB2_CNT = 0;
-  TCB2_CCMP = _position;
-  loop_until_bit_is_clear(TCB2_STATUS, TCB_RUN_bp);
-
-  /* 事後ディレイ */
-  delay_micros(600);
-
-  /* シリアルプロッタ表示 */
-  // Serial.println(_position, DEC);
+  long _angle;
+  size_t _length;
+  char _buff[5];
+  _length = Serial.readBytes(&_buff, sizeof(_buff), '\n');
+  if (_length) {
+    _angle = strtol((const char*)&_buff, NULL, 10);
+    if (-60 <= _angle && _angle <= 60) {
+      TCB2_CCMP = map_long(_angle, -60, 60, POSITION_MIN, POSITION_MAX);
+      TCB2_CNT = 0;
+      loop_until_bit_is_clear(TCB2_STATUS, TCB_RUN_bp);
+      Serial.print(F("new angle: ")).println(_angle, DEC);
+    }
+  }
 }
 
 // end of code
