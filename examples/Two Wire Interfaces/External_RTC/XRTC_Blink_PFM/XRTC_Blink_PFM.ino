@@ -12,8 +12,6 @@
 XRTC_PCF85063A XRTC = {Wire};
 void setup (void) {
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(PIN_PF0, OUTPUT);
-  pinControlRegister(PIN_PF0) = PORT_INVEN_bm;
   pinControlRegister(PIN_PF1) = PORT_PULLUPEN_bm | PORT_ISC_FALLING_gc;
 
   loop_until_bit_is_clear(RTC_PITSTATUS, RTC_CTRLBUSY_bp);
@@ -21,10 +19,11 @@ void setup (void) {
   RTC_PITCTRLA = RTC_PITEN_bm | RTC_PERIOD_CYC512_gc; // PIT Periodic 64Hz
 
   Wire.initiate(TWI_SM);
+  XRTC.reset();
   XRTC_TIMER_SETTINGS _settings = {
     64    // .Value           : 4096Hz / DIV64 = 64Hz
-  , true  // .InterruptMode   : Select Periodic
-  , true  // .InterruptEnable : Disable
+  , true  // .InterruptMode   : Periodic Interrupt
+  , true  // .InterruptEnable : Interrupt Enable
   , true  // .Enable          : Timer Enable
   , 0     // .ClockFrequency  : Select Freq 4096Hz
   };
@@ -36,13 +35,11 @@ void setup (void) {
 
 ISR(RTC_PIT_vect) {
   digitalWriteMacro(LED_BUILTIN, TOGGLE);
-  digitalWriteMacro(PIN_PF0, TOGGLE);
   RTC_PITINTFLAGS = RTC_PI_bm;
 }
 
 ISR(PORTF_PORT_vect) {
   digitalWriteMacro(LED_BUILTIN, TOGGLE);
-  digitalWriteMacro(PIN_PF0, TOGGLE);
   PORTF_INTFLAGS = PIN1_bm;
 }
 
