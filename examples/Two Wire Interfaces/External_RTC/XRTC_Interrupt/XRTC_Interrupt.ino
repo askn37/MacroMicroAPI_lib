@@ -18,7 +18,7 @@ XRTC_PCF85063A XRTC = {Wire};
 
 void setup (void) {
   pinMode(LED_BUILTIN, OUTPUT);
-  pinControlRegister(PIN_PF1) = PORT_PULLUPEN_bm | PORT_ISC_FALLING_gc;
+  pinControlRegister(PIN_PF1) = PORT_PULLUPEN_bm | PORT_ISC_BOTHEDGES_gc;
 
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
   Serial.print(F("F_CPU=")).println(F_CPU, DEC);
@@ -47,10 +47,11 @@ void setup (void) {
   makeAlarm();
 
   XRTC
-  .set12hourMode(false)
-  .setMinuteInterruptEnable(false)
-  .setHarfMinuteInterruptEnable(true)
-  .activeTimer();
+    .set12hourMode(false)
+    .setMinuteInterruptEnable(false)
+    .setHarfMinuteInterruptEnable(true)
+    .activeTimer()
+  ;
 
   XRTC.startPeriodTimer(XRTC_PERIOD_TIMER_INTERVAL);
 
@@ -59,13 +60,11 @@ void setup (void) {
   if (XRTC.isMinuteInterruptEnable()) Serial.println(F("isMIE"));
   if (XRTC.isHarfMinuteInterruptEnable()) Serial.println(F("isHMIE"));
 
-  set_sleep_mode(SLEEP_MODE_IDLE);
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_enable();
 }
 
-ISR(PORTF_PORT_vect) {
-  PORTF_INTFLAGS = PIN1_bm;
-}
+EMPTY_INTERRUPT(PORTF_PORT_vect);
 
 void loop (void) {
   digitalWrite(LED_BUILTIN, TOGGLE);
@@ -76,6 +75,11 @@ void loop (void) {
   if (XRTC.isStopped()) Serial.println(F("isStopped"));
   if (XRTC.isCorrectionInterruptEnable()) Serial.println(F("isCIE"));
 
+  if (XRTC.isTimer()) {
+    Serial.println(F("isTimer"));
+    XRTC.clearTimerFlag();
+  }
+
   if (XRTC.isAlarm()) {
     Serial.println(F("isAlarm"));
     XRTC.clearAlarmFlag();
@@ -85,10 +89,10 @@ void loop (void) {
   bcddatetime_t _bcddatetime = XRTC.getBcdDateTimeNow();
 
   printDateTime(Serial, _bcddatetime); Serial.print(' ');
-  Serial.print(XRTC.getEpochNow(), DEC);
-  Serial.ln();
+  Serial.println(XRTC.getEpochNow(), DEC);
   Serial.flush();
 
+  PORTF_INTFLAGS = PIN1_bm;
   sleep_cpu();
 }
 
@@ -110,17 +114,19 @@ void makeAlarm (void) {
 //
 template<class T>
 void printDateTime (T UART, bcddatetime_t BCD) {
-  UART.print(_BCDDT(BCD)->col.year, ZHEX, 4);
-  UART.write('-');
-  UART.print(_BCDDT(BCD)->col.month, ZHEX, 2);
-  UART.write('-');
-  UART.print(_BCDDT(BCD)->col.day, ZHEX, 2);
-  UART.write(' ');
-  UART.print(_BCDDT(BCD)->col.hour, ZHEX, 2);
-  UART.write(':');
-  UART.print(_BCDDT(BCD)->col.minute, ZHEX, 2);
-  UART.write(':');
-  UART.print(_BCDDT(BCD)->col.second, ZHEX, 2);
+  UART
+    .print(_BCDDT(BCD)->col.year, ZHEX, 4)
+    .print('-')
+    .print(_BCDDT(BCD)->col.month, ZHEX, 2)
+    .print('-')
+    .print(_BCDDT(BCD)->col.day, ZHEX, 2)
+    .print(' ')
+    .print(_BCDDT(BCD)->col.hour, ZHEX, 2)
+    .print(':')
+    .print(_BCDDT(BCD)->col.minute, ZHEX, 2)
+    .print(':')
+    .print(_BCDDT(BCD)->col.second, ZHEX, 2)
+  ;
 }
 
 //

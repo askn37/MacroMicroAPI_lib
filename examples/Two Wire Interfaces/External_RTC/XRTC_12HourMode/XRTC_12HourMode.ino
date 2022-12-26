@@ -36,9 +36,7 @@ void setup (void) {
   Serial.println(F("[Demonstration Wraparound 12-Hours]"));
 }
 
-ISR(PORTF_PORT_vect) {
-  PORTF_INTFLAGS = PIN1_bm;
-}
+EMPTY_INTERRUPT(PORTF_PORT_vect);
 
 void loop (void) {
   bcdtime_t times[] = { 0x315957, 0x125957, 0x115957, 0x325957 };
@@ -48,18 +46,20 @@ void loop (void) {
     XRTC.adjustBcdDateTime(t_bcd);
     for (int i = 0; i < 4; i++) {
       Serial.flush();
+      PORTF_INTFLAGS = PIN1_bm;
       sleep_cpu();
       digitalWrite(LED_BUILTIN, TOGGLE);
       XRTC.update();
+      XRTC.clearTimerFlag();
       t_bcd = XRTC.getBcdDateTimeNow();
       bool ampm = t_bcd.time & 0x200000;
       bcdtime_t time12 = t_bcd.time & ~0x200000;
-      Serial.printf(F("Date: %08lx  Week: %d  Time: %s %06lx (BCD:%06lx)\r\n"),
-        t_bcd.date,
-        XRTC.getWeekdays(),
-        (ampm ? "pm" : "am"),
-        time12,
-        t_bcd.time
+      Serial.printf(F("Date: %08lx  Week: %d  Time: %s %06lx (24h:%06lx)\r\n"),
+        t_bcd.date
+      , XRTC.getWeekdays()
+      , (ampm ? "pm" : "am")
+      , time12
+      , bcdTime12to24(t_bcd.time)
       );
     }
     Serial.println(F("---"));

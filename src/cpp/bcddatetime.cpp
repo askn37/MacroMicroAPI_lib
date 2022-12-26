@@ -157,8 +157,8 @@ bcddatetime_t bcdDateTime24to12 (const bcddatetime_t bcd_datetime) {
 }
 bcdtime_t bcdTime24to12 (const bcdtime_t bcd_time) {
   uint8_t t_hour = _BCDT(bcd_time)->col.hour;
-  uint8_t t_12h = (t_hour + 11) % 12 + 1;
-  if (t_hour & 0x80) t_12h += 0x20;
+  uint8_t t_12h = dtob((btod(t_hour) + 11) % 12 + 1);
+  if (t_hour & 0x80) t_12h |= 0x20;
   bcdtime_t t_time;
   _BCDT(t_time)->words[0] = _BCDT(bcd_time)->words[0];
   _BCDT(t_time)->words[1] = t_12h;
@@ -180,12 +180,12 @@ bcddatetime_t bcdDateTime12to24 (const bcddatetime_t bcd_datetime) {
   return t_bcd;
 }
 bcdtime_t bcdTime12to24 (const bcdtime_t bcd_time) {
-  uint8_t t_hour = bcd_time >> 16;
-  uint8_t t_24h = t_hour % 12;
+  uint8_t t_hour = _BCDT(bcd_time)->col.hour;
+  uint8_t t_24h = btod(t_hour & 0x1F) % 12;
   if (t_hour & 0x20) t_24h += 12;
   bcdtime_t t_time;
-  _BCDT(t_time)->words[0] = (uint16_t)bcd_time;
-  _BCDT(t_time)->words[1] = t_24h;
+  _BCDT(t_time)->words[0] = _BCDT(bcd_time)->words[0];
+  _BCDT(t_time)->words[1] = dtob(t_24h);
   return t_time;
 }
 

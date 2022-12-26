@@ -40,7 +40,7 @@ Arduino互換APIの例ではこちらのほうが普遍的だろう。
 
 ```c
 void loop (void) {
-	if ( Serial.available() ) Serial.write( Serial.read() );
+  if ( Serial.available() ) Serial.write( Serial.read() );
 }
 ```
 

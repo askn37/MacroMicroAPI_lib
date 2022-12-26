@@ -255,7 +255,8 @@ public:
   /*
    * Alarm Timer Selection
    */
-  bool activeAlarm (const bool t_enable);
+  bool activeAlarm (const bool t_enable = true);
+  inline bool deactiveAlarm (void) { return activeAlarm(false); }
   bool clearAlarmFlag (void);
   XRTC_PCF85063A& setAlarmSettings (const bcdtime_t t_bcd, XRTC_ALARM_SETTINGS t_enable_flags);
   bcdtime_t getAlarmTime (void);

@@ -36,9 +36,7 @@ void setup (void) {
   XRTC.startPeriodTimer(1);
 }
 
-ISR(PORTF_PORT_vect) {
-  PORTF_INTFLAGS = PIN1_bm;
-}
+EMPTY_INTERRUPT(PORTF_PORT_vect);
 
 void loop (void) {
   /* normal */
@@ -60,22 +58,24 @@ void loop (void) {
     t_bcd.time = 0x235957;
     Serial.printf(F("\r\nMJD: %ld  Wd: %d  Date: %08lx  adj:%d\r\n\r\n"),
       bcdDateToMjd(t_bcd.date)
-    ,	bcdDateToWeekday(t_bcd.date)
-    ,	t_bcd.date
-    ,	XRTC.adjustBcdDateTime(t_bcd)
+    , bcdDateToWeekday(t_bcd.date)
+    , t_bcd.date
+    , XRTC.adjustBcdDateTime(t_bcd)
     );
     for (int i = 0; i < 5; i++) {
       Serial.flush();
+      PORTF_INTFLAGS = PIN1_bm;
       sleep_cpu();
       digitalWrite(LED_BUILTIN, TOGGLE);
       XRTC.update();
+      XRTC.clearTimerFlag();
       t_bcd = XRTC.getCenturyDateTimeNow();
       Serial.printf(F("MJD: %ld  Wd: %d  Date: %08lx  Time: %06lx  Wd: %d  Epoch: %lu\r\n"),
         bcdDateToMjd(t_bcd.date)
-      ,	XRTC.getWeekdays()
-      ,	t_bcd.date
-      ,	t_bcd.time
-      ,	bcdDateToWeekday(t_bcd.date)
+      , XRTC.getWeekdays()
+      , t_bcd.date
+      , t_bcd.time
+      , bcdDateToWeekday(t_bcd.date)
       , XRTC.getCenturyEpochNow() - TZ_OFFSET
       );
     }
