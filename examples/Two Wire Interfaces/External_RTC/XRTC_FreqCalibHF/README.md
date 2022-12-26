@@ -18,7 +18,9 @@
 CPUの`CLK_PER`（`F_CPU`）を校正するデモンストレーションだ。
 ジャンパー端子の`PF0`は`COT`側に変更して使用する。
 
-周波数計測表示には
+> このプリント表示はシリアルプロッタに出力できる形式になっている。
+
+周波数計測には
 [[コード実行時間を計測するベンチマーク実演（TCB2組32bit計数器使用）]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Timer%20applications/Benchmark)
 の手法を使っている。
 
@@ -32,7 +34,7 @@ F_CPU=24011044,460.188ppm:460.188
 F_CPU=24009302,387.563ppm:387.563
 ```
 
-> このプリント表示はシリアルプロッタに出力できる形式になっている。
+![AutoTune](AutoTune.png)
 
 校正が行われると`F_CPU`の理想値からの誤差は概ね ±600ppm以内（0.06%以内）に調整されるだろう。
 
@@ -47,6 +49,8 @@ F_CPU=23918349,-3402.188ppm:-3402.188
 F_CPU=23919037,-3373.500ppm:-3373.500
 F_CPU=23916784,-3467.375ppm:-3467.375
 ```
+
+![NoTune](NoTune.png)
 
 ### ENABLE_FREQCARIB_EXTERNAL
 
