@@ -65,7 +65,7 @@ void setup (void) {
   TCB0_CTRLA = TCB_RUNSTDBY_bm | TCB_CLKSEL_DIV1_gc | TCB_ENABLE_bm;
 
   Wire.initiate(TWI_SM);
-	XRTC.reset();
+  XRTC.reset();
   XRTC.startPeriodTimer(INTERVAL_PERIOD);
 
   set_sleep_mode(SLEEP_MODE_IDLE);
@@ -82,7 +82,7 @@ void loop (void) {
   Serial.flush();
   digitalWrite(LED_BUILTIN, TOGGLE);
   sleep_cpu();
-  EVSYS_SWEVENTA = EVSYS_SWEVENTA_4_bm;	/* 計数捕獲 */
+  EVSYS_SWEVENTA = EVSYS_SWEVENTA_4_bm; /* 計数捕獲 */
   _CAPS32(_count)->words[0] = TCB0_CCMP;
   _CAPS32(_count)->words[1] = TCB1_CCMP;
   float _ppm = 1000000.0 * _count / INTERVAL_PERIOD / F_CPU - 1000000.0;
