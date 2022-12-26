@@ -9,15 +9,25 @@
  *
  */
 
+/**
+ * [M%Stack: Mini GPS/BDS Unit (AT6558) SKU:U032]
+ *
+ * [GPS]    [Duino]
+ *  TXD --> PIN_PD2
+ *  RXD <-- PIN_PD1
+ *  VCC <-- VCC (3.7V〜5.5V)
+ *  GND --> GND
+*/
+
 #include <XRTC_PCF85063A.h>
 #include <SoftwareUART.h>
-#include <GPS_RMS.h>
+#include <GPS_RMC.h>
 
 #define TZ_OFFSET (9 * 3600)
 
 XRTC_PCF85063A XRTC = {Wire};
 SoftwareUART_Class GPS = {PIN_PD1, PIN_PD2};
-GPS_RMS_Class GPS_RMS;
+GPS_RMC_Class GPS_RMC;
 
 const char _PCAS01_1152[] PROGMEM = "$PCAS01,5*19"; /* 115200bps */
 const char _PCAS02_MIN[]  PROGMEM = "$PCAS02,1000*2E"; /* 1000ms=1Hz */
@@ -32,15 +42,18 @@ void setup (void) {
   Serial.print(F("F_CPU=")).println(F_CPU, DEC);
 
   GPS.begin(9600);
+
   // GPS.println(P(_PCAS01_1152));
   // GPS.end();
   // delay(100);
   // GPS.begin(115200);
+
   GPS.println(P(_PCAS02_MIN));
   GPS.println(P(_PCAS03_MIN));
   GPS.println(P(_PCAS04_MID));
 
   Wire.initiate(TWI_SM);
+  XRTC.reset();
 }
 
 void loop (void) {
@@ -48,9 +61,9 @@ void loop (void) {
   size_t length = GPS.readBytes(&buff, sizeof(buff));
   if (0 < length && '$' == buff[0]) {
     digitalWrite(LED_BUILTIN, TOGGLE);
-    if (GPS_RMS.update(&buff, length)) {
+    if (GPS_RMC.update(&buff, length)) {
       XRTC.update();
-      gpsdata_t gpsdata = GPS_RMS.getData();
+      gpsdata_t gpsdata = GPS_RMC.getData();
       if (gpsdata.update.stamp) {
         time_t gps_time = bcdDateTimeToEpoch(gpsdata.stamp) + TZ_OFFSET;
         time_t xrtc_time = XRTC.getEpochNow();
@@ -67,7 +80,7 @@ void loop (void) {
         if (gpsdata.update.coordinate) {
           Serial.print(' ');
           Serial.print(gpsdata.coordinate.latitude / 6000000.0, 7);
-          Serial.print(' ');
+          Serial.print(',');
           Serial.print(gpsdata.coordinate.longitude / 6000000.0, 7);
           digitalWrite(LED_BUILTIN, TOGGLE);
         }

@@ -65,6 +65,7 @@ void setup (void) {
   TCB0_CTRLA = TCB_RUNSTDBY_bm | TCB_CLKSEL_DIV1_gc | TCB_ENABLE_bm;
 
   Wire.initiate(TWI_SM);
+	XRTC.reset();
   XRTC.startPeriodTimer(INTERVAL_PERIOD);
 
   set_sleep_mode(SLEEP_MODE_IDLE);
