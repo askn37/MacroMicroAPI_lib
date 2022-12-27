@@ -34,7 +34,7 @@ F_CPU=24011044,460.188ppm:460.188
 F_CPU=24009302,387.563ppm:387.563
 ```
 
-![AutoTune](AutoTune.png)
+![AutoTune](https://askn37.github.io/img/LIB_AutoTune.png)
 
 校正が行われると`F_CPU`の理想値からの誤差は概ね ±600ppm以内（0.06%以内）に調整されるだろう。
 
@@ -50,7 +50,7 @@ F_CPU=23919037,-3373.500ppm:-3373.500
 F_CPU=23916784,-3467.375ppm:-3467.375
 ```
 
-![NoTune](NoTune.png)
+![NoTune](https://askn37.github.io/img/LIB_NoTune.png)
 
 ### ENABLE_FREQCARIB_EXTERNAL
 

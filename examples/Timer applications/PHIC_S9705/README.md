@@ -165,7 +165,7 @@ void loop (void) {
 }
 ```
 
-![ProtImage](PHIC_S9705.png)
+![ProtImage](https://askn37.github.io/img/LIB_PHIC_S9705.png)
 
 ### megaAVR-0 や tinyAVR-0/1 系統の場合
 
