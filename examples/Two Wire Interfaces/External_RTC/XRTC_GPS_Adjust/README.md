@@ -32,7 +32,7 @@ GPSの NMEA出力は`<SoftwareUART.h>`で読み取り、
 UTC時刻から地方時刻を得るには`TZ_OFFSET`で時差を指定しておく。
 
 > GPSモジュールは
-[[M%Stack: Mini GPS/BDS Unit (AT6558) SKU:U032]](https://shop.m5stack.com/collections/m5-sensor/products/mini-gps-bds-unit)
+[[M5Stack: Mini GPS/BDS Unit (AT6558) SKU:U032]](https://shop.m5stack.com/collections/m5-sensor/products/mini-gps-bds-unit)
 の使用を想定している。
 他の製品を使う場合は通信速度や設定をそれに合わせて調整する。
 
