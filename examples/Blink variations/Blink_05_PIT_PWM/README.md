@@ -2,7 +2,7 @@
 
 このサンプルスケッチは以下について記述している；
 
-- PIT（Periodic Interrupt Timer）によるPWM出力
+- PWM信号を生成して"Blink"実演（CPU不使用）
 
 ## 対象AVR
 
@@ -13,7 +13,7 @@
   - AVR Dx系統
 
 すべてをハードウェア周辺機能だけで全制御しCPU本体の処理ループや割込は __使用しない。__\
-LED出力は PIN_PA7==EVOUTA_ALT1であると仮定。
+LED出力は`PIN_PA7==EVOUTA_ALT1`であると仮定。
 28pin以上の品種で動作する。
 
 > tinyAVR-0/1世代は`EVSYS`制御に互換性がないためここでは取り上げない。
@@ -57,11 +57,11 @@ void loop (void) {
 `PIT`用の`LED_BUILTIN`は`PIN_PA7`を示し、
 かつこれは`EVOUTA`信号出力ポートであるものとする。
 
-### RTC_PITの設定
+### RTC/PITの設定
 
 していることはふたつしかない。
 `RTC`周辺機能ブロックへのクロック配給に 1kHz内蔵発振器を選択し、
-`RTC_PIT`周辺機能を有効化するだけである。
+`PIT`周辺機能を有効化するだけである。
 このクロックはDuty比50:50を持つ。
 
 ```c
@@ -97,7 +97,7 @@ EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;
 ### PORTMUXの設定
 
 `PORTMUX`ポート多重化器では`EVOUTA`信号の出力先を`LED_BUILTIN`に一致する`PIN_PA7`に変更している。
-`pinMode()`を使う必要はなく`EVSYS_USER*`を設定した時点で該当ポートは出力方向に切り替えられる。
+`pinMode`を使う必要はなく`EVSYS_USER*`を設定した時点で該当ポートは出力方向に切り替えられる。
 
 ```c
 /* EVOUTAを既定の PIN_PA2ではなく代替の PIN_PA7 に変更 */
@@ -119,7 +119,7 @@ CPUが休止状態で停止しようとも、無限ループしていようと�
 点滅周期がゆっくりとずれていく様子が観察できるだろう。
 
 より高度なハードウェア周辺機能独立制御については
-[[PFM信号を生成して"Blink"実演（ホタル点滅：CPU不使用）]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_06_PFM)
+[[PFM信号を生成して"Blink"実演（ホタル明滅：CPU不使用）]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_06_PFM)
 でも触れているので参照すると良い。
 
 ## 著作表示

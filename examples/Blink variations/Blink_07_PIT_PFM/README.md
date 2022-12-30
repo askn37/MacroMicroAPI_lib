@@ -58,7 +58,7 @@ void loop (void) {
 ## 解説
 
 このサンプルスケッチは
-[[PFM信号を生成して"Blink"実演（ホタル点滅：CPU不使用）]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_06_PFM)
+[[PFM信号を生成して"Blink"実演（ホタル明滅：CPU不使用）]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_06_PFM)
 と同等の効果をRTCおよびPIT割込で実装したものだ。
 
 PFM周波数を得る式
@@ -80,7 +80,7 @@ MCU品種の差異に実装が左右されにくい。
 ### PIT割込疑似PWM
 
 PITの設定はこれまでも取り上げているが、次のようになる。
-ここでは128分周比を選び、そのたびにLED出力を反転するので
+ここでは分周比128を選び、そのたびにLED出力を反転するので
 `(CLK_RTC=32768Hz) / 128 / 2 = 128Hz`
 で Duty Cycle 50% のPWM信号出力が生成される。
 
@@ -104,7 +104,7 @@ ISR(RTC_PIT_vect) {
 `CLK_RTC == 32768Hz`に対して
 1から 32768までの16段階の分周比を選べる前置分周器が使えるので
 最大周期長は 65536秒となり、AVRが持つ単一計数器では最長の周期長を持つ。
-ただしPITと違って一番深い CPU休止状態では活動させる事ができず、
+ただし`PIT`と違って一番深い CPU休止状態では活動させる事ができず、
 スタンバイ休止状態までという制約がある。
 
 > `CLK_RTC`元に`OSC1K`を選択した場合`2097152秒＝24.27日`周期を作れるが、実用性は不明。

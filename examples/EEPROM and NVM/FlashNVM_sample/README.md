@@ -19,7 +19,7 @@
 ## \<FlashNVM.h\>
 
 - [FlashNVM](https://github.com/askn37/askn37.github.io/wiki/FlashNVM) -- フラッシュメモリ自己書換支援ツール
-- [place of folder](https://github.com/askn37/MacroMicroAPI_lib/tree/main/src)
+[[place of folder]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/src)
 
 これはスケッチプログラムを書き込んだ後の残りの、未使用フラッシュメモリ領域を
 スケッチの中から書換可能な不揮発記憶領域として扱うことを支援するツールライブラリだ。
@@ -77,7 +77,7 @@ if ( FlashNVM::page_update_PF( pgm_get_far_address(nvm_store), &nvm_buffer, size
 基本的には以下の操作フローとなる；
 
 1. プログラムメモリ領域に書き換え保存用のNVMページを確保する。
-1. `FlashNVM::spm_support_check()`で書き換え機能が使えるか確認する。
+1. `FlashNVM::spm_support_check`で書き換え機能が使えるか確認する。
 1. 確保したNVMページを SRAM上のデータバッファにコピーする。
 1. （任意）データバッファの CRCを計算／照合して検査する。
 1. データバッファを任意に書き換える。
@@ -118,7 +118,7 @@ const char nvm_store1[4] NVMEM;
 
 ## 書換機能確認
 
-`FlashNVM::spm_support_check()`は NVM自己書換機能を
+`FlashNVM::spm_support_check`は NVM自己書換機能を
 ブートローダーが支援していれば真を返す。
 そうでなければ以後の説明は用を為さないので、プログラム進行を止めるべきだ。
 

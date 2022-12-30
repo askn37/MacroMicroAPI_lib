@@ -118,7 +118,7 @@ void setup (void) {
 ```
 
 `"benchmark.h"`で定義される
-`Benchmark::test()`は与えられた`void`関数を実行し、
+`Benchmark::test`は関数ポインタで与えられた`void`関数を実行し、
 その実行CPUサイクル数を返す。
 これを`F_CPU`から求まる時間サイクル数で除すれば
 経過実行時間を得ることができる。

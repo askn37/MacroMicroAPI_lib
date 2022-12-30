@@ -2,7 +2,7 @@
 
 このサンプルスケッチは以下について記述している；
 
-- PIT（Periodic Interrupt Timer）による周期割込
+- PIT周期割込で"Blink"実演
 
 ## 対象AVR
 
@@ -45,31 +45,31 @@ void loop (void) {
 megaAVR世代以降には僅かな設定で
 8192Hz〜1Hz または
 256Hz〜1/32Hz の周期割込を発生させる
-PIT周辺機能が組み込まれている。
+`PIT`（Periodic Interrupt Timer）周辺機能が組み込まれている。
 これはまたCPUを深い休止状態から目覚めさせることができる特徴を持つ。
 IoTセンサー等で省電力周期的間欠駆動をさせたい場合には便利な機能だ。
 
 ### PITの設定（標準動作）
 
 PITを単純に1秒周期で動かしたい場合には、
-32768分周比を与え、割込と計時機能を有効化するだけで良い。
+分周比32768を与え、割込と計時機能を有効化するだけで良い。
 
 ```c
-/* RTCは CPUクロックと非同期に動作しているので設定可能な同期状態を待つ */
+/* RTC/PITは CPUクロックと非同期に動作しているので設定可能な同期状態を待つ */
 loop_until_bit_is_clear(RTC_PITSTATUS, RTC_CTRLBUSY_bp);
 
 /* PIT割込有効化 */
 RTC_PITINTCTRL = RTC_PI_bm;
 
-/* 32768分周比とともにPIT機能有効化 */
+/* 分周比32768とともにPIT機能有効化 */
 RTC_PITCTRLA = RTC_PITEN_bm | RTC_PERIOD_CYC32768_gc;
 ```
 
-PITは RTC周辺機能の一部で、OSC32K発振器からの
+`PIT`は`RTC`周辺機能の一部で、`OSCULP`発振器からの
 32768Hzクロックを供給されて動作する。
 分周比には4から32768の、2の冪乗数を指定できるので
 32768を指示すれば1秒周期での割込を発生させることが出来る。
-割込処理の中で LED_BUILTIN出力を反転すれば、0.5Hzの信号を発生させられる。
+割込処理の中で`LED_BUILTIN`出力を反転すれば、0.5Hzの信号を発生させられる。
 
 ```c
 /* PIT割込 */
@@ -109,7 +109,7 @@ ISR(RTC_PIT_vect) {
 
 最長周期が1Hzでは短くて使いづらい場合、
 基準周波数を 1024Hzに下げて得られる結果を32倍にすることが出来る。
-これにはRTC周辺機能に供給される基準周波数の選択を変える。
+これには`RTC`周辺機能に供給される基準周波数の選択を変える。
 
 ```c
 /* modernAVRの場合 */
@@ -119,7 +119,7 @@ RTC_CLKSEL = RTC_CLKSEL_OSC1K_gc;
 // RTC_CLKSEL = RTC_CLKSEL_INT1K_gc;
 ```
 
-しかしこれはRTC周辺機能の全体設定が変わってしまうので使用目的によってはあまり好ましいことではないだろう。
+しかしこれは`RTC`周辺機能の全体設定が変わってしまうので使用目的によってはあまり好ましいことではないだろう。
 代替案については[[PIT周期割込＋CPU休止で"Blink"実演]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_04_PIT_sleep)を参照されたい。
 
 ## 著作表示

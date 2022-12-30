@@ -2,7 +2,7 @@
 
 このサンプルスケッチは以下について記述している；
 
-- PIT（Periodic Interrupt Timer）による周期割込＋CPU連続休止
+- PIT周期割込＋CPU休止で"Blink"実演
 
 ## 対象AVR
 

@@ -2,7 +2,7 @@
 
 このサンプルスケッチは以下について記述している；
 
-- 遅延ループによる時間待機
+- 基本的な遅延ループで"Blink"実演
 
 ## 対象AVR
 
@@ -38,7 +38,9 @@ void loop (void) {
 
 通常のArduino互換APIでの`delay()`機能は（ほとんどの場合）
 計時器と割込よるマイクロ秒/ミリ秒計数で実装されている。
-その実装については[Blink_02_delay.ino](../Blink_02_delay/)を参照のこと。
+その実装については
+[[TCB計時機で"Blink"実演]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_02_delay)
+を参照のこと。
 
 ここではもっと原始的な遅延ループを使用する。
 この実装は次のようなものだ。

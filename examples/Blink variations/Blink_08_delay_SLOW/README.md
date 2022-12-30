@@ -2,7 +2,7 @@
 
 このサンプルスケッチは以下について記述している；
 
-- 計時器とミリ秒計数による Arduino互換API 同等の delay 実装（低速駆動用）
+- RTC計時機で"Blink"実演（低速駆動用）
 
 ## 対象AVR
 
@@ -44,7 +44,8 @@ void loop (void) {
 
 `<timer_delay_SLOW.h>`は
 Arduino互換APIの`delay()`とおおむね同等の実装を行う。
-原典である[Blink_02_delay.ino](../Blink_02_delay)
+原典である
+[[TCB計時機で"Blink"実演]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_02_delay)
 との違いは計時器資源として`RTC`周辺機能を使うことだ。
 これによって従前の最低対応速度 1Mhzより遅い CPUクロック設定に対応している。
 これの基本動作速度は`CLK_RTC=32768`なので
@@ -143,7 +144,7 @@ uint32_t micros (void) {
 ## 遅延ループ
 
 遅延ループ`Timer::delay()`の実装も
-[Blink_02_delay.ino](../Blink_02_delay)
+[[TCB計時機で"Blink"実演]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_02_delay)
 にはない特別な配慮が必要だ。
 
 ```diff

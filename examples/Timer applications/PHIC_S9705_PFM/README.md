@@ -25,8 +25,8 @@ LED駆動部分は
 ## 解説
 
 照度計測でしていることは
-[前回とおなじ](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Timer%20applications/PHIC_S9705)
-である。
+[[フォトICで照度を計測表示するシリアルプロッタ実演（S9705用）]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Timer%20applications/PHIC_S9705)
+とおなじである。
 `EVSYS`と`TCB0`で`S9705`の出力周波数を計測できるようにする。
 
 ```c

@@ -2,7 +2,7 @@
 
 このサンプルスケッチは以下について記述している；
 
-- 計時器とミリ秒計数による Arduino互換API 同等の　delay 実装
+- TCB計時機で"Blink"実演
 
 ## 対象AVR
 
@@ -16,7 +16,8 @@
 従って`OSC32K`を主クロック元に選ぶと正しい時間精度は得られない。
 
 `OSC32K`等の超低速駆動用 delay は
-[Blink_08_delay_SLOW.ino](../Blink_08_delay_SLOW/) を参照のこと。
+[[RTC計時機で"Blink"実演]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_08_delay_SLOW)
+を参照のこと。
 
 > `<timer_delay.h>`は選択された
 `TCBn`計時器別の実装ヘッダファイルを読み込むラッパーになっている。
