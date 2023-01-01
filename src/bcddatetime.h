@@ -30,6 +30,11 @@ struct bcddatetime_t {
   bcddate_t date;
 };
 
+struct datetime_t {
+  time_t time;
+  date_t date;
+};
+
 typedef union {
   uint8_t  bytes[2];
   uint16_t word;
@@ -96,6 +101,7 @@ extern time_t bcdDateTimeToEpoch (const bcddatetime_t);
 
 extern bcddatetime_t bcdDateTime24to12 (const bcddatetime_t);
 extern bcddatetime_t bcdDateTime12to24 (const bcddatetime_t);
+extern datetime_t bcdDateTimeToDateTime (const bcddatetime_t);
 
 //
 // bcd date to
@@ -119,10 +125,17 @@ extern uint8_t mjdToWeekday (const date_t);
 extern time_t mjdToEpoch (const date_t);
 
 //
+// datetime_t too
+//
+extern bcddatetime_t dateTimeToBcdDateTime (const datetime_t);
+extern time_t dateTimeToEpoch (const datetime_t);
+
+//
 // epoch to
 //
 extern date_t epochToMjd (const time_t);
 extern bcddatetime_t epochToBcdDateTime (const time_t);
+extern datetime_t epochToDateTime (const time_t);
 extern bcddate_t epochToBcdDate (const time_t);
 extern bcdtime_t epochToBcdTime (const time_t);
 extern bcdtime_t epochToBcdDayTime (const time_t);

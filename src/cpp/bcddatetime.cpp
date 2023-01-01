@@ -141,6 +141,13 @@ time_t bcdDateTimeToEpoch (const bcddatetime_t bcddatetime) {
                   + bcdTimeToEpoch(bcddatetime.time));
 }
 
+datetime_t bcdDateTimeToDateTime (const bcddatetime_t bcd_datetime) {
+  datetime_t t_dt;
+  t_dt.time = bcdTimeToEpoch(bcd_datetime.time);
+  t_dt.date = bcdDateToMjd(bcd_datetime.date);
+  return t_dt;
+}
+
 //
 // bcd date/time 24hour to 12hour
 //
@@ -227,6 +234,27 @@ bcddatetime_t epochToBcdDateTime (const time_t t_epoch) {
   bcddatetime_t t_bcd;
   _BCDDT(t_bcd)->bcd.time = epochToBcdTime(t_epoch);
   _BCDDT(t_bcd)->bcd.date = epochToBcdDate(t_epoch);
+  return t_bcd;
+}
+
+datetime_t epochToDateTime (const time_t t_epoch) {
+  datetime_t t_dt;
+  t_dt.time = t_epoch % 86400;
+  t_dt.date = epochToMjd(t_epoch);
+  return t_dt;
+}
+
+time_t dateTimeToEpoch (const datetime_t t_dt) {
+  time_t t_epoch = bcdToEpoch(mjdToBcdDate(t_dt.date), 0);
+  t_epoch += (uint32_t)t_dt.time % 86400;
+  t_epoch += ((int32_t)((uint32_t)t_epoch) / 86400) *86400;
+  return t_epoch;
+}
+
+bcddatetime_t dateTimeToBcdDateTime (const datetime_t t_dt) {
+  bcddatetime_t t_bcd;
+  _BCDDT(t_bcd)->bcd.time = epochToBcdTime(t_dt.time);
+  _BCDDT(t_bcd)->bcd.date = mjdToBcdDate(t_dt.date);
   return t_bcd;
 }
 
