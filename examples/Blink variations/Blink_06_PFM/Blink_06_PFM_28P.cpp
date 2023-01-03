@@ -31,7 +31,7 @@ void setup (void) {
   TCA0_SPLIT_LPER = periodic - 1;
   TCA0_SPLIT_LCMP0 = harfperi;
   TCA0_SPLIT_CTRLA = TCA_SPLIT_ENABLE_bm
-                                     | TCA_SPLIT_CLKSEL_DIV1024_gc;
+                   | TCA_SPLIT_CLKSEL_DIV1024_gc;
 
   TCB1_CCMP = (harfperi << 8) | periodic;
   TCB1_CTRLB = TCB_CNTMODE_PWM8_gc;                         // --> WOB1

@@ -18,7 +18,7 @@ void setup (void) {
   uint8_t periodic = sqrt((F_CPU / 1024.0) * (1.0 / BLINK_HZ)) - 0.5;
   uint8_t harfperi = periodic >> 1;
 
-  PORTMUX_EVSYSROUTEA = PORTMUX_EVOUTD_ALT1_gc;             // PIN_PA7 <-- EVOUTA
+  PORTMUX_EVSYSROUTEA = PORTMUX_EVOUTD_ALT1_gc;             // PIN_PD7 <-- EVOUTA
   EVSYS_CHANNEL0 = EVSYS_CHANNEL0_CCL_LUT0_gc;              // <-- LUT0OUT
   EVSYS_USEREVSYSEVOUTD = EVSYS_USER_CHANNEL0_gc;           // --> EVOUTA
 
@@ -31,7 +31,7 @@ void setup (void) {
   TCA0_SPLIT_LPER = periodic - 1;
   TCA0_SPLIT_LCMP0 = harfperi;
   TCA0_SPLIT_CTRLA = TCA_SPLIT_ENABLE_bm
-                                     | TCA_SPLIT_CLKSEL_DIV1024_gc;
+                   | TCA_SPLIT_CLKSEL_DIV1024_gc;
 
   TCB1_CCMP = (harfperi << 8) | periodic;
   TCB1_CTRLB = TCB_CNTMODE_PWM8_gc;                         // --> WOB1
