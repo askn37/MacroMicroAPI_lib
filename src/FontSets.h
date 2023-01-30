@@ -16,6 +16,7 @@ extern "C" {
 #endif
 
 extern const uint8_t moderndos_8x16 [] PROGMEM;
+extern const uint8_t moderndos_8x16_vh [] PROGMEM;
 
 #ifdef __cplusplus
 } // extern "C"
