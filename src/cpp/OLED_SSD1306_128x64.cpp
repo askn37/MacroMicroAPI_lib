@@ -61,7 +61,7 @@ OLED_SSD1306_Class& OLED_SSD1306_Class::clear (bool console_mode) {
 
 OLED_SSD1306_Class& OLED_SSD1306_Class::setFlip (bool flip_mode) {
   TWIC
-    .start(OLED_SSD1306_ADDR, 4)
+    .start(OLED_SSD1306_ADDR, 3)
     .send(0x00)
     .send(flip_mode ? 0xC0 : 0xC8)
     .send(flip_mode ? 0xA0 : 0xA1)
