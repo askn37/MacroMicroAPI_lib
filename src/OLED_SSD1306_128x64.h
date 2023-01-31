@@ -38,15 +38,17 @@ private:
   uint8_t* FontSet;
   uint8_t* ExtraROMSet = nullptr;
   uint8_t* ExtraRAMSet = nullptr;
-  uint8_t _cx, _cy, _cz;
+  uint8_t _cx, _cy, _cz, _ct = 0xC0;
   bool _console_mode;
 
 public:
   inline OLED_SSD1306_Class (TWIM_Class _twim, const uint8_t _fontset[]) : TWIC(_twim), FontSet((uint8_t*)_fontset) {}
 
+  OLED_SSD1306_Class& disable (void);
   OLED_SSD1306_Class& clear (bool console_mode = true);
   OLED_SSD1306_Class& setFlip (bool flip_mode = true);
   OLED_SSD1306_Class& setRevesible (bool reverse_mode = true);
+  OLED_SSD1306_Class& setContrast (uint8_t _contrast);
   OLED_SSD1306_Class& setScroll (uint8_t _offset);
   OLED_SSD1306_Class& setPosition (uint8_t _x, uint8_t _y);
   OLED_SSD1306_Class& drawTestPattern (uint8_t _offset = 0);
@@ -65,7 +67,7 @@ public:
 
   inline OLED_SSD1306_Class& send (const uint8_t _c) { write(_c); return *this; }
   inline OLED_SSD1306_Class& send (const char* _buffer, size_t _length) {
-  write((const uint8_t *) _buffer, _length);
+    write((const uint8_t *) _buffer, _length);
     return *this;
   }
 

@@ -21,7 +21,6 @@ const uint8_t oled_init[] PROGMEM = {
   , 0xA1  // Set Segment re-map : 0=Normal, >1=Flip
 
   , 0xD5, 0x80 // Set Display Clock Divide Ratio/Oscillator Frequency 0xD5, 0x80
-  , 0x81, 0x80 // Set Contrast Control 0x81, 0x80
   , 0x8D, 0x14 // Set Enable charge pump regulator 0x8D, 0x14
   , 0x40       // Set Display Start Line 0x40-0x7F
   , 0x2E       // Deactivate scroll
@@ -37,26 +36,30 @@ const uint8_t oled_init[] PROGMEM = {
   , OLED_O
 };
 
+OLED_SSD1306_Class& OLED_SSD1306_Class::disable (void) {
+  TWIC
+    .start(OLED_SSD1306_ADDR, 2)
+    .send(0x00)
+    .send(0xAE)
+  ;
+  return *this;
+}
+
 OLED_SSD1306_Class& OLED_SSD1306_Class::clear (bool console_mode) {
+  uint16_t _x = OLED_W * OLED_H * OLED_L;
   TWIC
     .start(OLED_SSD1306_ADDR)
     .send(P(oled_init), sizeof(oled_init))
     .start(OLED_SSD1306_ADDR)
     .send(0x40)         /* RAM Write Mode */
   ;
-  uint16_t _x = OLED_W * OLED_H * OLED_L;
   do {
     TWIC.write(0x00);
   } while (--_x);
-  TWIC
-    .start(OLED_SSD1306_ADDR, 2)
-    .send(0x00)
-    .send(0xAF) /* Display On */
-  ;
   _console_mode = console_mode;
   _cx = _cy = 0;
   _cz = OLED_V;
-  return *this;
+  return setContrast(_ct);
 }
 
 OLED_SSD1306_Class& OLED_SSD1306_Class::setFlip (bool flip_mode) {
@@ -78,12 +81,24 @@ OLED_SSD1306_Class& OLED_SSD1306_Class::setRevesible (bool reverse_mode) {
   return *this;
 }
 
+OLED_SSD1306_Class& OLED_SSD1306_Class::setContrast (uint8_t _contrast) {
+  _ct = _contrast;
+  TWIC
+    .start(OLED_SSD1306_ADDR, 4)
+    .send(0x00)
+    .send(0x81)
+    .send(_contrast)
+    .send(0xAF)     // Display >1=On
+  ;
+  return *this;
+}
+
 OLED_SSD1306_Class& OLED_SSD1306_Class::setScroll (uint8_t _offset) {
   TWIC
     .start(OLED_SSD1306_ADDR, 3)
     .send(0x00)
     .send(0xD3)
-    .send(_offset & (OLED_W * OLED_L - 1))
+    .send(_offset & (OLED_W * OLED_H - 1))
   ;
   return *this;
 }
@@ -101,8 +116,8 @@ OLED_SSD1306_Class& OLED_SSD1306_Class::drawTestPattern (uint8_t _offset) {
   uint16_t _x = OLED_W * OLED_H * OLED_L;
   TWIC
     .start(OLED_SSD1306_ADDR)
-    .send(0x21).send(0).send((OLED_W<<2)-1)
-    .send(0x22).send(0).send((OLED_V<<1)-1)
+    .send(0x21).send(0).send((OLED_W << 2) - 1)
+    .send(0x22).send(0).send((OLED_V << 1) - 1)
     .start(OLED_SSD1306_ADDR, _x + 1)
     .send(0x40)         /* RAM Write Mode */
   ;
@@ -147,13 +162,13 @@ OLED_SSD1306_Class& OLED_SSD1306_Class::newLine (uint8_t _ay, bool _scroll) {
       .send(0x00)
       .send(0x21).send(0x00).send(0x7F)
       .send(0x22)
-      .send(( _ay << 1) + ( 2 - _d))
+      .send((_ay << 1) + (2 - _d))
       .send((_ay << 1) + (3 - _d))
       .start(OLED_SSD1306_ADDR, _c + 1)
       .send(0x40)
     ;
     do TWIC.write(0x00); while (--_c);
-    if (_scroll) setScroll(((_ay + OLED_V + 1) << 4) - _d + 1);
+    if (_scroll) setScroll(((_ay + OLED_V + 1) << 4) - (_d << 3) + 8);
   } while (--_d);
   return *this;
 }

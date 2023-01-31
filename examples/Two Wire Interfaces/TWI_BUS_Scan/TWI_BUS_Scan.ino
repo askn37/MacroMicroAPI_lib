@@ -24,12 +24,12 @@ void setup (void) {
 void loop (void) {
 
   /* First TWI Master Bus */
-  Serial.ln().print(F("[First TWI BUS Scan]"));
+  Serial.ln().println(F("[First TWI BUS Scan]"));
   twi_scan(Wire);
 
   /* Second TWI Master Bus */
   #ifdef Wire1
-  Serial.ln().print(F("[Second TWI BUS Scan]"));
+  Serial.ln().println(F("[Second TWI BUS Scan]"));
   twi_scan(Wire1);
   #endif
 
