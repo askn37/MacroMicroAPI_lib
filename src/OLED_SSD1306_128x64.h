@@ -38,7 +38,7 @@ private:
   uint8_t* FontSet;
   uint8_t* ExtraROMSet = nullptr;
   uint8_t* ExtraRAMSet = nullptr;
-  uint8_t _cx, _cy, _cz, _ct = 0xC0;
+  uint8_t _cx, _cy, _cz, _ct = 0x80;
   bool _console_mode;
 
 public:
