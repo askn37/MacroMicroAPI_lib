@@ -8,9 +8,18 @@
  * @copyright Copyright (c) 2023
  *
  */
-
 #include <OLED_SH1106_128x64.h>
 #include <api/delay_busywait.h>
+
+/* Target OLED Controler SH1106 : Display Panel 128x64 Horizontal Type */
+#define OLED_SH1106_ADDR 0x3C
+#define OLED_COLM 132
+#define OLED_PAGE 8
+#define OLED_W 16
+#define OLED_H 4
+#define OLED_V 4
+#define OLED_L 16
+#define OLED_O 0
 
 const uint8_t oled_init[] PROGMEM = {
     0x00  // command stream

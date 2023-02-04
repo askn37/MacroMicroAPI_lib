@@ -8,9 +8,16 @@
  * @copyright Copyright (c) 2023
  *
  */
-
 #include <OLED_SSD1306_128x64.h>
 #include <api/delay_busywait.h>
+
+/* Target OLED Controler SSD1306 : Display Panel 128x64 Horizontal Type */
+#define OLED_SSD1306_ADDR 0x3C
+#define OLED_W 16
+#define OLED_H 4
+#define OLED_V 4
+#define OLED_L 16
+#define OLED_O 0
 
 const uint8_t oled_init[] PROGMEM = {
     0x00  // command stream
