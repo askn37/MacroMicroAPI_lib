@@ -22,7 +22,6 @@
 [[OLEDディスプレイ（U119）キャラクタコンソール実演]](https://github.com/askn37/M5_Modules_lib/tree/main/examples/M5_OLED_Console)
 と同じである。
 正し`SH1106`のGDDRAM搭載量は`SH1107`の約半分なので同じではない。
-- `<OLED_SSD1106_128x64.h>`は 128x64 ピクセルディスプレイ用に調整されてはいない。
 
 > `SH1106`は 132x64ピクセルぶんの GDDRAM を持つが、
 12x64ピクセルパネルの場合は両端2ピクセルが実在せず表示できない。

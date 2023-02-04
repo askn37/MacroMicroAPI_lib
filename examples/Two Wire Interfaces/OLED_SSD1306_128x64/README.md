@@ -22,7 +22,7 @@
 [[OLEDディスプレイ（U119）キャラクタコンソール実演]](https://github.com/askn37/M5_Modules_lib/tree/main/examples/M5_OLED_Console)
 と同じである。
 正し`SSD1306`のGDDRAM搭載量は`SH1107`の半分なので同じではない。
-- `<OLED_SSD1306_128x64.h>`は 128x64 ピクセルディスプレイ用に調整されてはいない。
+- `<OLED_SSD1306_128x64.h>`は 128x32 ピクセルディスプレイ用に調整されてはいない。
 
 配線接続は次のようにする。
 IOREF選択電圧は3V3選択とする。
