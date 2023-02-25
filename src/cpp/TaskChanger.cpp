@@ -2,22 +2,16 @@
  * @file TaskChanger.cpp
  * @author askn (K.Sato) multix.jp
  * @brief
- * @version 0.1
- * @date 2022-12-04
+ * @version 0.1.2
+ * @date 2023-02-25
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2023
  *
  */
 #include <avr/io.h>
 #include <util/atomic.h>
 #include <api/capsule.h>
 #include "../TaskChanger.h"
-
-#if !defined(NOTUSED_OVERWRITE_YIELD)
-void yield (void) {
-  TaskChanger::yield();
-}
-#endif
 
 namespace TaskChanger {
   volatile TaskChanger_work_t __worker = {0, (char*)-1, (char*)-1, (char*)-1, 0};

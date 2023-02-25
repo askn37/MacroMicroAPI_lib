@@ -25,6 +25,8 @@
 ```c
 #include <TaskChanger.h>
 
+void yield (void) { TaskChanger::yield(); }
+
 volatile char task1_stack[64];
 volatile char task2_stack[64];
 volatile char task3_stack[64];
@@ -62,6 +64,8 @@ void task3 (void) { while(true) yield(); }
 次のような記述ができる。
 
 ```c
+void yield (void) { TaskChanger::yield(); }
+
 void loop (void) {
   Serial.print(F("0:")).println(TimeoutTimer::millis_left(), DEC);
   Serial.flush();
@@ -274,8 +278,6 @@ size_t remaining_stack_free_size = TaskChanger::remaining_stack_1st(task1_stack)
 
 ### void TaskChanger::yield (void)
 
-### void yield (void)
-
 現在のタスクを中断し、全レジスタを保存し、次のタスクに実行権を移す。
 
 名前空間のないほうはグローバルな `yield`仮関数（weak属性登録）の書換であり
@@ -284,13 +286,16 @@ size_t remaining_stack_free_size = TaskChanger::remaining_stack_1st(task1_stack)
 名前空間付きで使用するのがよい。
 
 ```c
+/* week宣言されているグローバルな yield フックを置き換える */
+void yield (void) { TaskChanger::yield(); }
+
 TaskChanger::yield(); /* タスク実行権委譲 */
 ```
 
-### #define NOTUSED_OVERWRITE_YIELD
+### #define NOTUSED_OVERWRITE_YIELD  (obsolete)
 
-このマクロを事前に定義すると `yield`関数のグローバル空間への割付を抑止する。
-`yield`関数は名前空間付きでのみ呼ぶことができるようになる。
+以前はグローバルの`yield`を強制的に置き換えていたが、これは廃止された。
+v0.1.2以降では、明示的に記述しなければ`yield`は置き換わらない。
 
 ## 著作表示
 

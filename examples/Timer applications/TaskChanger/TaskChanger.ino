@@ -17,6 +17,8 @@ volatile char task2_stack[64];
 volatile char task3_stack[64];
 #endif
 
+void yield (void) { TaskChanger::yield(); }
+
 void setup (void) {
   pinModeMacro(LED_BUILTIN, OUTPUT);
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));

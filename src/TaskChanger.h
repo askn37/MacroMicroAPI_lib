@@ -2,10 +2,10 @@
  * @file TaskChanger.h
  * @author askn (K.Sato) multix.jp
  * @brief
- * @version 0.1
- * @date 2022-12-04
+ * @version 0.1.2
+ * @date 2023-02-25
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2023
  *
  */
 #pragma once
@@ -14,8 +14,6 @@
 
 #define __ASSERT_USE_STDERR
 #include <assert.h>
-
-extern "C" void yield (void);
 
 struct TaskChanger_work_t {
   char* stack[4];
