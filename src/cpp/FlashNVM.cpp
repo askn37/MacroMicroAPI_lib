@@ -2,21 +2,82 @@
  * @file FlashNVM.cpp
  * @author askn (K.Sato) multix.jp
  * @brief
- * @version 0.1
- * @date 2022-11-02
+ * @version 0.2
+ * @date 2023-04-08
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2023
  *
  */
 #include "../FlashNVM.h"
 #include <avr/pgmspace.h>
 #include <string.h>
+#include <api/capsule.h>
+// #include <peripheral.h>
 
 namespace FlashNVM {
-/**************************
- * AVR DA/DB/DD/EA Series *
- **************************/
-#if (NVMCTRL_VER == 2)
+/*****************
+ * AVR EA Series *
+ *****************/
+#if (NVMCTRL_VER == 3)
+  /* The maximum flash size for this series is 64KiB */
+
+  bool spm_support_check (void) {
+    _PROTECTED_WRITE(NVMCTRL_CTRLB, NVMCTRL_FLMAP_SECTION0_gc);
+    // Serial.print(F(" MAGICNUMBER=0x")).println(*((uint32_t*)(MAPPED_PROGMEM_START + 2)), HEX);
+    return ((uint16_t)&__vectors > 0) &&
+      (*((uint32_t*)(MAPPED_PROGMEM_START + 2)) == 0xE99DC009);
+  }
+
+  bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size) {
+    nvmptr_t _page_top = (nvmptr_t)_page_addr + MAPPED_PROGMEM_START;
+    do {
+      if (_CAPS16(_page_top)->bytes[1] & 0x80)
+        _PROTECTED_WRITE(NVMCTRL_CTRLB, NVMCTRL_FLMAP_SECTION0_gc);
+      else {
+        _PROTECTED_WRITE(NVMCTRL_CTRLB, NVMCTRL_FLMAP_SECTION1_gc);
+        _page_top += MAPPED_PROGMEM_START;
+      }
+      nvmctrl(NVMCTRL_CMD_NOCMD_gc);
+      nvmwrite(_page_top, 0xFF);
+      nvmctrl(NVMCTRL_CMD_FLPER_gc);
+      if (_page_size <= PROGMEM_PAGE_SIZE) break;
+      _page_top += PROGMEM_PAGE_SIZE;
+      _page_size -= PROGMEM_PAGE_SIZE;
+    } while (_page_size != 0);
+    return nvmstat();
+  }
+
+  bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size) {
+    uint8_t* _data_top = (uint8_t*)_data_addr;
+    uint8_t _buff_off = (nvmptr_t)_page_addr & (PROGMEM_PAGE_SIZE - 1);
+    nvmptr_t _page_top = (nvmptr_t)_page_addr + MAPPED_PROGMEM_START - _buff_off;
+    uint8_t buffer[PROGMEM_PAGE_SIZE];
+    while (_save_size) {
+      memset(&buffer, 0xFF, PROGMEM_PAGE_SIZE);
+      do {
+        buffer[_buff_off] = *((uint8_t*)_data_top++);
+      } while (--_save_size > 0 && ++_buff_off < PROGMEM_PAGE_SIZE);
+      _buff_off = 0;
+      if (_CAPS16(_page_top)->bytes[1] & 0x80)
+        _PROTECTED_WRITE(NVMCTRL_CTRLB, NVMCTRL_FLMAP_SECTION0_gc);
+      else {
+        _PROTECTED_WRITE(NVMCTRL_CTRLB, NVMCTRL_FLMAP_SECTION1_gc);
+        _page_top += MAPPED_PROGMEM_START;
+      }
+      nvmctrl(NVMCTRL_CMD_FLPBCLR_gc);
+      do {
+        nvmwrite(_page_top++, buffer[_buff_off]);
+      } while (++_buff_off < PROGMEM_PAGE_SIZE);
+      nvmctrl(NVMCTRL_CMD_FLPW_gc);
+    }
+    return nvmstat();
+  }
+
+/***********************
+ * AVR DA/DB/DD Series *
+ ***********************/
+#elif (NVMCTRL_VER == 2)
+  /* The maximum flash size for this series is 128KiB */
 
   bool spm_support_check (void) {
     // Serial.print(F(" MAGICNUMBER=0x")).println(pgm_read_dword(PROGMEM_START + 2), HEX);
@@ -73,7 +134,7 @@ namespace FlashNVM {
       "1:"
       "LD      R0, X+  \n"
       "LD      R1, X+  \n"
-      "CALL    %0      \n"      // SPM Z+ (dummy write)
+      "CALL    %0      \n"      // SPM Z+
       "SBIW    %3, 1   \n"
       "BRNE    1b      \n"
       "CLR     __zero_reg__"
@@ -95,6 +156,7 @@ namespace FlashNVM {
  * megaAVR/tinyAVR Series *
  **************************/
 #elif (NVMCTRL_VER == 1)
+  /* The maximum flash size for this series is 48KiB */
 
   bool spm_support_check (void) {
     // Serial.print(F(" MAGICNUMBER=0x")).println(*((uint32_t*)(MAPPED_PROGMEM_START + 2)), HEX);
@@ -132,6 +194,7 @@ namespace FlashNVM {
     }
     return nvmstat();
   }
+
 #endif
 }
 

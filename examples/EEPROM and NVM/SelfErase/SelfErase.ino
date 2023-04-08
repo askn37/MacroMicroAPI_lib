@@ -11,7 +11,7 @@
 
 #include <FlashNVM.h>
 
-alignas(64) const int _ro[] PROGMEM = {};
+alignas(PROGMEM_PAGE_SIZE) const int _ro[] PROGMEM = {};
 
 __attribute__ ((section (".init0")))
 int main (void) {

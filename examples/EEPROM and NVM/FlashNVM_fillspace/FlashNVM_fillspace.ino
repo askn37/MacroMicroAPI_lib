@@ -31,7 +31,7 @@ struct nvm_store_t {
   uint16_t magic;
 };
 
-/* AVR DA/DB/DD/EA */
+/* AVR_DA/DB/DD */
 #if (PROGMEM_PAGE_SIZE == 512)
 
   #if (PROGMEM_SIZE > 0x10000)
@@ -52,10 +52,14 @@ struct nvm_store_t {
     #define NVM_STORE1 (16 * 6)
   #endif
 
-/* ATmega48nn and ATtiny32nn */
+/* AVR_EA, ATmega48nn and ATtiny32nn */
 #elif (PROGMEM_PAGE_SIZE == 128)
 
-  #if (PROGMEM_SIZE > 0x8000)
+  #if (PROGMEM_SIZE > 0xC000)
+    /* 64KiB */
+    #define NVM_STORE0 (4 * 1)
+    #define NVM_STORE1 (4 * 121)
+  #elif (PROGMEM_SIZE > 0x8000)
     /* 48KiB */
     #define NVM_STORE0 (4 * 3)
     #define NVM_STORE1 (4 * 89)

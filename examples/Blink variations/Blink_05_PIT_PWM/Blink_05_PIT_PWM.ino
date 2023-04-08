@@ -22,12 +22,23 @@ void setup (void) {
   PORTMUX_EVSYSROUTEA = PORTMUX_EVOUTA_ALT1_gc;
 
   /* 事象システムで RTC_PITクロックを LED1 に向ける */
+  /* ここは AVR_EX かそれ以外かで変わる */
+  #if defined(AVR_AVREX)
+  EVSYS_CHANNEL0 = EVSYS_CHANNEL_RTC_PITEV0_gc;
+  #else
   EVSYS_CHANNEL0 = EVSYS_CHANNEL0_RTC_PIT_DIV2048_gc;
+  #endif
   EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;
 
   /* RTC_PIT有効化 : 1024Hz */
   loop_until_bit_is_clear(RTC_STATUS, RTC_CTRLABUSY_bp);
   RTC_CLKSEL = RTC_CLKSEL_OSC1K_gc;
+
+  /* AVR_EX では Event Generator で PITクロックを決める */
+  #if defined(AVR_AVREX)
+  RTC_PITEVGENCTRLA = RTC_EVGEN0SEL_DIV2048_gc;
+  #endif
+
   RTC_PITCTRLA = RTC_PITEN_bm;
 
   /* 1/1024/2048 -> 0.5Hz */

@@ -11,6 +11,7 @@
   - tinyAVR-0/1/2系統
 - modernAVR世代
   - AVR Dx系統
+  - AVR Ex系統
 
 ここで論じる機能は __本SDKに付属するブートローダーの使用__ を前提としている。
 他のSDKで用意されたブートローダを使用している、
@@ -27,7 +28,7 @@
 ```c
 #include <FlashNVM.h>
 
-alignas(64) const int _ro[] PROGMEM = {};
+alignas(PROGMEM_PAGE_SIZE) const int _ro[] PROGMEM = {};
 
 __attribute__ ((section (".init0")))
 int main (void) {

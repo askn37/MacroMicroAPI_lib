@@ -11,6 +11,7 @@
   - tinyAVR-0/1/2系統
 - modernAVR世代
   - AVR Dx系統
+  - AVR Ex系統 (後述)
 
 ## EEPROM領域へのアクセス
 
@@ -176,6 +177,14 @@ IDEの`ツール`サブメニューで`FUSE EEPROM`->`Save guard "Erase"`を選�
 書込機でブートローダーを書き込むか、適当なスケッチを書き込む。\
 > あるいは`EEPROM_SIZE`全量を`0xFF`で埋め尽くしたブロックを
 `eeprom_write_block`で書き込むスケッチを記述して実行する。
+
+## AVR EA系統での挙動
+
+`AVR EA`系統のAVR-LIBCデバイスファイルパックは、2023-03-22 時点では`<avr/eeprom.h>`に問題があって、EEPROMの書換が動作していない。従ってこの応用記述も正常動作しない。具体的には`NVMCTRL`に発行する指令が`AVR EA`の値になっていない。
+（megaAVR-0世代の値になっている）
+
+> http://packs.download.atmel.com/Atmel.AVR-Ex_DFP.2.3.163.atpack (2023-03-22)
+
 
 ## 著作表示
 

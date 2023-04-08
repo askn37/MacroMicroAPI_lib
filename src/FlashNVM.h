@@ -2,10 +2,10 @@
  * @file FlashNVM.h
  * @author askn (K.Sato) multix.jp
  * @brief
- * @version 0.1
- * @date 2022-11-02
+ * @version 0.2
+ * @date 2023-04-08
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2023
  *
  */
 #pragma once
@@ -25,8 +25,13 @@
 #endif
 
 #if (LOCKBITS_DEFAULT == 0x5CC5C55C)
-  /* AVR DA/DB/DD/EA Series */
-  #define NVMCTRL_VER 2
+  #if defined(NVMCTRL_FLBUSY_bm)
+    /* AVR EA Series */
+    #define NVMCTRL_VER 3
+  #else
+    /* AVR DA/DB/DD Series */
+    #define NVMCTRL_VER 2
+  #endif
 #elif (LOCKBITS_DEFAULT == 0xC5)
   /* megaAVR/tinyAVR Series */
   #define NVMCTRL_VER 1
@@ -44,25 +49,21 @@
 extern const uint8_t* __vectors;
 
 namespace FlashNVM {
-/**************************
- * AVR DA/DB/DD/EA Series *
- **************************/
-#if (NVMCTRL_VER == 2)
-  bool spm_support_check (void);
-  inline bool nvmstat (void) {
-    return NVMCTRL_STATUS == 0;
-  }
+/*****************
+ * AVR EA Series *
+ *****************/
+#if (NVMCTRL_VER == 3)
+  typedef void (*nvmctrl_t) (uint8_t _nvm_cmd);
+  typedef void (*nvmwrite_t) (uint16_t _address, uint8_t _data);
+
+  const nvmctrl_t nvmctrl = (nvmctrl_t)((PROGMEM_START + 4) >> 1);
+  const nvmwrite_t nvmwrite = (nvmwrite_t)((PROGMEM_START + 2) >> 1);
+
+/***********************
+ * AVR DA/DB/DD Series *
+ ***********************/
+#elif (NVMCTRL_VER == 2)
   void nvm_ctrl (uint8_t _nvm_cmd = NVMCTRL_CMD_NONE_gc);
-
-  bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size = 1);
-  inline bool page_erase_P (const void* _page_addr, size_t _page_size = 1) {
-    return page_erase_PF ((const nvmptr_t)_page_addr, _page_size);
-  }
-
-  bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size);
-  inline bool page_update_P (const void* _page_addr, const void* _data_addr, size_t _save_size) {
-    return page_update_PF ((const nvmptr_t)_page_addr, _data_addr, _save_size);
-  }
 
 /**************************
  * megaAVR/tinyAVR Series *
@@ -75,8 +76,10 @@ namespace FlashNVM {
   const nvmctrl_t nvmctrl = (nvmctrl_t)((PROGMEM_START + 4) >> 1);
   const nvmwrite_t nvmwrite = (nvmwrite_t)((PROGMEM_START + 2) >> 1);
 
+#endif
+
   bool spm_support_check (void);
-    inline bool nvmstat (void) {
+  inline bool nvmstat (void) {
     return NVMCTRL_STATUS == 0;
   }
 
@@ -89,8 +92,6 @@ namespace FlashNVM {
   inline bool page_update_P (const void* _page_addr, const void* _data_addr, size_t _save_size) {
     return page_update_PF ((const nvmptr_t)_page_addr, _data_addr, _save_size);
   }
-
-#endif
 }
 
 // end of code
