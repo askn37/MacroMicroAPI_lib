@@ -146,8 +146,13 @@ eeprom_update_float(&_eeprom_float, _float);
 uint8_t _userrow[USER_SIGNATURES_SIZE] __attribute__((section(".user_signatures")));
 ```
 
-> `eeprom_update_*`でスケッチ内から書き換えることは可能。\
-> 割り付けアドレス位置は`EEPROM`とは連続しておらず、全く別の領域に存在する。
+`tinyAVR`および`megaAVR`系統での`USERROW`の物理特性は`EEPROM`なので、
+`eeprom_update_*`でスケッチ内から自己書換することは可能だ。
+しかし`AVR_Dx`および`AVR_Ex`系統での`USERROW`の物理特性は`Flash`なので、
+既定では自己書換の手段は用意されていない。
+物理特性が異なるので当然`NVMCTRL`の制御方法も異なる。
+
+> かつ`AVR_Dx`および`AVR_Ex`とでは`NVMCTRL`のバージョンが異なり、制御方法も異なる。
 
 ## サンプルスケッチ
 
