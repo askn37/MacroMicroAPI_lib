@@ -185,11 +185,10 @@ IDEの`ツール`サブメニューで`FUSE EEPROM`->`Save guard "Erase"`を選�
 
 ## AVR EA系統での挙動
 
-`AVR EA`系統のAVR-LIBCデバイスファイルパックは、2023-03-22 時点では`<avr/eeprom.h>`に問題があって、EEPROMの書換が動作していない。従ってこの応用記述も正常動作しない。具体的には`NVMCTRL`に発行する指令が`AVR EA`の値になっていない。
-（megaAVR-0世代の値になっている）
+~~`AVR EA`系統のAVR-LIBCデバイスファイルパックは、2023-03-22 時点では`<avr/eeprom.h>`に問題があって、EEPROMの書換が動作していない。従ってこの応用記述も正常動作しない。具体的には`NVMCTRL`に発行する指令が`AVR EA`の値になっていない。
+（megaAVR-0世代の値になっている）~~
 
-> http://packs.download.atmel.com/Atmel.AVR-Ex_DFP.2.3.163.atpack (2023-03-22)
-
+このバグは __Atmel AVR-Ex Series Device Support (2.5.176)(2023-06-26)__ で解消された。
 
 ## 著作表示
 
