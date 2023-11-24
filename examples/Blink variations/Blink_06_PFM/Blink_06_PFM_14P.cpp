@@ -19,13 +19,13 @@ void setup (void) {
   uint8_t harfperi = periodic >> 1;
 
   CCL_TRUTH1 = CCL_TRUTH_1_bm | CCL_TRUTH_2_bm;
-  CCL_LUT1CTRLB = CCL_INSEL1_TCA0_gc | CCL_INSEL0_TCB0_gc;  // <-- WOA0 XOR WOB0
+  CCL_LUT1CTRLB = CCL_INSEL1_TCA0_gc | CCL_INSEL0_TCB0_gc;  // <-- WOA1 XOR WOB0
   CCL_LUT1CTRLA = CCL_ENABLE_bm | CCL_OUTEN_bm;             // --> LUT1OUT = LED_BUILTIN
   CCL_CTRLA = CCL_ENABLE_bm;
 
   TCA0_SPLIT_CTRLD = TCA_SPLIT_SPLITM_bm;
   TCA0_SPLIT_LPER = periodic - 1;
-  TCA0_SPLIT_LCMP0 = harfperi;
+  TCA0_SPLIT_LCMP1 = harfperi;
   TCA0_SPLIT_CTRLA = TCA_SPLIT_ENABLE_bm
                    | TCA_SPLIT_CLKSEL_DIV1024_gc;
 
