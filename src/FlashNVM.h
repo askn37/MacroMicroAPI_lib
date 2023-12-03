@@ -2,10 +2,10 @@
  * @file FlashNVM.h
  * @author askn (K.Sato) multix.jp
  * @brief
- * @version 0.2
- * @date 2023-04-08
+ * @version 0.3
+ * @date 2023-12-03
  *
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2023 askn at github.com
  *
  */
 #pragma once
@@ -53,28 +53,28 @@ namespace FlashNVM {
  * AVR EA Series *
  *****************/
 #if (NVMCTRL_VER == 3)
-  typedef void (*nvmctrl_t) (uint8_t _nvm_cmd);
-  typedef void (*nvmwrite_t) (uint16_t _address, uint16_t _data);
 
-  const nvmctrl_t nvmctrl = (nvmctrl_t)((PROGMEM_START + 4) >> 1);
-  const nvmwrite_t nvmwrite = (nvmwrite_t)((PROGMEM_START + 2) >> 1);
+  typedef void (*nvmcmd_t) (uint8_t _nvm_cmd);
+  const nvmcmd_t nvm_cmd = (nvmcmd_t)((PROGMEM_START + 6) >> 1);
 
 /***********************
  * AVR DA/DB/DD Series *
  ***********************/
 #elif (NVMCTRL_VER == 2)
-  void nvm_ctrl (uint8_t _nvm_cmd = NVMCTRL_CMD_NONE_gc);
+
+  typedef void (*nvmcmd_t) (uint8_t _nvm_cmd);
+  const nvmcmd_t nvm_cmd = (nvmcmd_t)((PROGMEM_START + 6) >> 1);
 
 /**************************
  * megaAVR/tinyAVR Series *
  **************************/
 #elif (NVMCTRL_VER == 0)
 
-  typedef void (*nvmctrl_t) (uint8_t _nvm_cmd);
+  typedef void (*nvmcmd_t) (uint8_t _nvm_cmd);
   typedef void (*nvmwrite_t) (uint16_t _address, uint8_t _data);
 
-  const nvmctrl_t nvmctrl = (nvmctrl_t)((PROGMEM_START + 4) >> 1);
-  const nvmwrite_t nvmwrite = (nvmwrite_t)((PROGMEM_START + 2) >> 1);
+  const nvmcmd_t nvm_cmd = (nvmcmd_t)((PROGMEM_START + 4) >> 1);
+  const nvmwrite_t nvm_write = (nvmwrite_t)((PROGMEM_START + 2) >> 1);
 
 #endif
 
