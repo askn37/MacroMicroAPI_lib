@@ -12,7 +12,6 @@
 #include <avr/pgmspace.h>
 #include <string.h>
 #include <api/capsule.h>
-// #include <peripheral.h>
 
 namespace FlashNVM {
 /*****************
@@ -29,16 +28,10 @@ namespace FlashNVM {
   }
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size) {
-    nvmptr_t _page_top = (nvmptr_t)_page_addr + MAPPED_PROGMEM_START;
+    nvmptr_t _page_top = (nvmptr_t)_page_addr;
     do {
-      if (_CAPS16(_page_top)->bytes[1] & 0x80)
-        _PROTECTED_WRITE(NVMCTRL_CTRLB, NVMCTRL_FLMAP_SECTION0_gc);
-      else {
-        _PROTECTED_WRITE(NVMCTRL_CTRLB, NVMCTRL_FLMAP_SECTION1_gc);
-        _page_top += MAPPED_PROGMEM_START;
-      }
       nvmctrl(NVMCTRL_CMD_NOCMD_gc);
-      nvmwrite(_page_top, 0xFF);
+      nvmwrite(_page_top, 0xFFFF);
       nvmctrl(NVMCTRL_CMD_FLPER_gc);
       if (_page_size <= PROGMEM_PAGE_SIZE) break;
       _page_top += PROGMEM_PAGE_SIZE;
@@ -50,7 +43,7 @@ namespace FlashNVM {
   bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size) {
     uint8_t* _data_top = (uint8_t*)_data_addr;
     uint8_t _buff_off = (nvmptr_t)_page_addr & (PROGMEM_PAGE_SIZE - 1);
-    nvmptr_t _page_top = (nvmptr_t)_page_addr + MAPPED_PROGMEM_START - _buff_off;
+    nvmptr_t _page_top = (nvmptr_t)_page_addr - _buff_off;
     uint8_t buffer[PROGMEM_PAGE_SIZE];
     while (_save_size) {
       memset(&buffer, 0xFF, PROGMEM_PAGE_SIZE);
@@ -58,16 +51,12 @@ namespace FlashNVM {
         buffer[_buff_off] = *((uint8_t*)_data_top++);
       } while (--_save_size > 0 && ++_buff_off < PROGMEM_PAGE_SIZE);
       _buff_off = 0;
-      if (_CAPS16(_page_top)->bytes[1] & 0x80)
-        _PROTECTED_WRITE(NVMCTRL_CTRLB, NVMCTRL_FLMAP_SECTION0_gc);
-      else {
-        _PROTECTED_WRITE(NVMCTRL_CTRLB, NVMCTRL_FLMAP_SECTION1_gc);
-        _page_top += MAPPED_PROGMEM_START;
-      }
       nvmctrl(NVMCTRL_CMD_FLPBCLR_gc);
       do {
-        nvmwrite(_page_top++, buffer[_buff_off]);
-      } while (++_buff_off < PROGMEM_PAGE_SIZE);
+        nvmwrite(_page_top, *(uint16_t*)&buffer[_buff_off]);
+        _page_top += 2;
+        _buff_off += 2;
+      } while (_buff_off < PROGMEM_PAGE_SIZE);
       nvmctrl(NVMCTRL_CMD_FLPW_gc);
     }
     return nvmstat();
@@ -155,7 +144,7 @@ namespace FlashNVM {
 /**************************
  * megaAVR/tinyAVR Series *
  **************************/
-#elif (NVMCTRL_VER == 1)
+#elif (NVMCTRL_VER == 0)
   /* The maximum flash size for this series is 48KiB */
 
   bool spm_support_check (void) {

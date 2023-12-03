@@ -34,7 +34,7 @@
   #endif
 #elif (LOCKBITS_DEFAULT == 0xC5)
   /* megaAVR/tinyAVR Series */
-  #define NVMCTRL_VER 1
+  #define NVMCTRL_VER 0
 #endif
 
 #if !defined(NVMCTRL_VER) || \
@@ -54,7 +54,7 @@ namespace FlashNVM {
  *****************/
 #if (NVMCTRL_VER == 3)
   typedef void (*nvmctrl_t) (uint8_t _nvm_cmd);
-  typedef void (*nvmwrite_t) (uint16_t _address, uint8_t _data);
+  typedef void (*nvmwrite_t) (uint16_t _address, uint16_t _data);
 
   const nvmctrl_t nvmctrl = (nvmctrl_t)((PROGMEM_START + 4) >> 1);
   const nvmwrite_t nvmwrite = (nvmwrite_t)((PROGMEM_START + 2) >> 1);
@@ -68,7 +68,7 @@ namespace FlashNVM {
 /**************************
  * megaAVR/tinyAVR Series *
  **************************/
-#elif (NVMCTRL_VER == 1)
+#elif (NVMCTRL_VER == 0)
 
   typedef void (*nvmctrl_t) (uint8_t _nvm_cmd);
   typedef void (*nvmwrite_t) (uint16_t _address, uint8_t _data);
