@@ -49,34 +49,28 @@
 extern const uint8_t* __vectors;
 
 namespace FlashNVM {
-/*****************
- * AVR EA Series *
- *****************/
-#if (NVMCTRL_VER == 3)
 
-  typedef void (*nvmcmd_t) (uint8_t _nvm_cmd);
-  const nvmcmd_t nvm_cmd = (nvmcmd_t)((PROGMEM_START + 6) >> 1);
+#if defined(HAVE_RAMPZ)
+  /*  AVR_Dx 24bit */
 
-/***********************
- * AVR DA/DB/DD Series *
- ***********************/
-#elif (NVMCTRL_VER == 2)
+  void nvm_spm (uint32_t _addr);
+  void nvm_write (uint32_t _addr, uint8_t *_data);
 
-  typedef void (*nvmcmd_t) (uint8_t _nvm_cmd);
-  const nvmcmd_t nvm_cmd = (nvmcmd_t)((PROGMEM_START + 6) >> 1);
+#elif (NVMCTRL_VER != 0)
+  /*  AVR_Dx/Ex 16bit */
 
-/**************************
- * megaAVR/tinyAVR Series *
- **************************/
-#elif (NVMCTRL_VER == 0)
+  void nvm_spm (uint16_t _addr);
+  void nvm_write (uint16_t _addr, uint8_t *_data);
 
-  typedef void (*nvmcmd_t) (uint8_t _nvm_cmd);
-  typedef void (*nvmwrite_t) (uint16_t _address, uint8_t _data);
+#else
+  /*  megaAVR, tinyAVR 16bit */
 
-  const nvmcmd_t nvm_cmd = (nvmcmd_t)((PROGMEM_START + 4) >> 1);
-  const nvmwrite_t nvm_write = (nvmwrite_t)((PROGMEM_START + 2) >> 1);
+  void nvm_spm (uint16_t _addr);
+  void nvm_write (uint16_t _addr, uint8_t _data);
 
 #endif
+
+  void nvm_cmd (uint8_t _nvm_cmd);
 
   bool spm_support_check (void);
   inline bool nvmstat (void) {
