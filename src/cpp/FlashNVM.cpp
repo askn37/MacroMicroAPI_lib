@@ -32,7 +32,8 @@ namespace FlashNVM {
         R"#ASM#(
           CALL  0x2     ; SPM Z+ (dummy write)
         )#ASM#"
-        :: "z" (_page_top)
+        :
+        : "z" (_page_top)
       );
       nvm_cmd(NVMCTRL_CMD_FLPER_gc);
       if (_page_size <= PROGMEM_PAGE_SIZE) break;
@@ -56,16 +57,17 @@ namespace FlashNVM {
       nvm_cmd(NVMCTRL_CMD_FLPBCLR_gc);
       __asm__ __volatile__ (
         R"#ASM#(
-      1:  LD    R0, X+  ;
-          LD    R1, X+  ; R1:R0 <- (buffer)++
+      1:  LD    R0, X+  ; R0 <- (buffer)++
+          LD    R1, X+  ; R1 <- (buffer)++
           CALL  0x2     ; SPM Z+
           SBIW  %0, 1   ; (PROGMEM_PAGE_SIZE / 2)--
           BRNE  1b      ;
           CLR   __zero_reg__
         )#ASM#"
-        :: "r" (PROGMEM_PAGE_SIZE / 2)
-         , "x" (buffer)
-         , "z" (_page_top)
+        :
+        : "w" (PROGMEM_PAGE_SIZE / 2)
+        , "x" (buffer)
+        , "z" (_page_top)
       );
       nvm_cmd(NVMCTRL_CMD_FLPW_gc);
       _page_top += PROGMEM_PAGE_SIZE;
@@ -102,11 +104,10 @@ namespace FlashNVM {
     #else
       __asm__ __volatile__ (
         R"#ASM#(
-          MOVW  Z, %A0  ; Z <- (_page_top)
           CALL  0x2     ; SPM Z+ (dummy write)
         )#ASM#"
         :
-        : "r" (_page_top)
+        : "z" (_page_top)
       );
     #endif
       nvm_cmd(NVMCTRL_CMD_NONE_gc);
@@ -134,8 +135,8 @@ namespace FlashNVM {
         R"#ASM#(
           STS   %3, %C2 ; RAMPZ <- (_page_top:HH)
           MOVW  Z, %A2  ; Z <- (_page_top)
-      1:  LD    R0, X+  ;
-          LD    R1, X+  ; R1:R0 <- (buffer)++
+      1:  LD    R0, X+  ; R0 <- (buffer)++
+          LD    R1, X+  ; R1 <- (buffer)++
           CALL  0x2     ; SPM Z+
           SBIW  %0, 1   ; (PROGMEM_PAGE_SIZE / 2)--
           BRNE  1b      ;
@@ -150,9 +151,8 @@ namespace FlashNVM {
     #else
       __asm__ __volatile__ (
         R"#ASM#(
-          MOVW  Z, %A2  ; Z <- (_page_top)
-      1:  LD    R0, X+  ;
-          LD    R1, X+  ; R1:R0 <- (buffer)++
+      1:  LD    R0, X+  ; R0 <- (buffer)++
+          LD    R1, X+  ; R1 <- (buffer)++
           CALL  0x2     ; SPM Z+
           SBIW  %0, 1   ; (PROGMEM_PAGE_SIZE / 2)--
           BRNE  1b      ;
@@ -161,7 +161,7 @@ namespace FlashNVM {
         :
         : "r" (PROGMEM_PAGE_SIZE / 2)
         , "x" (buffer)
-        , "r" (_page_top)
+        , "z" (_page_top)
       );
     #endif
       nvm_cmd(NVMCTRL_CMD_NONE_gc);
