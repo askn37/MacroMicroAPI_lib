@@ -116,6 +116,7 @@ namespace FlashNVM {
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size) {
     nvmptr_t _page_top = (nvmptr_t)_page_addr;
+    _page_top -= _page_top & (PROGMEM_PAGE_SIZE - 1);
     do {
       nvm_cmd(NVMCTRL_CMD_NOCMD_gc);
       nvm_spm(_page_top);
@@ -151,6 +152,7 @@ namespace FlashNVM {
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size) {
     nvmptr_t _page_top = (nvmptr_t)_page_addr;
+    _page_top -= _page_top & (PROGMEM_PAGE_SIZE - 1);
     do {
       nvm_cmd(NVMCTRL_CMD_FLPER_gc);
       nvm_spm(_page_top);
@@ -236,6 +238,7 @@ namespace FlashNVM {
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size) {
     nvmptr_t _page_top = (nvmptr_t)_page_addr + MAPPED_PROGMEM_START;
+    _page_top -= _page_top & (PROGMEM_PAGE_SIZE - 1);
     do {
       nvm_spm(_page_top);
       nvm_cmd(NVMCTRL_CMD_PAGEERASE_gc);
