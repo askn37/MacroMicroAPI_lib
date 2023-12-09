@@ -73,6 +73,29 @@ NVMコントローラのアドレス指定レジスタは
 実際のフラッシュメモリ量を示せるだけのビット幅しか物理的に存在しておらず、
 128KiB品種なら 17bit幅レジスタとしてラップアラウンドするので効率よく一巡する。
 
+### 補足：tinyAVR への適用
+
+tinyAVR系統のうちいくつかの品種では普通にビルドしたのでは正しく動作しない場合がある。これは目的の動作に不必要なベクターテーブルやライブラリスタートアップコードの埋め込みによって、肝心の動作ループ全体がページ境界に納まらなくなるためだ。
+
+この場合は、ボードメニューの`Build API`->`Standard Library All Disable`を選択してビルドするとより小さく、確実に動作するバイナリが作成される。
+
+これを可能にするには、前述のスケッチに以下の記述を追加する。
+
+```diff
++ #define ENABLE_MACRO_API
++ #include <api/macro_api.h>
+  #include <FlashNVM.h>
+
+  alignas(PROGMEM_PAGE_SIZE) const int _ro[] PROGMEM = {};
+
++ __attribute__ ((used))
++ __attribute__ ((OS_main))
+  __attribute__ ((section (".init0")))
+  int main (void) {
+```
+
+冒頭は`Standard Library All Disable`によって無効化される`Macro_API`を改めて有効化し、`pinMode`や`digitalWrite`マクロを使用可能にする。そして除去されるスタートアップコードに代えて`main`が使われることを明らかとすべく、追加の属性を`main`に加えている。こうしてビルドされる出力コードは、概ね 60byte内外になる。
+
 ## 著作表示
 
 Twitter: [@askn37](https://twitter.com/askn37) \
