@@ -82,8 +82,10 @@ tinyAVR系統のうちいくつかの品種では普通にビルドしたので�
 これを可能にするには、前述のスケッチに以下の記述を追加する。
 
 ```diff
++ #ifndef ENABLE_MACRO_API
 + #define ENABLE_MACRO_API
 + #include <api/macro_api.h>
++ #endif
   #include <FlashNVM.h>
 
   alignas(PROGMEM_PAGE_SIZE) const int _ro[] PROGMEM = {};
