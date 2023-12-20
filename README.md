@@ -33,6 +33,7 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
 |FlashNVM.h|フラッシュメモリ領域自己書換支援
 |FontSets.h|OLED用英数フォントイメージ
 |GPS_RMS.h|簡易NMEAパーサ
+|ReadUART.h|リードバッファ付ハードウェアUSART
 |SoftwareUART.h|SoftwareSerial代替
 |TaskChanger.h|協調的マルチタスク支援
 |TimeoutTimer.h|RTCによるタイムアウト制御支援と delay/millis代替
