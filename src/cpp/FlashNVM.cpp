@@ -14,7 +14,7 @@
 
 namespace FlashNVM {
 
-#if (NVMCTRL_VER != 0)
+#if (AVR_NVMCTRL != 0)
   /* AVR_Dx/Ex */
 
   bool spm_support_check (void) {
@@ -111,7 +111,7 @@ namespace FlashNVM {
   }
   #endif /* HAVE_RAMPZ */
 
-  #if (NVMCTRL_VER == 3)
+  #if (AVR_NVMCTRL == 3) || (AVR_NVMCTRL == 5)
   /* AVR_Ex */
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size) {
@@ -147,7 +147,7 @@ namespace FlashNVM {
     return nvmstat();
   }
 
-  #else /* NVMCTRL_VER == 2 */
+  #else /* AVR_NVMCTRL == 2 || AVR_NVMCTRL == 4 */
   /* AVR_Dx */
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size) {
@@ -182,10 +182,10 @@ namespace FlashNVM {
     }
     return nvmstat();
   }
-  #endif /* NVMCTRL_VER == 2 */
-#endif /* NVMCTRL_VER != 0 */
+  #endif /* AVR_NVMCTRL == 2 || AVR_NVMCTRL == 4 */
+#endif /* AVR_NVMCTRL != 0 */
 
-#if (NVMCTRL_VER == 0)
+#if (AVR_NVMCTRL == 0)
   /* tinyAVR, megaAVR 16bit : not SPM+ */
 
   bool spm_support_check (void) {
@@ -266,7 +266,7 @@ namespace FlashNVM {
     return nvmstat();
   }
 
-#endif /* NVMCTRL_VER == 0 */
+#endif /* AVR_NVMCTRL == 0 */
 }
 
 // end of code

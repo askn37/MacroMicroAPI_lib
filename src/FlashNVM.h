@@ -13,6 +13,7 @@
 #include <avr/pgmspace.h>
 #include <api/memspace.h>
 #include <stddef.h>
+#include <variant.h>
 
 #if defined(RAMPZ)
   /* 128KiB model */
@@ -24,20 +25,7 @@
   #define NOTUSE_RAMPZ
 #endif
 
-#if (LOCKBITS_DEFAULT == 0x5CC5C55C)
-  #if defined(NVMCTRL_FLBUSY_bm)
-    /* AVR EA Series */
-    #define NVMCTRL_VER 3
-  #else
-    /* AVR DA/DB/DD Series */
-    #define NVMCTRL_VER 2
-  #endif
-#elif (LOCKBITS_DEFAULT == 0xC5)
-  /* megaAVR/tinyAVR Series */
-  #define NVMCTRL_VER 0
-#endif
-
-#if !defined(NVMCTRL_VER) || \
+#if !defined(AVR_NVMCTRL) || \
     !defined(__AVR_XMEGA__) || \
            ((__AVR_ARCH__ != 102) && \
             (__AVR_ARCH__ != 103) && \
@@ -56,7 +44,7 @@ namespace FlashNVM {
   void nvm_spm (uint32_t _addr);
   void nvm_write (uint32_t _addr, uint8_t *_data);
 
-#elif (NVMCTRL_VER != 0)
+#elif (AVR_NVMCTRL != 0)
   /*  AVR_Dx/Ex 16bit */
 
   void nvm_spm (uint16_t _addr);

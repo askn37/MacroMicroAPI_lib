@@ -22,9 +22,9 @@ void setup (void) {
   PORTMUX_EVSYSROUTEA = PORTMUX_EVOUTA_ALT1_gc;
 
   /* 事象システムで RTC_PITクロックを LED1 に向ける */
-  /* ここは AVR_EX かそれ以外かで変わる */
-  #if defined(AVR_AVREX)
-  EVSYS_CHANNEL0 = EVSYS_CHANNEL_RTC_PITEV0_gc;
+  /* ここは AVR_Ex以降 かそれ以外かで変わる */
+  #if AVR_EVSYS >= 201
+  EVSYS_CHANNEL0 = EVSYS_CHANNEL_RTC_EVGEN0_gc;
   #else
   EVSYS_CHANNEL0 = EVSYS_CHANNEL0_RTC_PIT_DIV2048_gc;
   #endif

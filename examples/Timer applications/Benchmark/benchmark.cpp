@@ -23,13 +23,13 @@
 namespace Benchmark {
   void init (void) {
     /* TCB0とTCB1の捕獲事象に接続 */
-    EVSYS_CHANNEL4 = EVSYS_CHANNEL4_OFF_gc;
+    EVSYS_CHANNEL4 = EVSYS_CHANNEL_OFF_gc;
     EVSYS_USERTCB0CAPT = EVSYS_USER_CHANNEL4_gc;
     EVSYS_USERTCB1CAPT = EVSYS_USER_CHANNEL4_gc;
 
     /* ch5=TCB0溢れ*/
     /* TCB1の計数事象に接続 */
-    EVSYS_CHANNEL5 = EVSYS_CHANNEL5_TCB0_OVF_gc;
+    EVSYS_CHANNEL5 = EVSYS_CHANNEL_TCB0_OVF_gc;
     EVSYS_USERTCB1COUNT = EVSYS_USER_CHANNEL5_gc;
 
     /* TCB1は計数捕獲周波数測定動作かつ連結上位 */

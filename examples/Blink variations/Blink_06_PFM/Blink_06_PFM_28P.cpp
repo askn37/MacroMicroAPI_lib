@@ -19,7 +19,7 @@ void setup (void) {
   uint8_t harfperi = periodic >> 1;
 
   PORTMUX_EVSYSROUTEA = PORTMUX_EVOUTA_ALT1_gc;             // PIN_PA7 <-- EVOUTA
-  EVSYS_CHANNEL0 = EVSYS_CHANNEL0_CCL_LUT0_gc;              // <-- LUT0OUT
+  EVSYS_CHANNEL0 = EVSYS_CHANNEL_CCL_LUT0_gc;               // <-- LUT0OUT
   EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;           // --> EVOUTA
 
   CCL_TRUTH0 = CCL_TRUTH_1_bm | CCL_TRUTH_2_bm;
