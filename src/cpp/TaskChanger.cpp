@@ -21,12 +21,12 @@ namespace TaskChanger {
         PUSH    R1              ; enter function
         IN      R1, __SREG__    ; load SREG
         PUSH    R1              ; keep SREG
+        CLI                     ; change SREG
     ; TIMEOUT_BLOCK実行中（RTC_CMP_bp==1）はタスクを切り替えない
         LDS     R1, %2          ; R1 := RTC_INTCTRL
         SBRC    R1, %3          ; check bit RTC_CMP_bp
         RJMP    3f              ; ENABLE bit is all skip
     ; 割込を禁止して残りの全レジスタを保存
-        CLI                     ; change SREG
         PUSH    R0              ; keep all
         PUSH    R2              ;
         PUSH    R3              ;
