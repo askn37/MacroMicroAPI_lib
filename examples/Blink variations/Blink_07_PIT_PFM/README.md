@@ -197,6 +197,7 @@ C/C++言語で記述する限り（コンパイル最適化の対象外で）定
 ## 著作表示
 
 Twitter: [@askn37](https://twitter.com/askn37) \
+BlueSky Social: [@multix.jp](https://bsky.app/profile/multix.jp) \
 GitHub: [https://github.com/askn37/](https://github.com/askn37/) \
 Product: [https://askn37.github.io/](https://askn37.github.io/)
 

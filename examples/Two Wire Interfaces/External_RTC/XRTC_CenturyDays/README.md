@@ -142,6 +142,7 @@ MJD: 15020  Wd: 1  Date: 19000101  Time: 000002  Wd: 1  Epoch: 2085978498
 ## 著作表示
 
 Twitter: [@askn37](https://twitter.com/askn37) \
+BlueSky Social: [@multix.jp](https://bsky.app/profile/multix.jp) \
 GitHub: [https://github.com/askn37/](https://github.com/askn37/) \
 Product: [https://askn37.github.io/](https://askn37.github.io/)
 
