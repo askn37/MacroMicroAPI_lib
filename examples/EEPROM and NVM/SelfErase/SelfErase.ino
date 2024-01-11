@@ -23,7 +23,7 @@ __attribute__ ((section (".init0")))
 int main (void) {
   asm("CLR R1");
   pinMode(LED_BUILTIN, OUTPUT);
-  uint32_t top = (uint32_t)_ro;
+  nvmptr_t top = (nvmptr_t)_ro;
   for (;;) {
     top -= PROGMEM_PAGE_SIZE;
     FlashNVM::page_erase_PF(top);

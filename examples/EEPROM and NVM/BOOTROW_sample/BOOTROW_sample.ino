@@ -1,8 +1,8 @@
 /**
- * @file FlashNVM_sample.ino
+ * @file BOOTROW_sample.ino
  * @author askn (K.Sato) multix.jp
  * @brief
- * @version 0.3
+ * @version 0.1
  * @date 2024-01-10
  *
  * @copyright Copyright (c) 2024 askn37 at github.com
@@ -10,6 +10,11 @@
  */
 #include <FlashNVM.h>
 #include <TaskChanger.h>
+
+#ifndef BOOTROW_SIZE
+  #error This sketch can only be built on AVR_DU/EB
+  #include BUILD_STOP
+#endif
 
 #if (INTERNAL_SRAM_SIZE < 256)
   #error This MCU not supported
@@ -25,22 +30,11 @@ struct nvm_store_t {
   uint16_t magic;
 };
 
-extern const uint8_t* __data_load_end;
-
-// const struct nvm_store_t nvm_store PGM_ALIGN ROMEM = {0, __DATE__ " " __TIME__, 0xABCD};
-const struct nvm_store_t nvm_store PGM_ALIGN NVMEM = {};
-
 void setup (void) {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(CONSOLE_BAUD).println(F("\n<startup>"));
   Serial.print(F("_AVR_IOXXX_H_ = ")).println(_AVR_IOXXX_H_);
   TaskChanger::attach_task_1st(task1_stack, sizeof(task1_stack), &task1);
-
-  /* Printed system parameters */
-  Serial.print(F("PROGMEM_PAGE_SIZE=")).println(PROGMEM_PAGE_SIZE, DEC);
-  Serial.print(F("PROGMEM_END=0x")).println(PROGMEM_END, HEX);
-  Serial.print(F("upload_end=0x")).println(pgm_get_far_address(__data_load_end), HEX);
-  Serial.print(F("nvm_store=0x")).println(pgm_get_far_address(nvm_store), HEX);
 
   /* Support check */
   if (! FlashNVM::spm_support_check()) {
@@ -49,10 +43,17 @@ void setup (void) {
   }
   Serial.println(F("SPM_CHECK=<supported>")).ln();
 
+  {
+    uint8_t buf[BOOTROW_SIZE];
+    FlashNVM::bootrow_load(&buf);
+    Serial.print(F("BOOTROW_START=0x")).println(BOOTROW_START, HEX);
+    Serial.print(F("BOOTROW_SIZE=")).println(BOOTROW_SIZE, DEC);
+    Serial.printHex((const void *)&buf, BOOTROW_SIZE, ' ', 16).ln().ln();
+  }
+
   /* SRAM <- NVM structure copy */
   struct nvm_store_t nvm_buffer;
-  memcpy_PF(&nvm_buffer, pgm_get_far_address(nvm_store), sizeof(nvm_buffer));
-  Serial.printHex((const void *)&nvm_buffer, sizeof(nvm_buffer), ' ', 16).ln().ln();
+  FlashNVM::bootrow_load(&nvm_buffer);
 
   /* Before NVM check */
   if (nvm_buffer.magic != 0xABCD) {
@@ -69,13 +70,13 @@ void setup (void) {
   Serial.print(F("count=")).println(nvm_buffer.count, DEC).ln();
 
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    if ( FlashNVM::page_erase_P(&nvm_store, sizeof(nvm_buffer))
-      && FlashNVM::page_update_P(&nvm_store, &nvm_buffer, sizeof(nvm_buffer))
+    if ( FlashNVM::bootrow_clear()
+      && FlashNVM::bootrow_save(&nvm_buffer, sizeof(nvm_buffer))
     )    Serial.println(F("[success]"));
-    else Serial.println(F("*failed*"));
+    else Serial.print(F("*failed* 0x")).println(NVMCTRL_STATUS, ZHEX, 2);
   }
 
-  if (0 == memcmp_P(&nvm_buffer, pgm_get_far_address(nvm_store), sizeof(nvm_buffer)))
+  if (FlashNVM::bootrow_verify(&nvm_buffer, sizeof(nvm_buffer)))
        Serial.println(F("[matched]"));
   else Serial.println(F("*mismatch*"));
 }

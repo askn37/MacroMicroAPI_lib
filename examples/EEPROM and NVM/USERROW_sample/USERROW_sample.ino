@@ -1,5 +1,5 @@
 /**
- * @file FlashNVM_sample.ino
+ * @file UrowNVM_sample.ino
  * @author askn (K.Sato) multix.jp
  * @brief
  * @version 0.3
@@ -8,16 +8,8 @@
  * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
-#include <FlashNVM.h>
+#include <UrowNVM.h>
 #include <TaskChanger.h>
-
-#if (INTERNAL_SRAM_SIZE < 256)
-  #error This MCU not supported
-  #include BUILD_STOP
-#endif
-
-volatile char task1_stack[64];
-void yield (void) { TaskChanger::yield(); }
 
 struct nvm_store_t {
   uint32_t count;
@@ -25,34 +17,28 @@ struct nvm_store_t {
   uint16_t magic;
 };
 
-extern const uint8_t* __data_load_end;
-
-// const struct nvm_store_t nvm_store PGM_ALIGN ROMEM = {0, __DATE__ " " __TIME__, 0xABCD};
-const struct nvm_store_t nvm_store PGM_ALIGN NVMEM = {};
+#if (PROGMEM_SIZE > 2048)
+volatile char task1_stack[64];
+void yield (void) { TaskChanger::yield(); }
+#endif
 
 void setup (void) {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(CONSOLE_BAUD).println(F("\n<startup>"));
   Serial.print(F("_AVR_IOXXX_H_ = ")).println(_AVR_IOXXX_H_);
+
+#if (PROGMEM_SIZE > 2048)
   TaskChanger::attach_task_1st(task1_stack, sizeof(task1_stack), &task1);
 
-  /* Printed system parameters */
-  Serial.print(F("PROGMEM_PAGE_SIZE=")).println(PROGMEM_PAGE_SIZE, DEC);
-  Serial.print(F("PROGMEM_END=0x")).println(PROGMEM_END, HEX);
-  Serial.print(F("upload_end=0x")).println(pgm_get_far_address(__data_load_end), HEX);
-  Serial.print(F("nvm_store=0x")).println(pgm_get_far_address(nvm_store), HEX);
-
-  /* Support check */
-  if (! FlashNVM::spm_support_check()) {
-    Serial.println(F("SPM_CHECK=<nosupported>"));
-    return;
-  }
-  Serial.println(F("SPM_CHECK=<supported>")).ln();
+  Serial.print(F("USER_SIGNATURES_START=0x")).println(USER_SIGNATURES_START, HEX);
+  Serial.print(F("USER_SIGNATURES_SIZE=")).println(USER_SIGNATURES_SIZE, DEC);
+  Serial.printHex((const void *)USER_SIGNATURES_START, USER_SIGNATURES_SIZE, ' ', 16).ln();
+#endif
+  Serial.ln();
 
   /* SRAM <- NVM structure copy */
   struct nvm_store_t nvm_buffer;
-  memcpy_PF(&nvm_buffer, pgm_get_far_address(nvm_store), sizeof(nvm_buffer));
-  Serial.printHex((const void *)&nvm_buffer, sizeof(nvm_buffer), ' ', 16).ln().ln();
+  UrowNVM::userrow_load(&nvm_buffer, sizeof(nvm_buffer));
 
   /* Before NVM check */
   if (nvm_buffer.magic != 0xABCD) {
@@ -69,13 +55,13 @@ void setup (void) {
   Serial.print(F("count=")).println(nvm_buffer.count, DEC).ln();
 
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    if ( FlashNVM::page_erase_P(&nvm_store, sizeof(nvm_buffer))
-      && FlashNVM::page_update_P(&nvm_store, &nvm_buffer, sizeof(nvm_buffer))
+    if ( UrowNVM::userrow_clear()
+      && UrowNVM::userrow_save(&nvm_buffer, sizeof(nvm_buffer))
     )    Serial.println(F("[success]"));
     else Serial.println(F("*failed*"));
   }
 
-  if (0 == memcmp_P(&nvm_buffer, pgm_get_far_address(nvm_store), sizeof(nvm_buffer)))
+  if (UrowNVM::userrow_verify(&nvm_buffer, sizeof(nvm_buffer)))
        Serial.println(F("[matched]"));
   else Serial.println(F("*mismatch*"));
 }
@@ -93,11 +79,13 @@ void loop (void) {
   for (;;);
 }
 
+#if (PROGMEM_SIZE > 2048)
 void task1 (void) {
   while (true) {
     digitalWriteMacro(LED_BUILTIN, TOGGLE);
     delay(1000);
   }
 }
+#endif
 
 // end of code

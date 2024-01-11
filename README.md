@@ -37,6 +37,7 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
 |SoftwareUART.h|SoftwareSerial代替
 |TaskChanger.h|協調的マルチタスク支援
 |TimeoutTimer.h|RTCによるタイムアウト制御支援と delay/millis代替
+|UrowNVM.h|USERROW領域書き換え支援
 |XRTC_PCF85063A.h|オンボード外部RTC制御（NXP PCF85063A用）
 |bcddatetime.h|BCD年月日/時分秒表現とMJD変換支援
 
