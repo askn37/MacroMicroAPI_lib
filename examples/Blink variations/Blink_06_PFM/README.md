@@ -14,6 +14,7 @@
   - tinyAVR-0/1系統 8pin
 - modernAVR世代
   - AVR Dx系統
+  - AVR Ex系統
 
 以下の記述にある周辺機能の説明は 28pin以上を対象に書かれている。\
 14pin/20pin品種については周辺機能割当が異なる。
@@ -360,6 +361,8 @@ CCL_CTRLA |= CCL_ENABLE_bm;
 > 一般に出口側から入口側に向かって順次設定してゆく。
 この逆だと意図しない外部端子に意図しない信号が出力される時間が生じるからだ。
 
+> サンプルスケッチの tinyAVR 系統 14pin 以上の品種では、`LUT1OUT` に LED が繋がっていると仮定している。
+
 ## tinyAVR-0/1 系統 8pin 品種例外
 
 tinyAVR-0/1系統の特に 8pin品種では
@@ -384,6 +387,11 @@ EVSYS_ASYNCUSER8 = EVSYS_ASYNCUSER0_ASYNCCH0_gc; // EVOUT0(非同期チャネル
 > これは`LUT0_OUT == PA6`がLEDならば不要だが
 `PIN_PA6`は普通`USART0_TXD`でも使われるため
 ブートローダー経由書込時に問題を生じるだろう。
+
+## AVR_EB 系統例外
+
+AVR_EB系統には `TCA0` が存在しないため、代わりに `TCE0` を使用する。
+`TCE0` には分割モードがないので設定も他と異なる。
 
 ## 著作表示
 
