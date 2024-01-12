@@ -397,7 +397,7 @@ namespace FlashNVM {
     assert(_save_size > 0);
     assert(_save_size <= BOOTROW_SIZE);
     nvm_wait();
-    uint8_t _result;
+    bool _result;
     __asm__ __volatile__ (
       R"#ASM#(
         CLR   %0
