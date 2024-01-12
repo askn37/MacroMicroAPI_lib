@@ -14,7 +14,7 @@
 namespace UrowNVM {
 
 bool nvm_result (void) { return NVMCTRL_STATUS == 0; }
-void nvm_wait (void) { while (NVMCTRL_STATUS & 3); }
+void nvm_wait (void) { while (NVMCTRL_STATUS & 3); }  /* NVMCTRL_FBUSY_bm | NVMCTRL_EEBUSY_bm */
 void nvm_cmd (uint8_t _nvm_cmd) {
   _PROTECTED_WRITE_SPM(NVMCTRL_CTRLA, _nvm_cmd);
 }
@@ -61,6 +61,7 @@ void nvm_cmd (uint8_t _nvm_cmd) {
   void userrow_load (void* _data_addr, size_t _save_size) {
     assert(_save_size > 0);
     assert(_save_size <= USER_SIGNATURES_SIZE);
+    nvm_wait();
     memcpy(_data_addr, (const void*)USER_SIGNATURES_START, _save_size);
   }
 
