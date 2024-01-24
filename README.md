@@ -30,16 +30,17 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
 
 |名称|機能|
 |-|-|
-|FlashNVM.h|フラッシュメモリ領域自己書換支援
-|FontSets.h|OLED用英数フォントイメージ
-|GPS_RMS.h|簡易NMEAパーサ
-|ReadUART.h|リードバッファ付ハードウェアUSART
-|SoftwareUART.h|SoftwareSerial代替
-|TaskChanger.h|協調的マルチタスク支援
-|TimeoutTimer.h|RTCによるタイムアウト制御支援と delay/millis代替
-|UrowNVM.h|USERROW領域書き換え支援
-|XRTC_PCF85063A.h|オンボード外部RTC制御（NXP PCF85063A用）
-|bcddatetime.h|BCD年月日/時分秒表現とMJD変換支援
+|FlashNVM.h|[フラッシュメモリ領域自己書換支援](https://github.com/askn37/askn37.github.io/wiki/FlashNVM)
+|FontSets.h|[OLED用英数フォントイメージ](https://github.com/askn37/askn37.github.io/wiki/FontSets)
+|GPS_RMS.h|[簡易NMEAパーサ](https://github.com/askn37/askn37.github.io/wiki/GPS_RMC)
+|OLED_*.h|[OLEDパネル(I2C)制御支援](https://github.com/askn37/askn37.github.io/wiki/OLED_SSD1306)
+|ReadUART.h|[リードバッファ付ハードウェアUSART](https://github.com/askn37/askn37.github.io/wiki/ReadUART)
+|SoftwareUART.h|[SoftwareSerial代替](https://github.com/askn37/askn37.github.io/wiki/SoftwareUART)
+|TaskChanger.h|[協調的マルチタスク支援](https://github.com/askn37/askn37.github.io/wiki/TaskChanger)
+|TimeoutTimer.h|[RTCによるタイムアウト制御支援](https://github.com/askn37/askn37.github.io/wiki/TimeoutTimer)と delay/millis代替
+|UrowNVM.h|[USERROW領域書き換え支援](https://github.com/askn37/askn37.github.io/wiki/UrowNVM)
+|XRTC_*.h|[外部RTC制御支援](https://github.com/askn37/askn37.github.io/wiki/XRTC_PCF85063A)（NXP PCF85063A用）
+|bcddatetime.h|[BCD年月日/時分秒表現とMJD変換支援](https://github.com/askn37/askn37.github.io/wiki/bcddatetime)
 
 ## 収容サンプルスケッチ
 
