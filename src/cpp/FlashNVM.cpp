@@ -285,7 +285,7 @@ namespace FlashNVM {
     nvm_cmd(NVMCTRL_CMD_FLWR_gc);
     uint16_t _p = BOOTROW_START;
     uint8_t *_q = (uint8_t*)_data_addr;
-    do { nvm_stz(_p++, *(_q++)); } while (_save_size);
+    do { nvm_stz(_p++, *(_q++)); } while (--_save_size);
     nvm_wait();
     nvm_cmd(NVMCTRL_CMD_NONE_gc);
     return 0 == (NVMCTRL_STATUS & 3);
