@@ -12,7 +12,7 @@
 #if defined(AVR_TINYAVR_8)
   #include "Blink_06_PFM_8P.cpp"
 
-#elif defined(AVR_AVRDD14) || defined(AVR_AVRDD20)
+#elif defined(AVR_AVRDD14) || defined(AVR_AVRDD20) || defined(AVR_AVRDU14)
   #include "Blink_06_PFM_DD14.cpp"
 
 #elif defined(AVR_TINYAVR_14) || defined(AVR_TINYAVR_20) || defined(AVR_TINYAVR_24)
