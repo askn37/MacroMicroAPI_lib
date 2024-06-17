@@ -137,6 +137,7 @@ namespace USB_NAMESPACE {
     uint8_t bRequest = USB_SETUP_DATA.bRequest;
     D1PRINTF("CR=%02X:%02X:%04X\r\n", USB_SETUP_DATA.bmRequestType, USB_SETUP_DATA.bRequest, USB_SETUP_DATA.wLength);
     if (bRequest == CDC_REQ_SetLineEncoding) {
+      ep_setup_in_listen();
       ep_setup_out_listen();
       ep_setup_out_pending();
       ep_setup_in_pending();

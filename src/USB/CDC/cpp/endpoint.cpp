@@ -60,12 +60,10 @@ namespace USB_NAMESPACE {
   }
 
   WEAK void ep_setup_in_pending (void) {
-    loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
     loop_until_bit_is_set(USB_EP_RES.STATUS, USB_BUSNAK_bp);
   }
 
   WEAK void ep_setup_out_pending (void) {
-    loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
     loop_until_bit_is_set(USB_EP_REQ.STATUS, USB_BUSNAK_bp);
   }
 

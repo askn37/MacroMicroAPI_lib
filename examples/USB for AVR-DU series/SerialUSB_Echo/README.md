@@ -1,4 +1,4 @@
-# USB_CDC_Echoback.ino
+# SerialUSB_Echo.ino
 
 SerialUSBの基本的な実演
 
