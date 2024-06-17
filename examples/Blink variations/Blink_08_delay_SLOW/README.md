@@ -10,7 +10,8 @@
   - megaAVR-0系統
   - tinyAVR-0/1/2系統
 - modernAVR世代
-  - AVR Dx系統
+  - AVR-Dx系統
+  - AVR-Dx系統
 
 これは
 [[TCB計時機で"Blink"実演]](https://github.com/askn37/MacroMicroAPI_lib/tree/main/examples/Blink%20variations/Blink_02_delay)

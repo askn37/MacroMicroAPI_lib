@@ -7,7 +7,8 @@
 ## 対象AVR
 
 - modernAVR世代
-  - AVR Dx系統
+  - AVR-Dx系統
+  - AVR-Ex系統
 
 > megaAVR-0とtinyAVR-0/1/2系統は動作しない。\
 > NXP PCF85063Aは __"Zinnia Duino"__ 系列にオンボードで搭載されている。

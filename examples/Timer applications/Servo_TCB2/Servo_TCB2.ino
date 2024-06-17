@@ -5,9 +5,10 @@
  * @version 0.2
  * @date 2022-12-24
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
 
 /**
  * FS0403 Servo motor wiring : FUTABA / JS Type Connector

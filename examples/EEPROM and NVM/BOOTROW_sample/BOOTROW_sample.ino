@@ -8,6 +8,8 @@
  * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #include <FlashNVM.h>
 #include <TaskChanger.h>
 

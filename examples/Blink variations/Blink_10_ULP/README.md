@@ -14,7 +14,8 @@
   - megaAVR-0系統
   - tinyAVR-0/1/2系統
 - modernAVR世代
-  - AVR Dx系統
+  - AVR-Dx系統
+  - AVR-Dx系統
 
 ## Blinkの要件
 

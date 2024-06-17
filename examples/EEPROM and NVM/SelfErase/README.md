@@ -10,8 +10,8 @@
   - megaAVR-0系統
   - tinyAVR-0/1/2系統
 - modernAVR世代
-  - AVR Dx系統
-  - AVR Ex系統
+  - AVR-Dx系統
+  - AVR-Ex系統
 
 ここで論じる機能は __本SDKに付属するブートローダーの使用__ を前提としている。
 他のSDKで用意されたブートローダを使用している、

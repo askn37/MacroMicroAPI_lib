@@ -5,9 +5,11 @@
  * @version 0.1.2
  * @date 2023-02-25
  *
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #include <avr/io.h>
 #include <util/atomic.h>
 #include <api/capsule.h>

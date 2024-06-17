@@ -5,9 +5,11 @@
  * @version 0.1
  * @date 2022-10-24
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #include <FontSets.h>
 
 const uint8_t moderndos_8x16 [] PROGMEM = {

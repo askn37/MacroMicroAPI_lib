@@ -9,7 +9,8 @@
 - megaAVR世代
   - tinyAVR-2系統
 - modernAVR世代
-  - AVR Dx系統
+  - AVR-Dx系統
+  - AVR-Ex系統
 
 > megaAVR-0、tinyAVR-0/1系統は対応しない。
 

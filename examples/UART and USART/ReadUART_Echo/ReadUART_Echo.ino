@@ -5,9 +5,11 @@
  * @version 0.1
  * @date 2023-12-20
  *
- * @copyright Copyright (c) 2023 askn37 at github.com
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #include <ReadUART.h>
 
 Settings_SerialR0A(ReadUART_BUFFSIZE);

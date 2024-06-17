@@ -10,7 +10,8 @@
   - megaAVR-0系統
   - tinyAVR-2系統
 - modernAVR世代
-  - AVR Dx系統
+  - AVR-Dx系統
+  - AVR-Ex系統
 
 すべてをハードウェア周辺機能だけで全制御しCPU本体の処理ループや割込は __使用しない。__\
 LED出力は`PIN_PA7==EVOUTA_ALT1`であると仮定。

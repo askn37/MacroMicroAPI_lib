@@ -5,9 +5,11 @@
  * @version 0.1
  * @date 2023-12-20
  *
- * @copyright Copyright (c) 2023 askn37 at github.com
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #pragma once
 #include <avr/io.h>
 #if defined(__cplusplus) && !defined(__AVR_TINY__)
@@ -17,14 +19,18 @@
 /*** class definition ***/
 
 class ReadUART_Class : public Print {
+public:
+  USART_t* usart;
+
 private:
   const UART_portmux_t* portmux;
   uint8_t *_work;
-  size_t _size, _top, _end;
+  size_t _size;
+
+  size_t _top, _end;
   uint8_t _status, _last;
 
 public:
-  USART_t* usart;
 
   inline ReadUART_Class (USART_t* _usart, const UART_portmux_t* _portmux, void *_buffer_ptr, size_t _buffer_size) :
     usart(_usart), portmux(_portmux), _work((uint8_t*)_buffer_ptr), _size(_buffer_size) {}

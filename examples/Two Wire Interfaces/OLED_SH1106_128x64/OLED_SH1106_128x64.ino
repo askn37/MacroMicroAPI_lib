@@ -5,9 +5,10 @@
  * @version 0.1
  * @date 2023-02-04
  *
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
 
 #include <OLED_SH1106_128x64.h>
 

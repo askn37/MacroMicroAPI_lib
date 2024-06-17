@@ -5,9 +5,11 @@
  * @version 0.1
  * @date 2023-12-20
  *
- * @copyright Copyright (c) 2023 askn37 at github.com
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #if !defined(__AVR_TINY__)
 #include "../ReadUART.h"
 #include <avr/pgmspace.h>
@@ -98,7 +100,7 @@ int ReadUART_Class::peek (void) {
 
 size_t ReadUART_Class::available (void) {
   size_t _s = _top - _end;
-  if (_s < 0) _s += _size;
+  if ((int16_t)_s < 0) _s += _size;
   return _s;
 }
 

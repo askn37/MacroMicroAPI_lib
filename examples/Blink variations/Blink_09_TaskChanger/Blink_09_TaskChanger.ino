@@ -5,9 +5,11 @@
  * @version 0.1
  * @date 2024-01-17
  *
- * @copyright Copyright (c) 2024 askn37 at multix.jp
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #include <TaskChanger.h>
 
 volatile char blink_stack[64];

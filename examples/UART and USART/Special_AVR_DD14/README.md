@@ -5,7 +5,7 @@ AVR_DD14/20品種での USART1_TXD 端子代替方法の実演
 ## 対象AVR
 
 - modernAVR世代
-  - AVR_DD系統 AVR_DD14/20
+  - AVR-DD系統 14/20pin外囲器
 
 ## AVR_DD14は割と御しがたい
 

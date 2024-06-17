@@ -5,9 +5,10 @@
  * @version 0.1
  * @date 2022-12-08
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
 
 #include <api/macro_digital.h>
 #include <api/delay_busywait.h>

@@ -13,8 +13,8 @@
   - tinyAVR-0/1/2系統 14pin以上
   - tinyAVR-0/1系統 8pin
 - modernAVR世代
-  - AVR Dx系統
-  - AVR Ex系統
+  - AVR-Dx系統
+  - AVR-Ex系統
 
 以下の記述にある周辺機能の説明は 28pin以上を対象に書かれている。\
 14pin/20pin品種については周辺機能割当が異なる。

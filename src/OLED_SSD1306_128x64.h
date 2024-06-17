@@ -5,11 +5,12 @@
  * @version 0.1
  * @date 2023-01-29
  *
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
-#pragma once
+// MIT License : https://askn37.github.io/LICENSE.html
 
+#pragma once
 #include <avr/pgmspace.h>
 #include <api/TWIM.h>
 #include <api/Print.h>

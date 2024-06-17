@@ -5,9 +5,10 @@
  * @version 0.1
  * @date 2022-09-28
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
 
 #if !defined(PORTMUX_EVSYSROUTEA)
   #error This MCU not supported

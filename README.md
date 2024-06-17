@@ -11,7 +11,8 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
   - megaAVR-0系統
   - tinyAVR-0/1/2系統
 - modernAVR世代
-  - AVR Dx系統
+  - AVR-Dx系統
+  - AVR-Ex系統
 
 ## パス配置
 
@@ -35,6 +36,7 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
 |GPS_RMS.h|[簡易NMEAパーサ](https://github.com/askn37/askn37.github.io/wiki/GPS_RMC)
 |OLED_*.h|[OLEDパネル(I2C)制御支援](https://github.com/askn37/askn37.github.io/wiki/OLED_SSD1306)
 |ReadUART.h|[リードバッファ付ハードウェアUSART](https://github.com/askn37/askn37.github.io/wiki/ReadUART)
+|SerialUSB.h|[USB-CDC VCOM実装](https://github.com/askn37/askn37.github.io/wiki/SerialUSB) (__AVR-DU系列専用__)
 |SoftwareUART.h|[SoftwareSerial代替](https://github.com/askn37/askn37.github.io/wiki/SoftwareUART)
 |TaskChanger.h|[協調的マルチタスク支援](https://github.com/askn37/askn37.github.io/wiki/TaskChanger)
 |TimeoutTimer.h|[RTCによるタイムアウト制御支援](https://github.com/askn37/askn37.github.io/wiki/TimeoutTimer)と delay/millis代替
@@ -51,7 +53,16 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
 |EEPROM and NVM|不揮発メモリ操作実演
 |Timer applications|計時器/計数器周辺機能の様々な応用
 |UART and USART|UART/USART実演
+|USB for AVR-DU series|USB周辺機能実装実演 / AVR-DU系列専用
 |Miscellaneous|その他の様々な実演
+
+## 更新履歴
+
+- 0.2.14 (24/06/17)
+  - 各ファイルの MITライセンスリンク対応
+  - modernAVR: __AVR-DU系列専用__ USB周辺機能に暫定対応
+    - `<SerialUSB.h>` 基本的な USB-SERIAL通信クラス
+    - `<USB/USB_CDC.h>` 上記の下位実装（USB-CDC）
 
 ## 著作表示
 

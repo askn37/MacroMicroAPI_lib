@@ -10,8 +10,8 @@
   - megaAVR-0系統
   - tinyAVR-0/1/2系統
 - modernAVR世代
-  - AVR Dx系統
-  - AVR Ex系統 (後述)
+  - AVR-Dx系統
+  - AVR-Ex系統 (後述)
 
 ## EEPROM領域へのアクセス
 
@@ -148,11 +148,11 @@ uint8_t _userrow[USER_SIGNATURES_SIZE] __attribute__((section(".user_signatures"
 
 `tinyAVR`および`megaAVR`系統での`USERROW`の物理特性は`EEPROM`なので、
 `eeprom_update_*`でスケッチ内から自己書換することは可能だ。
-しかし`AVR_Dx`および`AVR_Ex`系統での`USERROW`の物理特性は`Flash`なので、
+しかし`AVR-Dx`および`AVR-Ex`系統での`USERROW`の物理特性は`Flash`なので、
 既定では自己書換の手段は用意されていない。
 物理特性が異なるので当然`NVMCTRL`の制御方法も異なる。
 
-> かつ`AVR_Dx`および`AVR_Ex`とでは`NVMCTRL`のバージョンが異なり、制御方法も異なる。
+> かつ`AVR-Dx`および`AVR-Ex`とでは`NVMCTRL`のバージョンが異なり、制御方法も異なる。
 
 ## サンプルスケッチ
 
@@ -183,9 +183,9 @@ IDEの`ツール`サブメニューで`FUSE EEPROM`->`Save guard "Erase"`を選�
 > あるいは`EEPROM_SIZE`全量を`0xFF`で埋め尽くしたブロックを
 `eeprom_write_block`で書き込むスケッチを記述して実行する。
 
-## AVR EA系統での挙動
+## AVR-EA系統での挙動
 
-~~`AVR EA`系統のAVR-LIBCデバイスファイルパックは、2023-03-22 時点では`<avr/eeprom.h>`に問題があって、EEPROMの書換が動作していない。従ってこの応用記述も正常動作しない。具体的には`NVMCTRL`に発行する指令が`AVR EA`の値になっていない。
+~~`AVR-EA`系統のAVR-LIBCデバイスファイルパックは、2023-03-22 時点では`<avr/eeprom.h>`に問題があって、EEPROMの書換が動作していない。従ってこの応用記述も正常動作しない。具体的には`NVMCTRL`に発行する指令が`AVR-EA`の値になっていない。
 （megaAVR-0世代の値になっている）~~
 
 このバグは __Atmel AVR-Ex Series Device Support (2.5.176)(2023-06-26)__ で解消された。

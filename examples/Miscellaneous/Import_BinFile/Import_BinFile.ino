@@ -5,9 +5,10 @@
  * @version 0.1
  * @date 2022-11-05
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
 
 /* FLASHページ境界に次の定数領域要素を配置する */
 // PAGE_ALIGN(".progmem");

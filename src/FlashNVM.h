@@ -5,9 +5,11 @@
  * @version 0.3
  * @date 2023-12-03
  *
- * @copyright Copyright (c) 2023 askn at github.com
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #pragma once
 #include <avr/io.h>
 #include <avr/pgmspace.h>

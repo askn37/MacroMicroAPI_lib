@@ -5,9 +5,10 @@
  * @version 0.1
  * @date 2022-11-19
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
 
 /**
  * [M%Stack: Mini GPS/BDS Unit (AT6558) SKU:U032]

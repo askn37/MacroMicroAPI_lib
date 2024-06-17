@@ -9,9 +9,10 @@
 - megaAVR世代
   - megaAVR-0系統
   - tinyAVR-0/1系統
-- modernAVR世代
-  - AVR Dx系統
   - tinyAVR-2系統
+- modernAVR世代
+  - AVR-Dx系統
+  - AVR-Ex系統
 - reduceAVR
   - ATtiny10
 

@@ -5,9 +5,11 @@
  * @version 0.3
  * @date 2024-01-10
  *
- * @copyright Copyright (c) 2024 askn at github.com
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #include "../UrowNVM.h"
 #include <string.h>
 

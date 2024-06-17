@@ -5,9 +5,10 @@
  * @version 0.2
  * @date 2023-12-09
  *
- * @copyright Copyright (c) 2023 askn37 at github.com
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
 
 #ifndef ENABLE_MACRO_API
 #define ENABLE_MACRO_API

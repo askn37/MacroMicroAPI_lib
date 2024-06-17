@@ -5,9 +5,11 @@
  * @version 0.3
  * @date 2023-12-03
  *
- * @copyright Copyright (c) 2023 askn at github.com
+ * @copyright Copyright (c) 2024 askn37 at github.com
  *
  */
+// MIT License : https://askn37.github.io/LICENSE.html
+
 #include "../FlashNVM.h"
 #include <avr/pgmspace.h>
 #include <string.h>
@@ -18,7 +20,7 @@ namespace FlashNVM {
 
   __attribute__((naked))
   __attribute__((noinline))
-  void nvm_stc (uint16_t _addr) {
+  void nvm_stc (uint16_t /* _addr */) {
     __asm__ __volatile__ (
       /* Z <- R24:R25 <- &_addr */
       R"#ASM#(
@@ -39,7 +41,7 @@ namespace FlashNVM {
 
   __attribute__((naked))
   __attribute__((noinline))
-  void nvm_stz (uint16_t _addr, uint8_t _data) {
+  void nvm_stz (uint16_t /* _addr */, uint8_t /* _data */) {
     __asm__ __volatile__ (
       /* Z   <- R24:R25 <- &_addr */
       /* R22 <- R22     <- _data */
@@ -53,7 +55,7 @@ namespace FlashNVM {
 
   __attribute__((naked))
   __attribute__((noinline))
-  uint8_t nvm_ldz (uint16_t _addr) {
+  uint8_t nvm_ldz (uint16_t /* _addr */) {
     __asm__ __volatile__ (
       /* Z <- R24:R25 <- &_addr */
       R"#ASM#(
@@ -66,7 +68,7 @@ namespace FlashNVM {
 
   __attribute__((naked))
   __attribute__((noinline))
-  void nvm_cmd (uint8_t _nvm_cmd) {
+  void nvm_cmd (uint8_t /* _nvm_cmd */) {
     __asm__ __volatile__ (
       /* R24 <- _nvm_cmd */
       R"#ASM#(
@@ -82,7 +84,7 @@ namespace FlashNVM {
   /* 24bit version */
   __attribute__((naked))
   __attribute__((noinline))
-  void nvm_spm (uint32_t _addr) {
+  void nvm_spm (uint32_t /* _addr */) {
     /* R22:R23:R24:R25 <- &_addr */
     __asm__ __volatile__ (
       R"#ASM#(
@@ -98,7 +100,7 @@ namespace FlashNVM {
   /* 24bit version */
   __attribute__((naked))
   __attribute__((noinline))
-  void nvm_write (uint32_t _addr, uint8_t *_data) {
+  void nvm_write (uint32_t /* _addr */, uint8_t* /* _data */) {
     __asm__ __volatile__ (
       /* R22:R23:R24:R25 <- &_addr */
       /* R20             <- &_data */
@@ -127,7 +129,7 @@ namespace FlashNVM {
   /* 16bit version */
   __attribute__((naked))
   __attribute__((noinline))
-  void nvm_spm (uint16_t _addr) {
+  void nvm_spm (uint16_t /* _addr */) {
     __asm__ __volatile__ (
       /* Z <- R24:R25 <- &_addr */
       R"#ASM#(
@@ -141,7 +143,7 @@ namespace FlashNVM {
   /* 16bit version */
   __attribute__((naked))
   __attribute__((noinline))
-  void nvm_write (uint16_t _addr, uint8_t *_data) {
+  void nvm_write (uint16_t /* _addr */, uint8_t* /* _data */) {
     __asm__ __volatile__ (
       /* R24:R25 <- &_addr */
       /* R22:R23 <- &_data */
@@ -248,7 +250,7 @@ namespace FlashNVM {
 
   bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size) {
     uint8_t* _data_top = (uint8_t*)_data_addr;
-    uint8_t _buff_off = (nvmptr_t)_page_addr & (PROGMEM_PAGE_SIZE - 1);
+    size_t _buff_off = (nvmptr_t)_page_addr & (PROGMEM_PAGE_SIZE - 1);
     nvmptr_t _page_top = (nvmptr_t)_page_addr - _buff_off;
     uint8_t buffer[PROGMEM_PAGE_SIZE];
     while (_save_size) {
