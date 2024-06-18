@@ -24,7 +24,7 @@
 #include <peripheral.h> /* from Micro_API : inport Serial (Debug) */
 #define D1PRINTF(...) Serial.printf(__VA_ARGS__)
 #if DEBUG == 2
-#define D1PRINTF(...) Serial.printf(__VA_ARGS__)
+#define D2PRINTF(...) Serial.printf(__VA_ARGS__)
 #else
 #define D2PRINTF(...)
 #endif

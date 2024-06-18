@@ -46,10 +46,9 @@ namespace USB_NAMESPACE {
    * Please process class requests with 'bool cb_request_class(*EP_REQ, *EP_RES)'
    */
   bool request_standard (USB_EP_t* EP_REQ, USB_EP_t* EP_RES) {
-    EP_RES->CNT = 0;
     bool listen = true;
     uint8_t bRequest = USB_SETUP_DATA.bRequest;
-    D1PRINTF("SR=%02X:%02X:%04X\r\n", USB_SETUP_DATA.bmRequestType, USB_SETUP_DATA.bRequest, USB_SETUP_DATA.wLength);
+    D1PRINTF("SR=%02X:%02X:%04X:%04X:%04X\r\n", USB_SETUP_DATA.bmRequestType, USB_SETUP_DATA.bRequest, USB_SETUP_DATA.wValue, USB_SETUP_DATA.wIndex, USB_SETUP_DATA.wLength);
     if (bRequest == USB_REQ_GetStatus) {  /* 0x00 */
       EP_RES->CNT = 2;
       USB_HEADER_DATA.bLength = 0;
@@ -67,6 +66,7 @@ namespace USB_NAMESPACE {
     }
     else if (bRequest == USB_REQ_SetConfiguration) {  /* 0x09 */
       listen = cb_set_configuration((uint8_t)USB_SETUP_DATA.wValue);
+      EP_RES->CNT = 0;
     }
     else if (bRequest == USB_REQ_GetInterface) {  /* 0x0A */
       EP_RES->CNT = 1;
@@ -74,9 +74,11 @@ namespace USB_NAMESPACE {
     }
     else if (bRequest == USB_REQ_SetInterface) {  /* 0x0B */
       listen = cb_set_interface((uint8_t)USB_SETUP_DATA.wIndex, (uint8_t)USB_SETUP_DATA.wValue);
+      EP_RES->CNT = 0;
     }
     else if (bRequest == USB_REQ_SetAddress) {  /* 0x05 */
       /* Initiate EP0_IN and, if there is a response, activate the assigned address. */
+      EP_RES->CNT = 0;
       ep_setup_in_listen();
       ep_setup_in_pending();
       USB0_ADDR = USB_SETUP_DATA.wValue & 0x7F;

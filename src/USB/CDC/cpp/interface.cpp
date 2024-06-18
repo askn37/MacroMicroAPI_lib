@@ -132,28 +132,34 @@ namespace USB_NAMESPACE {
    */
   /* This is called continuously while the CDC port is open on the host side. */
   bool cb_request_class (USB_EP_t* EP_REQ, USB_EP_t* EP_RES) {
-    EP_RES->CNT = 0;
+    // uint16_t _cnt = EP_RES->CNT;
     bool listen = true;
     uint8_t bRequest = USB_SETUP_DATA.bRequest;
-    D1PRINTF("CR=%02X:%02X:%04X\r\n", USB_SETUP_DATA.bmRequestType, USB_SETUP_DATA.bRequest, USB_SETUP_DATA.wLength);
+    D1PRINTF("CR=%02X:%02X:%04X:%04X:%04X\r\n", USB_SETUP_DATA.bmRequestType, USB_SETUP_DATA.bRequest, USB_SETUP_DATA.wValue, USB_SETUP_DATA.wIndex, USB_SETUP_DATA.wLength);
     if (bRequest == CDC_REQ_SetLineEncoding) {
-      ep_setup_in_listen();
       ep_setup_out_listen();
       ep_setup_out_pending();
-      ep_setup_in_pending();
-      memcpy(&USBSTATE.sLineEncoding, &USB_HEADER_DATA, sizeof(LineEncoding_t));
-      cb_cdc_set_lineencoding(&USBSTATE.LineEncoding);
+      if (EP_REQ->CNT == USB_SETUP_DATA.wLength) {
+        memcpy(&USBSTATE.sLineEncoding, &USB_HEADER_DATA, sizeof(LineEncoding_t));
+        D2PRINTF("  SLE=%ld\r\n", USBSTATE.LineEncoding.dwDTERate);
+        cb_cdc_set_lineencoding(&USBSTATE.LineEncoding);
+      }
+      EP_RES->CNT = 0;
     }
     else if (bRequest == CDC_REQ_GetLineEncoding) {
       EP_RES->CNT = sizeof(LineEncoding_t);
       memcpy(&USB_HEADER_DATA, &USBSTATE.sLineEncoding, sizeof(LineEncoding_t));
+      D2PRINTF("  GLE=%ld\r\n", USBSTATE.LineEncoding.dwDTERate);
     }
     else if (bRequest == CDC_REQ_SetLineState) {
       USBSTATE.bLineState = (uint8_t)USB_SETUP_DATA.wValue;
+      D2PRINTF("  SLS=%02X\r\n", USBSTATE.bLineState);
       cb_cdc_set_linestate(&USBSTATE.bmLineState);
+      EP_RES->CNT = 0;
     }
     else if (bRequest == CDC_REQ_SendBreak) {
       USBSTATE.BREAKCNT = USB_SETUP_DATA.wValue;
+      D2PRINTF("  SB=%04X\r\n", USBSTATE.BREAKCNT);
       if (USB_SETUP_DATA.wValue) {
         USBSTATE.SerialState.bBreak = true;
         cb_cdc_set_sendbreak(USB_SETUP_DATA.wValue);
@@ -163,6 +169,7 @@ namespace USB_NAMESPACE {
         cb_cdc_clear_sendbreak();
       }
       send_serialstate(USBSTATE.SerialState);
+      EP_RES->CNT = 0;
     }
     else {
       listen = cb_request_class_other(EP_REQ, EP_RES);
