@@ -175,7 +175,6 @@ namespace USB_NAMESPACE {
       EP_REQ->STATUS, EP_REQ->CNT, USB_SETUP_DATA.bmRequestType, USB_SETUP_DATA.bRequest,
       USB_SETUP_DATA.wValue, USB_SETUP_DATA.wIndex, USB_SETUP_DATA.wLength);
     if (bRequest == CDC_REQ_SetLineEncoding) {        /* 0x20 */
-      loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
       ep_setup_out_listen();
       ep_setup_out_pending();
       D2PRINTF("  =%02X:%04X:%02X:%02X:%04X:%04X:%04X\r\n",
