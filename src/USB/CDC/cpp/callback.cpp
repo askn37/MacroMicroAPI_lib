@@ -27,6 +27,9 @@ namespace USB_NAMESPACE {
   WEAK void cb_bus_event_stalled (void) {}
   WEAK void cb_bus_event_overflow (void) {}
   WEAK void cb_bus_event_underflow (void) {}
+  WEAK void cb_bus_event_start (void) {}
+  WEAK void cb_bus_event_stop (void) {}
+  WEAK bool cb_bus_check (void) { return true; }
 
   WEAK void cb_request_setup_stalled (USB_EP_t* /* EP_REQ */, USB_EP_t* /* EP_RES */) {}
   WEAK bool cb_request_standard_other (USB_EP_t* /* EP_REQ */, USB_EP_t* /* EP_RES */) { return false; }
@@ -37,7 +40,7 @@ namespace USB_NAMESPACE {
   WEAK void cb_endpoint_complete (USB_EP_t* /* EP */, uint8_t /* EP_ID */) {}
 
   WEAK uint8_t cb_get_configuration (void) { return 0; }
-  WEAK bool    cb_set_configuration (uint8_t /* _config */) {return false; }
+  WEAK bool    cb_set_configuration (uint8_t /* _config */) { return false; }
   WEAK bool    cb_clear_feature (void) { return true; }
   WEAK bool    cb_set_feature (void) { return true; }
   WEAK void    cb_clear_state (void) {}

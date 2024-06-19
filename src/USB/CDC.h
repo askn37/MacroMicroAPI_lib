@@ -37,19 +37,20 @@ namespace USB_NAMESPACE {
 
   void start (void);
   void stop (void);
-  void flush (void);
-  void clear (void);
+  void write_flush (void);
+  void read_clear (void);
 
-  size_t put_byte (const uint8_t _c);
-  int get_byte (void);
-  size_t get_available (void);
-  size_t put_available (void);
-  int peek_byte (void);
-  bool find_byte (const uint8_t _c = '\n');
+  Interface_State* get_state (void);
+  size_t write_byte (const uint8_t _c);
   size_t write_bytes (const void* _buffer, size_t _length);
   size_t write_bytes (const PGM_t* _buffer, size_t _length);
+  size_t write_available (void);
+  int read_byte (void);
+  size_t read_available (void);
+  int peek_byte (void);
   void set_timeout (uint16_t _timeout);
   size_t read_bytes (void* _buffer, size_t _limit, char _terminate = 0, uint8_t _swevent = 0);
+  bool find_byte (const uint8_t _c = '\n');
 
   void send_serialstate (SerialState_t& _serialstate);
   LineState_t& get_line_state (void);
@@ -64,6 +65,9 @@ namespace USB_NAMESPACE {
   void cb_bus_event_stalled (void);
   void cb_bus_event_underflow (void);
   void cb_bus_event_overflow (void);
+  void cb_bus_event_start (void);
+  void cb_bus_event_stop (void);
+  bool cb_bus_check (void);
 
   void cb_cdc_set_lineencoding (LineEncoding_t* _lineencoding);
   void cb_cdc_set_linestate (LineState_t* _linestate);

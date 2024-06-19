@@ -14,7 +14,7 @@
 #if defined(__cplusplus) && defined(USB0)
 #include <avr/interrupt.h>
 
-#include "../SerialUSB_Class.h"
+#include "../SerialUSB.h"
 
 extern "C" {
   SerialUSB_Class SerialUSB;  /* Instance allocation */

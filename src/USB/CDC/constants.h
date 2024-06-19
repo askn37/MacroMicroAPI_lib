@@ -19,8 +19,8 @@
 
 /* CDC-ACM general specs */
 #define USB_ENDPOINTS_MAX     3     /* fixed value */
-#define USB_BULK_INTERVAL     2     /* As large as possible */
-#define USB_INTR_INTERVAL     2     /* As large as possible */
+#define USB_BULK_INTERVAL     0     /* As large as possible */
+#define USB_INTR_INTERVAL     5     /* As large as possible */
 
 #define USB_SETUP_PK_SIZE     64    /* This length cannot be changed. */
 #define USB_DATA_PK_SIZE      64    /* 64 is the maximum allowed by USB 2.0. */
@@ -28,6 +28,7 @@
 
 #define USB_BULK_RECV_MAX     USB_DATA_PK_SIZE  /* Cannot be changed. */
 #define USB_BULK_SEND_MAX     64                /* It can be expanded up to 1023. */
+#define USB_BULK_SEND_DELAY   2
 
 #define USB_DATA_BUFFER_SIZE  (USB_BULK_SEND_MAX + USB_BULK_RECV_MAX + USB_INTR_PK_SIZE - 8)
 
@@ -35,8 +36,6 @@
                             (x <= 16) ? USB_BUFSIZE_DEFAULT_BUF16_gc:\
                             (x <= 32) ? USB_BUFSIZE_DEFAULT_BUF32_gc:\
                                         USB_BUFSIZE_DEFAULT_BUF64_gc)
-#define _MIN(A,B) ((A)<(B)?(A):(B))
-#define _MAX(A,B) ((A)>(B)?(A):(B))
 
 /* EPFIFO number that identifies the EP */
 #define USB_EP_SETUP_OUT  (0x00)
@@ -95,7 +94,6 @@ namespace USB_NAMESPACE {
 
   USB_EP_TABLE_t* get_endpointer_ptr (void);  /* 64 bytes */
   USB_WM_TABLE_t* get_workmem_ptr (void);     /* 136 bytes */
-  Interface_State* get_state (void);
 
   /* Static descriptor getter */
   size_t cb_get_descriptor_data (uint16_t _index, uint8_t* _buffer);

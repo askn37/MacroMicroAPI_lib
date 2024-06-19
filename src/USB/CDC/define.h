@@ -50,8 +50,8 @@ namespace USB_NAMESPACE {
   /* bmRequestType */
   , USB_REQTYPE_DIRECTION_gp        = 7
   , USB_REQTYPE_DIRECTION_gm        = (1 << 7)
-  , USB_REQTYPE_TYPE_gm             = 0x60
-  , USB_REQTYPE_RECIPIENT_gm        = 0x1F
+  , USB_REQTYPE_TYPE_gm             = (3 << 5)
+  , USB_REQTYPE_RECIPIENT_gm        = (31)
   , USB_RECIPIENT_DEVICE_gc         = (0 << 0)  // 0x00
   , USB_RECIPIENT_INTERFACE_gc      = (1 << 0)  // 0x01
   , USB_RECIPIENT_ENDPOINT_gc       = (2 << 0)  // 0x02
@@ -172,8 +172,15 @@ namespace USB_NAMESPACE {
 
   /* USB_Descriptor_Header : 2 bytes */
   typedef struct {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
+    union {
+      struct {
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
+      };
+      struct {
+        uint32_t dwValue;
+      };
+    };
   } PACKED Descriptor_Header;
 
   /* USB_Device_Descriptor : 18 bytes */
@@ -348,22 +355,24 @@ namespace USB_NAMESPACE {
 
   /* USB InterfaceState : 16 bytes */
   typedef struct {
+    register8_t  CONFIG = 0;
+    register8_t  DELAY = 0;
+    register8_t  SOF = 0;
+    register16_t SENDCNT = 0;
+    register16_t RECVCNT = 0;
+    register16_t BREAKCNT = 0;
+    register16_t TIMEOUT = 1000;
     SerialState_t SerialState;
     union {
-      uint8_t sLineEncoding[sizeof(LineEncoding_t)];
       LineEncoding_t LineEncoding = {
         9600UL, StopBits_1, Parity_None, 8
       };
+      uint8_t sLineEncoding[sizeof(LineEncoding_t)];
     };
     union {
-      register8_t bLineState;
+      register8_t bLineState = 0;
       LineState_t bmLineState;
     };
-    register8_t  CONFIG;
-    register16_t RECVCNT;
-    register16_t SENDCNT;
-    register16_t BREAKCNT;
-    register16_t TIMEOUT = 1000;
   } PACKED Interface_State;
 
 } /* USB_CDC */

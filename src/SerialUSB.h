@@ -32,20 +32,20 @@ public:
   inline SerialUSB_Class& initiate (const uint16_t /* unused */) { USB_NAMESPACE::start(); return *this; }
   inline void end (void) { return USB_NAMESPACE::stop(); }
 
-  size_t write (const uint8_t _c) { return USB_NAMESPACE::put_byte(_c); }
-  inline size_t write (const void* _buffer, size_t _length) { return USB_NAMESPACE::write_bytes(_buffer, _length); }
-  inline size_t write (const PGM_t* _buffer, size_t _length) { return USB_NAMESPACE::write_bytes(_buffer, _length); }
+  size_t write (const uint8_t _c) { return USB_NAMESPACE::write_byte(_c); }
+  size_t write (const void* _buffer, size_t _length) { return USB_NAMESPACE::write_bytes(_buffer, _length); }
+  size_t write (const PGM_t* _buffer, size_t _length) { return USB_NAMESPACE::write_bytes(_buffer, _length); }
 
-  int read (void) { return USB_NAMESPACE::get_byte(); }
-  void flush (void) { return USB_NAMESPACE::flush(); }
-  inline void clear (void) { return USB_NAMESPACE::clear(); }
-  inline size_t available (void) { return USB_NAMESPACE::get_available(); }
-  inline size_t availableForWrite (void) { return USB_NAMESPACE::put_available(); }
-  inline int peek (void) { return USB_NAMESPACE::peek_byte(); }
+  int read (void) { return USB_NAMESPACE::read_byte(); }
+  void flush (void) { return USB_NAMESPACE::write_flush(); }
+  void clear (void) { return USB_NAMESPACE::read_clear(); }
+  size_t available (void) { return USB_NAMESPACE::read_available(); }
+  size_t availableForWrite (void) { return USB_NAMESPACE::write_available(); }
+  int peek (void) { return USB_NAMESPACE::peek_byte(); }
   bool find (const uint8_t _c = '\n') { return USB_NAMESPACE::find_byte(_c); }
 
-  inline void setTimeout (uint16_t _timeout) { USB_NAMESPACE::set_timeout(_timeout); }
-  inline size_t readBytes (void* _buffer, size_t _limit, char _terminate = 0, uint8_t _swevent = 0) {
+  void setTimeout (uint16_t _timeout) { USB_NAMESPACE::set_timeout(_timeout); }
+  size_t readBytes (void* _buffer, size_t _limit, char _terminate = 0, uint8_t _swevent = 0) {
     return USB_NAMESPACE::read_bytes(_buffer, _limit, _terminate, _swevent);
   }
 
