@@ -12,7 +12,6 @@
 
 #include <avr/io.h>
 #if defined(__cplusplus) && defined(USB0)
-#include <string.h>
 
 #include "../../CDC.h"
 #include "../constants.h"
@@ -32,7 +31,7 @@ namespace USB_NAMESPACE {
   WEAK void ep_setup_clear (void) {
     USB0_ADDR = 0;
     USB0_FIFOWP = 0;
-    USB0_EPPTR = (uint16_t)&get_endpointer_ptr()->EP;
+    USB0_EPPTR = (uint16_t)&EP_TABLE.EP;
 
     /* USB_EP_REQ=EP0_OUT is TYPE_CONTROL and does not use the TRNCOMPL interrupt. */
     USB_EP_REQ.CTRL = USB_TYPE_CONTROL_gc | USB_MULTIPKT_bm | USB_AZLP_bm | USB_TCDSBL_bm | USB_EP_SIZE_gc(USB_SETUP_PK_SIZE);

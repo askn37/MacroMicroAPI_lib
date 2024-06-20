@@ -15,7 +15,6 @@
 #if defined(__cplusplus) && defined(USB0)
 #include <string.h>         /* memcpy */
 #include "api/macro_api.h"  /* interrupts and ATOMIC_BLOCK */
-#include "api/String.h"     /* PGM_t and pgm_read_byte */
 
 #include "../../CDC.h"
 #include "../constants.h"
@@ -82,7 +81,7 @@ namespace USB_NAMESPACE {
       USB_EP_RECV.STATUS, USB_EP_RECV.CNT - USBSTATE.RECVCNT);
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USBSTATE.RECVCNT = 0;
-      USB_EP_RECV.CNT = 0;
+      USB_EP_RECV.CNT  = 0;
     }
     ep_recv_listen();
     ep_recv_pending();
@@ -109,7 +108,7 @@ namespace USB_NAMESPACE {
   void ep_interrupt_send (size_t _size = 0) {
     D1PRINTF("  INTR=%02X:%d\r\n", USB_EP_INTR.STATUS, _size);
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      USB_EP_INTR.CNT = _size;
+      USB_EP_INTR.CNT  = _size;
       USB_EP_INTR.MCNT = 0;
     }
     ep_interrupt_listen();
@@ -132,25 +131,25 @@ namespace USB_NAMESPACE {
       USBSTATE.RECVCNT = 0;
 
       /* USB_EP_INTR=EP1_IN uses the TRNCOMPL interrupt. */
-      USB_EP_INTR.CNT = 0;
+      USB_EP_INTR.CNT     = 0;
       USB_EP_INTR.DATAPTR = (uint16_t)&USB_INTR_BUFFER;
-      USB_EP_INTR.MCNT = 0;
-      USB_EP_INTR.STATUS = USB_BUSNAK_bm;
-      USB_EP_INTR.CTRL = USB_TYPE_BULKINT_gc | USB_MULTIPKT_bm | USB_AZLP_bm | USB_EP_SIZE_gc(USB_INTR_PK_SIZE);
+      USB_EP_INTR.MCNT    = 0;
+      USB_EP_INTR.STATUS  = USB_BUSNAK_bm;
+      USB_EP_INTR.CTRL    = USB_TYPE_BULKINT_gc | USB_MULTIPKT_bm | USB_AZLP_bm | USB_EP_SIZE_gc(USB_INTR_PK_SIZE);
 
       /* USB_EP_RECV=EP2_OUT does not use the TRNCOMPL interrupt and MULTIPKT. */
-      USB_EP_RECV.CNT = 0;
+      USB_EP_RECV.CNT     = 0;
       USB_EP_RECV.DATAPTR = (uint16_t)&USB_RECV_BUFFER;
-      USB_EP_RECV.MCNT = USB_BULK_RECV_MAX;
-      USB_EP_RECV.STATUS = USB_BUSNAK_bm;
-      USB_EP_RECV.CTRL = USB_TYPE_BULKINT_gc | USB_TCDSBL_bm | USB_EP_SIZE_gc(USB_BULK_RECV_MAX);
+      USB_EP_RECV.MCNT    = USB_BULK_RECV_MAX;
+      USB_EP_RECV.STATUS  = USB_BUSNAK_bm;
+      USB_EP_RECV.CTRL    = USB_TYPE_BULKINT_gc | USB_TCDSBL_bm | USB_EP_SIZE_gc(USB_BULK_RECV_MAX);
 
       /* USB_EP_SEND=EP2_IN does not use the TRNCOMPL interrupt, only MULTIPKT. */
-      USB_EP_SEND.CNT = 0;
+      USB_EP_SEND.CNT     = 0;
       USB_EP_SEND.DATAPTR = (uint16_t)&USB_SEND_BUFFER;
-      USB_EP_SEND.MCNT = 0;
-      USB_EP_SEND.STATUS = USB_BUSNAK_bm;
-      USB_EP_SEND.CTRL = USB_TYPE_BULKINT_gc | USB_MULTIPKT_bm | USB_AZLP_bm | USB_TCDSBL_bm | USB_EP_SIZE_gc(USB_BULK_SEND_MAX);
+      USB_EP_SEND.MCNT    = 0;
+      USB_EP_SEND.STATUS  = USB_BUSNAK_bm;
+      USB_EP_SEND.CTRL    = USB_TYPE_BULKINT_gc | USB_MULTIPKT_bm | USB_AZLP_bm | USB_TCDSBL_bm | USB_EP_SIZE_gc(USB_BULK_SEND_MAX);
 
       send_serialstate(USBSTATE.SerialState);
       cb_bus_event_start();
@@ -327,46 +326,6 @@ namespace USB_NAMESPACE {
     return 1;
   }
 
-  /* Sends the specified amount from the specified buffer. */
-  /* The buffer address must not point to anything other than SRAM. */
-  size_t write_bytes (const void* _buffer, size_t _length) {
-    if (is_busy() || _length == 0 || bit_is_set(USB_EP_SEND.STATUS, USB_BUSNAK_bp)) return 0;
-    if (USBSTATE.SENDCNT > 0) ep_send_listen();
-    ep_send_pending();
-    /* Change the pointer and send everything with MULTIPKT. */
-    /* This is only possible if BUSNAK is set. */
-    uint16_t _q = USB_EP_SEND.DATAPTR;
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      USB_EP_SEND.DATAPTR = (register16_t)_buffer;
-      USB_EP_SEND.CNT = _length;
-      USB_EP_SEND.MCNT = 0;
-    }
-    ep_send_listen();
-    /* Wait for the transmission to complete and restore the pointer. */
-    ep_send_pending();
-    USB_EP_SEND.DATAPTR = _q;
-    /* The return value of this function is a dummy. */
-    return _length;
-  }
-
-  /* Sends the specified amount from PROGMEM. */
-  size_t write_bytes (const PGM_t* _buffer, size_t _length) {
-    size_t _n = 0;
-    PGM_P _p = reinterpret_cast<PGM_P>(_buffer);
-    while (_length--) {
-      if (is_busy()) break;
-      ep_send_pending();
-      /* This is only possible if BUSNAK is set. */
-      ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-        USB_SEND_BUFFER[USBSTATE.SENDCNT++] = pgm_read_byte(_p++);
-      }
-      _n++;
-      if (USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) ep_send_listen();
-    }
-    if (USBSTATE.SENDCNT > 0) ep_send_listen();
-    return _n;
-  }
-
   /* Returns the number of characters available to write. */
   size_t write_available (void) {
     return (is_busy() || bit_is_clear(USB_EP_SEND.STATUS, USB_BUSNAK_bp))
@@ -406,7 +365,7 @@ namespace USB_NAMESPACE {
 
   /* Fills the given receive buffer until either a timeout occurs or the given character arrives. */
   size_t read_bytes (void* _buffer, size_t _limit, char _terminate, uint8_t _swevent) {
-    size_t _length = 0;
+    size_t   _length  = 0;
     uint16_t _timeout = 0;
     do {
       if (is_busy()) return _length;
@@ -415,8 +374,8 @@ namespace USB_NAMESPACE {
       if (_timeout >= USBSTATE.TIMEOUT) break;
       EVSYS_SWEVENTA = _swevent;
       _swevent = 0;
-      int _c = read_byte();
-      if (_c >= 0) {
+      if (read_available()) {
+        int _c = read_byte();
         ((uint8_t*)_buffer)[_length++] = (uint8_t)_c;
         if (_terminate == (uint8_t)_c) break;
       }

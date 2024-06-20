@@ -47,8 +47,6 @@ namespace USB_NAMESPACE {
 
   Interface_State* get_state (void);
   size_t write_byte (const uint8_t _c);
-  size_t write_bytes (const void* _buffer, size_t _length);
-  size_t write_bytes (const PGM_t* _buffer, size_t _length);
   size_t write_available (void);
   int read_byte (void);
   size_t read_available (void);

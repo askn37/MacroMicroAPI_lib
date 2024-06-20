@@ -356,7 +356,6 @@ namespace USB_NAMESPACE {
   /* USB InterfaceState : 16 bytes */
   typedef struct {
     register8_t  CONFIG = 0;
-    register8_t  DELAY = 0;
     register8_t  SOF = 0;
     register16_t SENDCNT = 0;
     register16_t RECVCNT = 0;

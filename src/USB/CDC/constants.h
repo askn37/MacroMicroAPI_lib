@@ -28,7 +28,6 @@
 
 #define USB_BULK_RECV_MAX     USB_DATA_PK_SIZE  /* Cannot be changed. */
 #define USB_BULK_SEND_MAX     64                /* It can be expanded up to 1023. */
-#define USB_BULK_SEND_DELAY   2
 
 #define USB_DATA_BUFFER_SIZE  (USB_BULK_SEND_MAX + USB_BULK_RECV_MAX + USB_INTR_PK_SIZE - 8)
 

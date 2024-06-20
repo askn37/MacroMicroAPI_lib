@@ -12,8 +12,7 @@
 
 #include <avr/io.h>
 #if defined(__cplusplus) && defined(USB0)
-#include <string.h> /* memcpy */
-#include "api/macro_api.h"
+#include <string.h>         /* memcpy */
 
 #include "../../CDC.h"
 #include "../constants.h"

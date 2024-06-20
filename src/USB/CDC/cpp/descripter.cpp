@@ -12,13 +12,12 @@
 
 #include <avr/io.h>
 #if defined(__cplusplus) && defined(USB0)
-#include <avr/pgmspace.h>
-// #include "api/macro_api.h"
+#include <avr/pgmspace.h>   /* PROGMEM memcpy_P */
 
 #include "../../CDC.h"
 #include "../constants.h"
 
-#include "api/btools.h" /* from Micro_API */
+#include "api/btools.h"     /* btoh */
 
 /*** WARNING ***
  * This USB device information applies only when using Microchip Technology Inc. products.
