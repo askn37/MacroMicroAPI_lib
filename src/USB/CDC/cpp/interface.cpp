@@ -11,14 +11,16 @@
 // MIT License : https://askn37.github.io/LICENSE.html
 
 #include <avr/io.h>
+/* Compilation with anything other than the AVR-DU series will be rejected. */
 #if defined(__cplusplus) && defined(USB0)
 #include <string.h>         /* memcpy */
-#include "api/macro_api.h"  /* interrupts ATOMIC_BLOCK */
-#include "api/String.h"     /* PGM_t */
+#include "api/macro_api.h"  /* interrupts and ATOMIC_BLOCK */
+#include "api/String.h"     /* PGM_t and pgm_read_byte */
 
 #include "../../CDC.h"
 #include "../constants.h"
 
+/* USB_NAMESPACE is specified by a macro. */
 namespace USB_NAMESPACE {
   /*
    * Implementing the communication data class
@@ -26,7 +28,10 @@ namespace USB_NAMESPACE {
 
   /*** Here we must allocate memory and define callback functions to operate on it. ***/
 
+  /* Memory to hold the USB_STATE structure. */
   Interface_State USB_STATE;
+
+  /* Returns a pointer to the USB_STATE structure. */
   Interface_State* get_state (void) { return &USB_STATE; }
 
   /*
@@ -41,7 +46,6 @@ namespace USB_NAMESPACE {
   /* Wait for reception to complete. */
   void ep_recv_pending (void) {
     loop_until_bit_is_set(USB_EP_RECV.STATUS, USB_BUSNAK_bp);
-    D2PRINTF("  RN=%d/%d\r\n", USBSTATE.RECVCNT, USB_EP_RECV.CNT);
   }
 
   /* Wait for the transmission to complete. */
@@ -49,52 +53,61 @@ namespace USB_NAMESPACE {
     loop_until_bit_is_set(USB_EP_SEND.STATUS, USB_BUSNAK_bp);
   }
 
+  /* Allow the next transmission. */
+  /* Avoid buffer operations until transmission is complete. */
   void ep_interrupt_listen (void) {
     loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
     USB_EP_STATUS_CLR(USB_EP_INTR_IN) = ~USB_TOGGLE_bm;
   }
 
   /* Allow the next reception. */
+  /* Avoid buffer operations until the next receive is complete. */
   void ep_recv_listen (void) {
     loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
     USB_EP_STATUS_CLR(USB_EP_BULK_OUT) = ~USB_TOGGLE_bm;
   }
 
   /* Allow the next transmission. */
+  /* Avoid buffer operations until transmission is complete. */
   void ep_send_listen (void) {
     loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
     USB_EP_STATUS_CLR(USB_EP_BULK_IN) = ~USB_TOGGLE_bm;
   }
 
   /* Allow the next reception. */
+  /* This is only possible if BUSNAK is set. */
   /* This will block until the host sends data. */
   void ep_recv_flush (void) {
-    D1PRINTF("  RECV=%02X", USB_EP_RECV.STATUS);
+    D1PRINTF("  RECV=%02X:%d",
+      USB_EP_RECV.STATUS, USB_EP_RECV.CNT - USBSTATE.RECVCNT);
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USBSTATE.RECVCNT = 0;
       USB_EP_RECV.CNT = 0;
     }
     ep_recv_listen();
     ep_recv_pending();
-    D1PRINTF("->%02X:%d/%d\r\n", USB_EP_RECV.STATUS, USBSTATE.RECVCNT, USB_EP_RECV.CNT);
+    D1PRINTF("->%02X\r\n", USB_EP_RECV.STATUS);
   }
 
   /* Allow the next reception. */
-  /* Blocks until the host receives data. */
+  /* This is only possible if BUSNAK is set. */
   void ep_send_flush (void) {
-    // ep_send_pending();
-    D1PRINTF("  SEND=%d\r\n", USBSTATE.SENDCNT);
+    D1PRINTF("  RECV=%02X:%d SEND=%02X:%d\r\n",
+      USB_EP_RECV.STATUS, USB_EP_RECV.CNT - USBSTATE.RECVCNT,
+      USB_EP_SEND.STATUS, USBSTATE.SENDCNT);
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USB_EP_SEND.CNT = USBSTATE.SENDCNT;
       USB_EP_SEND.MCNT = 0;
       USBSTATE.SENDCNT = 0;
     }
     ep_send_listen();
+    // D1PRINTF("  RECV=%02X", USB_EP_RECV.STATUS);
   }
 
   /* The next interrupt will be allowed. */
+  /* This is only possible if BUSNAK is set. */
   void ep_interrupt_send (size_t _size = 0) {
-    D1PRINTF("  INTR=%d\r\n", _size);
+    D1PRINTF("  INTR=%02X:%d\r\n", USB_EP_INTR.STATUS, _size);
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USB_EP_INTR.CNT = _size;
       USB_EP_INTR.MCNT = 0;
@@ -106,14 +119,13 @@ namespace USB_NAMESPACE {
    * Callback override functions
    */
 
-  /* Returns the device setting value. */
+  /* Callback function that returns the device setting value. */
   uint8_t cb_get_configuration (void) { return USBSTATE.CONFIG; }
 
-  /* This operation is called during enumeration. */
+  /* This callback operation is called during enumeration. */
   bool cb_clear_feature (void) { return true; }
 
-  /* Prepare the device when called from enumeration. */
-  /* Prepare the stream pipe for CDC here. */
+  /* Callback function that, when called, prepares the bulk transfer. */
   bool cb_set_configuration (uint8_t _config) {
     if (_config) {
       USBSTATE.SENDCNT = 0;
@@ -150,17 +162,14 @@ namespace USB_NAMESPACE {
   /* Sends the current SerialState information to the host. */
   void send_serialstate (SerialState_t &_serialstate) {
     ep_interrupt_pending();
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      /* This operation must be performed with interrupts disabled. */
-      Notification_SerialState_t *p = (Notification_SerialState_t*)&USB_INTR_BUFFER;
-      p->bmRequestType  = USB_REQTYPE_DIRECTION_gm | USB_REQTYPE_CLASS_gc | USB_RECIPIENT_INTERFACE_gc; // 0xA1
-      p->bRequest       = CDC_NOTIF_SerialState;  // 0x20
-      p->wValue         = 0;
-      p->wIndex         = 0;  // Interface#0
-      p->wLength        = 2;
-      p->data           = _serialstate;
-      ep_interrupt_send(sizeof(Notification_SerialState_t));
-    }
+    Notification_SerialState_t *p = (Notification_SerialState_t*)&USB_INTR_BUFFER;
+    p->bmRequestType  = USB_REQTYPE_DIRECTION_gm | USB_REQTYPE_CLASS_gc | USB_RECIPIENT_INTERFACE_gc; // 0xA1
+    p->bRequest       = CDC_NOTIF_SerialState;  // 0x20
+    p->wValue         = 0;
+    p->wIndex         = 0;  // Interface#0
+    p->wLength        = 2;
+    p->data           = _serialstate;
+    ep_interrupt_send(sizeof(Notification_SerialState_t));
   }
 
   /*
@@ -168,7 +177,6 @@ namespace USB_NAMESPACE {
    */
   /* This is called continuously while the CDC port is open on the host side. */
   bool cb_request_class (USB_EP_t* EP_REQ, USB_EP_t* EP_RES) {
-    // uint16_t _cnt = EP_RES->CNT;
     bool listen = true;
     uint8_t bRequest = USB_SETUP_DATA.bRequest;
     D1PRINTF("CR=%02X:%04X:%02X:%02X:%04X:%04X:%04X\r\n",
@@ -223,7 +231,7 @@ namespace USB_NAMESPACE {
   void cb_endpoint_complete (USB_EP_t* /* EP */, uint8_t EP_ID) {
     if (EP_ID == USB_EP_INTR_IN) {
       ep_interrupt_pending();
-      if (0xFFFF > (uint16_t)(USBSTATE.BREAKCNT - 1)) {
+      if (1 < (uint16_t)(USBSTATE.BREAKCNT + 1)) {
         USBSTATE.BREAKCNT = USBSTATE.BREAKCNT < USB_INTR_INTERVAL ? 0 : USB_INTR_INTERVAL;
         ep_interrupt_send(0);
       }
@@ -239,16 +247,27 @@ namespace USB_NAMESPACE {
    * Application interface
    */
 
-  bool is_ready (void) { return !!(USBSTATE.CONFIG && cb_bus_check()); }
+  /* Returns true if USB communication is enabled. */
+  bool is_ready (void) { return !is_busy(); }
 
-  bool is_busy (void) { return !is_ready(); }
+  /* Returns false if USB communication is enabled. */
+  bool is_busy (void) { return !(USBSTATE.CONFIG && cb_bus_check()); }
 
+  /* Clear the USB_STATE structure to its initial values. */
   void cb_clear_state (void) { USBSTATE = (Interface_State){}; }
 
+  /* SOF token detected interrupt callback. */
+  /* This may occur up to one or more times within 1 millisecond. */
   void cb_bus_event_sof (void) {
+    /* Buffer read/write delay processing. */
+    /* An attempt is made at least every 64 ms. */
     if (0 == (0x3F & (--USBSTATE.SOF))) {
-      if (USB_EP_RECV.CNT == USBSTATE.RECVCNT && bit_is_set(USB_EP_RECV.STATUS, USB_UNFOVF_bp)) ep_recv_flush();
-      if (USBSTATE.SENDCNT > 0 && bit_is_set(USB_EP_SEND.STATUS, USB_UNFOVF_bp)) ep_send_flush();
+      /* Buffered sends and receives can only be performed */
+      /* if the underflow bit is set to avoid blocking from the host side. */
+      if (USB_EP_RECV.CNT == USBSTATE.RECVCNT
+       && bit_is_set(USB_EP_RECV.STATUS, USB_UNFOVF_bp)) ep_recv_flush();
+      if (USBSTATE.SENDCNT > 0
+       && bit_is_set(USB_EP_SEND.STATUS, USB_UNFOVF_bp)) ep_send_flush();
     }
   }
 
@@ -278,6 +297,7 @@ namespace USB_NAMESPACE {
   }
 
   /* Discard the current receive buffer. */
+  /* Wait until NAK is set before writing data. */
   void read_clear (void) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USBSTATE.RECVCNT = 0;
@@ -295,11 +315,12 @@ namespace USB_NAMESPACE {
     if (is_busy()) return 0;
     if (USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) ep_send_flush();
     ep_send_pending();
+    /* This is only possible if BUSNAK is set. */
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USB_SEND_BUFFER[USBSTATE.SENDCNT++] = _c;
     }
     USBSTATE.SOF = 0;
-    D2PRINTF(" SV=%d/%d<%02X\r\n", USBSTATE.SENDCNT, USB_BULK_SEND_MAX, _c);
+    D2PRINTF(" WB=%d/%d<%02X\r\n", USBSTATE.SENDCNT, USB_BULK_SEND_MAX, _c);
     if (USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) ep_send_flush();
     return 1;
   }
@@ -311,6 +332,7 @@ namespace USB_NAMESPACE {
     if (USBSTATE.SENDCNT > 0) ep_send_listen();
     ep_send_pending();
     /* Change the pointer and send everything with MULTIPKT. */
+    /* This is only possible if BUSNAK is set. */
     uint16_t _q = USB_EP_SEND.DATAPTR;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USB_EP_SEND.DATAPTR = (register16_t)_buffer;
@@ -332,6 +354,7 @@ namespace USB_NAMESPACE {
     while (_length--) {
       if (is_busy()) break;
       ep_send_pending();
+      /* This is only possible if BUSNAK is set. */
       ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         USB_SEND_BUFFER[USBSTATE.SENDCNT++] = pgm_read_byte(_p++);
       }
@@ -344,9 +367,8 @@ namespace USB_NAMESPACE {
 
   /* Returns the number of characters available to write. */
   size_t write_available (void) {
-    D1PRINTF("WA=%02X:%d/%d\r\n", USB_EP_SEND.STATUS, USBSTATE.SENDCNT, USB_BULK_SEND_MAX);
-    if (is_busy()) return 0;
-    return USB_BULK_SEND_MAX - USBSTATE.SENDCNT;
+    return (is_busy() || bit_is_clear(USB_EP_SEND.STATUS, USB_BUSNAK_bp))
+      ? 0 : USB_BULK_SEND_MAX - USBSTATE.SENDCNT;
   }
 
   /* Receives one character. */
@@ -356,31 +378,25 @@ namespace USB_NAMESPACE {
     /* This will block until the host sends data. */
     if (USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
     if (USB_EP_RECV.CNT > USBSTATE.RECVCNT) {
-      D1PRINTF("RA=%02X:%d/%d\r\n", USB_EP_RECV.STATUS, USBSTATE.RECVCNT, USB_EP_RECV.CNT);
+      D1PRINTF("RA=%02X:%d/%d\r\n",
+        USB_EP_RECV.STATUS, USBSTATE.RECVCNT, USB_EP_RECV.CNT);
+      /* This is only possible if BUSNAK is set. */
       ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         _c = USB_RECV_BUFFER[USBSTATE.RECVCNT++];
       }
-      D2PRINTF(" RV=%d/%d>%02X\r\n", USBSTATE.RECVCNT, USB_EP_RECV.CNT, _c);
+      D2PRINTF(" RB=%d/%d>%02X\r\n", USBSTATE.RECVCNT, USB_EP_RECV.CNT, _c);
     }
     return _c;
   }
 
   /* Returns the number of unread characters. */
   size_t read_available (void) {
-    size_t _s = 0;
-    if (is_busy()) return 0;
-    _s = USB_EP_RECV.CNT - USBSTATE.RECVCNT;
-    return _s;
+    return is_busy() ? 0 : USB_EP_RECV.CNT - USBSTATE.RECVCNT;
   }
 
   /* Returns the last character of the unread buffer. */
   int peek_byte (void) {
-    int _c = -1;
-    if (is_busy()) return _c;
-    if (USB_EP_RECV.CNT != USBSTATE.RECVCNT) {
-      _c = USB_RECV_BUFFER[USBSTATE.RECVCNT - 1];
-    }
-    return _c;
+    return USB_EP_RECV.CNT == USBSTATE.RECVCNT ? -1 : USB_RECV_BUFFER[USBSTATE.RECVCNT - 1];
   }
 
   /* Change the timeout for read_bytes. The default is 1000ms. */
