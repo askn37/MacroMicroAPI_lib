@@ -13,9 +13,14 @@
 #pragma once
 #include <avr/io.h>
 #if defined(__cplusplus) && defined(USB0)
+#if (F_CPU < 12000000L)
+#error Please specify an MCU operating speed (F_CPU) of 12MHz (12000000L) or higher.
+#include BUILD_STOP
+#endif
 #include <stddef.h>
 #include "api/String.h"
 
+/* If you fork and create a custom build, you will need to change this name. */
 #define USB_NAMESPACE USB::CDC
 
 #include "CDC/define.h"

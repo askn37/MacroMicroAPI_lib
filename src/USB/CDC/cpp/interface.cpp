@@ -155,6 +155,7 @@ namespace USB_NAMESPACE {
       send_serialstate(USBSTATE.SerialState);
       cb_bus_event_start();
     }
+    else cb_bus_event_stop();
     USBSTATE.CONFIG = _config;
     return !!_config;
   }
@@ -285,6 +286,7 @@ namespace USB_NAMESPACE {
   void stop (void) {
     cb_clear_state();
     bus_detach();
+    cb_bus_event_stop();
     USB0_CTRLA = 0;
     D1PRINTF("USB0=%02X/E\r\n", USB0_CTRLA);
   }
