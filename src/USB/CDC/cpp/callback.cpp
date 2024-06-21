@@ -38,6 +38,7 @@ namespace USB_NAMESPACE {
   WEAK bool cb_request_vender (USB_EP_t* /* EP_REQ */, USB_EP_t* /* EP_RES */) { return false; }
 
   WEAK void cb_endpoint_complete (USB_EP_t* /* EP */, uint8_t /* EP_ID */) {}
+  WEAK void cb_event_class_sof (void) {}
 
   WEAK uint8_t cb_get_configuration (void) { return 0; }
   WEAK bool    cb_set_configuration (uint8_t /* _config */) { return false; }

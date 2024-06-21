@@ -113,7 +113,7 @@ namespace USB_NAMESPACE {
   bool cb_request_vender (USB_EP_t* EP_REQ, USB_EP_t* EP_RES);
 
   void cb_endpoint_complete (USB_EP_t* EP, uint8_t EP_ID);
-
+  void cb_event_class_sof (void);
   uint8_t cb_get_configuration (void);
   bool cb_set_configuration (uint8_t _config);
   bool cb_clear_feature (void);

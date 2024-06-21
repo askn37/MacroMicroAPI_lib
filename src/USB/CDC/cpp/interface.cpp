@@ -30,12 +30,44 @@ namespace USB_NAMESPACE {
   /* Memory to hold the USB_STATE structure. */
   Interface_State USB_STATE;
 
-  /* Returns a pointer to the USB_STATE structure. */
-  Interface_State* get_state (void) { return &USB_STATE; }
-
   /*
    * Private functions
    */
+
+  /* Returns a pointer to the USB_STATE structure. */
+  Interface_State* get_state (void) { return &USB_STATE; }
+
+  /* Reads the current LineState_t structure. */
+  LineState_t& get_line_state (void) { return USBSTATE.bmLineState; }
+
+  /* Reads the current LineEncoding_t structure. */
+  LineEncoding_t& get_line_encoding (void) { return USBSTATE.LineEncoding; }
+
+  /* Change the timeout for read_bytes. The default is 1000ms. */
+  void set_timeout (uint16_t _timeout) { USBSTATE.TIMEOUT = _timeout; }
+
+  /* Clear the USB_STATE structure to its initial values. */
+  void cb_clear_state (void) { USBSTATE = (Interface_State){}; }
+
+  /* Callback function that returns the device setting value. */
+  uint8_t cb_get_configuration (void) { return USBSTATE.CONFIG; }
+
+  /* This callback operation is called during enumeration. */
+  bool cb_clear_feature (void) { return true; }
+
+  /*
+   * Endpoint check functions
+   */
+
+  /* True if the host is waiting to send. */
+  bool is_recv_ready (void) {
+    return bit_is_set(USB_EP_RECV.STATUS, USB_UNFOVF_bp);
+  }
+
+  /* True if the host is able to receive. */
+  bool is_send_ready (void) {
+    return bit_is_set(USB_EP_SEND.STATUS, USB_UNFOVF_bp);
+  }
 
   /* Wait for the interrupt to complete. */
   void ep_interrupt_pending (void) {
@@ -86,6 +118,9 @@ namespace USB_NAMESPACE {
     ep_recv_listen();
     ep_recv_pending();
     D1PRINTF("->%02X\r\n", USB_EP_RECV.STATUS);
+    #if defined(DEBUG) && (DEBUG == 2)
+      Serial.print("  RECV=").printHex((uint8_t*)USB_EP_RECV.DATAPTR, (size_t)USB_EP_RECV.CNT, ':').ln();
+    #endif
   }
 
   /* Allow the next reception. */
@@ -94,13 +129,15 @@ namespace USB_NAMESPACE {
     D1PRINTF("  RECV=%02X:%d SEND=%02X:%d\r\n",
       USB_EP_RECV.STATUS, USB_EP_RECV.CNT - USBSTATE.RECVCNT,
       USB_EP_SEND.STATUS, USBSTATE.SENDCNT);
+    #if defined(DEBUG) && (DEBUG == 2)
+      Serial.print("  SEND=").printHex((uint8_t*)USB_EP_SEND.DATAPTR, (size_t)USBSTATE.SENDCNT, ':').ln();
+    #endif
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USB_EP_SEND.CNT = USBSTATE.SENDCNT;
       USB_EP_SEND.MCNT = 0;
       USBSTATE.SENDCNT = 0;
     }
     ep_send_listen();
-    // D1PRINTF("  RECV=%02X", USB_EP_RECV.STATUS);
   }
 
   /* The next interrupt will be allowed. */
@@ -114,15 +151,22 @@ namespace USB_NAMESPACE {
     ep_interrupt_listen();
   }
 
+  /* SOF token detected interrupt callback. */
+  /* This may occur up to one or more times within 1 millisecond. */
+  void cb_event_class_sof (void) {
+    /* Buffer read/write delay processing. */
+    /* An attempt is made at least every 64 ms. */
+    if (0 == (0x3F & (--USBSTATE.SOF))) {
+      /* Buffered sends and receives can only be performed */
+      /* if the underflow bit is set to avoid blocking from the host side. */
+      if (is_recv_ready() && USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
+      if (is_send_ready() && USBSTATE.SENDCNT > 0               ) ep_send_flush();
+    }
+  }
+
   /*
-   * Callback override functions
+   * Interface configuration callback functions
    */
-
-  /* Callback function that returns the device setting value. */
-  uint8_t cb_get_configuration (void) { return USBSTATE.CONFIG; }
-
-  /* This callback operation is called during enumeration. */
-  bool cb_clear_feature (void) { return true; }
 
   /* Callback function that, when called, prepares the bulk transfer. */
   bool cb_set_configuration (uint8_t _config) {
@@ -151,8 +195,8 @@ namespace USB_NAMESPACE {
       USB_EP_SEND.STATUS  = USB_BUSNAK_bm;
       USB_EP_SEND.CTRL    = USB_TYPE_BULKINT_gc | USB_MULTIPKT_bm | USB_AZLP_bm | USB_TCDSBL_bm | USB_EP_SIZE_gc(USB_BULK_SEND_MAX);
 
-      send_serialstate(USBSTATE.SerialState);
       cb_bus_event_start();
+      send_serialstate(USBSTATE.SerialState);
     }
     else cb_bus_event_stop();
     USBSTATE.CONFIG = _config;
@@ -183,12 +227,12 @@ namespace USB_NAMESPACE {
       EP_REQ->STATUS, EP_REQ->CNT, USB_SETUP_DATA.bmRequestType, USB_SETUP_DATA.bRequest,
       USB_SETUP_DATA.wValue, USB_SETUP_DATA.wIndex, USB_SETUP_DATA.wLength);
     if (bRequest == CDC_REQ_SetLineEncoding) {        /* 0x20 */
-      ep_setup_out_listen();
+      /* Wait for a DATA phase packet to arrive. */
       ep_setup_out_pending();
-      D2PRINTF("  =%02X:%04X:%02X:%02X:%04X:%04X:%04X\r\n",
-        EP_REQ->STATUS, EP_REQ->CNT, USB_SETUP_DATA.bmRequestType, USB_SETUP_DATA.bRequest,
-        USB_SETUP_DATA.wValue, USB_SETUP_DATA.wIndex, USB_SETUP_DATA.wLength);
-      memcpy(&USBSTATE.sLineEncoding, &USB_HEADER_DATA, sizeof(LineEncoding_t));
+      #if defined(DEBUG) && (DEBUG == 2)
+        Serial.print("  DATA=").printHex((uint8_t*)EP_REQ->DATAPTR, (size_t)EP_REQ->CNT, ':').ln();
+      #endif
+      memcpy(&USBSTATE.sLineEncoding, &USB_DATA_BUFFER, sizeof(LineEncoding_t));
       D1PRINTF(" SLE=%ld\r\n", USBSTATE.LineEncoding.dwDTERate);
       cb_cdc_set_lineencoding(&USBSTATE.LineEncoding);
       EP_RES->CNT = 0;
@@ -246,30 +290,6 @@ namespace USB_NAMESPACE {
   /*
    * Application interface
    */
-
-  /* Returns true if USB communication is enabled. */
-  bool is_ready (void) { return !is_busy(); }
-
-  /* Returns false if USB communication is enabled. */
-  bool is_busy (void) { return !(USBSTATE.CONFIG && cb_bus_check()); }
-
-  /* Clear the USB_STATE structure to its initial values. */
-  void cb_clear_state (void) { USBSTATE = (Interface_State){}; }
-
-  /* SOF token detected interrupt callback. */
-  /* This may occur up to one or more times within 1 millisecond. */
-  void cb_bus_event_sof (void) {
-    /* Buffer read/write delay processing. */
-    /* An attempt is made at least every 64 ms. */
-    if (0 == (0x3F & (--USBSTATE.SOF))) {
-      /* Buffered sends and receives can only be performed */
-      /* if the underflow bit is set to avoid blocking from the host side. */
-      if (USB_EP_RECV.CNT == USBSTATE.RECVCNT
-       && bit_is_set(USB_EP_RECV.STATUS, USB_UNFOVF_bp)) ep_recv_flush();
-      if (USBSTATE.SENDCNT > 0
-       && bit_is_set(USB_EP_SEND.STATUS, USB_UNFOVF_bp)) ep_send_flush();
-    }
-  }
 
   /* Start running the application. */
   void start (void) {
@@ -360,9 +380,6 @@ namespace USB_NAMESPACE {
     return USB_EP_RECV.CNT == USBSTATE.RECVCNT ? -1 : USB_RECV_BUFFER[USBSTATE.RECVCNT - 1];
   }
 
-  /* Change the timeout for read_bytes. The default is 1000ms. */
-  void set_timeout (uint16_t _timeout) { USBSTATE.TIMEOUT = _timeout; }
-
   /* Fills the given receive buffer until either a timeout occurs or the given character arrives. */
   size_t read_bytes (void* _buffer, size_t _limit, char _terminate, uint8_t _swevent) {
     size_t   _length  = 0;
@@ -394,12 +411,6 @@ namespace USB_NAMESPACE {
     }
     return _r;
   }
-
-  /* Reads the current LineState_t structure. */
-  LineState_t& get_line_state (void) { return USBSTATE.bmLineState; }
-
-  /* Reads the current LineEncoding_t structure. */
-  LineEncoding_t& get_line_encoding (void) { return USBSTATE.LineEncoding; }
 
 } /* USB_CDC */
 

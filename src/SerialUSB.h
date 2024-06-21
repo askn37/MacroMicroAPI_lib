@@ -23,7 +23,7 @@ public:
    * Application Methods 
    */
 
-  explicit operator bool (void) { return USB_NAMESPACE::is_ready(); }
+  explicit operator bool (void) { return USB_NAMESPACE::is_ready() && USB_NAMESPACE::is_send_ready(); }
   using Print::write; // pull in write(str) and write(buf, size) from Print
 
   inline SerialUSB_Class& begin (void) { USB_NAMESPACE::start(); return *this; }

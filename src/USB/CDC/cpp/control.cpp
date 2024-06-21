@@ -19,17 +19,29 @@
 
 namespace USB_NAMESPACE {
 
+  /* Performs a USB bus reset, allowing initial control enumeration to begin. */
   void bus_reset (void) {
     ep_setup_clear();
     cb_clear_state();
     USB0_CTRLA = USB_ENABLE_bm | USB_FIFOEN_bm | USB_STFRNUM_bm | (USB_ENDPOINTS_MAX - 1);
   }
 
+  /* Detach the USB bus. */
   void bus_detach (void) { USB0_CTRLB &= ~USB_ATTACH_bm; }
+
+  /* Attach the USB bus. */
   void bus_attach (void) { USB0_CTRLB |= USB_ATTACH_bm; }
+
+  /* Attempt to resume the USB bus. */
   void bus_resume (void) {
     if (bit_is_clear(USB0_BUSSTATE, USB_URESUME_bp)) USB0_CTRLB |= USB_URESUME_bm;
   }
+
+  /* Returns true if USB communication is enabled. */
+  bool is_ready (void) { return !is_busy(); }
+
+  /* Returns false if USB communication is enabled. */
+  bool is_busy (void) { return !(USBSTATE.CONFIG && cb_bus_check()); }
 
   /* 
    * Standard Request Enumeration Process
@@ -94,7 +106,7 @@ namespace USB_NAMESPACE {
     }
     else if (bRequest == USB_REQ_SynchFrame) {    /* 0x0C */
       EP_RES->CNT = 2;
-      *((uint16_t*)(&USB_HEADER_DATA)) = get_endpointer_ptr()->FRAMENUM & 0x7FF;
+      *((uint16_t*)(&USB_HEADER_DATA)) = get_frame();
     }
     else {
       listen = cb_request_standard_other(EP_REQ, EP_RES);
@@ -114,6 +126,7 @@ namespace USB_NAMESPACE {
     }
     /*** Do not allow unnecessary interrupts. ***/
     if (bit_is_set(busstate, USB_SOF_bp)) {
+      cb_event_class_sof();
       cb_bus_event_sof();
       USB0_INTFLAGSA |= USB_SOF_bm;
     }
@@ -167,7 +180,11 @@ namespace USB_NAMESPACE {
     if (bit_is_set(EP_REQ->STATUS, USB_EPSETUP_bp)) {
       USB_EP_t* EP_RES = &USB_EP_RES;
       bool listen = true;
-      uint8_t bmRequestType = USB_SETUP_DATA.bmRequestType & USB_REQTYPE_TYPE_gm;
+      uint8_t bmRequestType = USB_SETUP_DATA.bmRequestType;
+      /* This condition indicates that there is a DATA phase packet to be received. */
+      if (bit_is_clear(bmRequestType, USB_REQTYPE_DIRECTION_gp)
+       && USB_SETUP_DATA.wLength > 0) ep_setup_out_listen();
+      bmRequestType &= USB_REQTYPE_TYPE_gm;
       if (bmRequestType == USB_REQTYPE_STANDARD_gc) {
         listen = request_standard(EP_REQ, EP_RES);
       }

@@ -39,13 +39,18 @@ namespace USB_NAMESPACE {
 
   bool is_ready (void);
   bool is_busy (void);
+  bool is_recv_ready (void);
+  bool is_send_ready (void);
+
+  Interface_State* get_state (void);
+  uint16_t get_frame (void);
 
   void start (void);
   void stop (void);
+
   void write_flush (void);
   void read_clear (void);
 
-  Interface_State* get_state (void);
   size_t write_byte (const uint8_t _c);
   size_t write_available (void);
   int read_byte (void);

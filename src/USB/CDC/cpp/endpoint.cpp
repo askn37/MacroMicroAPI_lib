@@ -28,6 +28,9 @@ namespace USB_NAMESPACE {
   WEAK USB_EP_TABLE_t* get_endpointer_ptr (void) { return &EP_TABLE; }
   WEAK USB_WM_TABLE_t* get_workmem_ptr (void) { return &EP_BUFFER; }
 
+  /* Returns the USB frame number. */
+  uint16_t get_frame (void) { return EP_TABLE.FRAMENUM & 0x7FF; }
+
   WEAK void ep_setup_clear (void) {
     USB0_ADDR = 0;
     USB0_FIFOWP = 0;
