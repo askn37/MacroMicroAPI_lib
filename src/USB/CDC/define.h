@@ -48,8 +48,8 @@ namespace USB_NAMESPACE {
   , USB_EP_DESCRIPTOR_DIR_OUT_bm    = (0 << 7)
 
   /* bmRequestType */
-  , USB_REQTYPE_DIRECTION_gp        = 7
-  , USB_REQTYPE_DIRECTION_gm        = (1 << 7)
+  , USB_REQTYPE_DIRECTION_bp        = 7
+  , USB_REQTYPE_DIRECTION_bm        = (1 << 7)
   , USB_REQTYPE_TYPE_gm             = (3 << 5)
   , USB_REQTYPE_RECIPIENT_gm        = (31)
   , USB_RECIPIENT_DEVICE_gc         = (0 << 0)  // 0x00

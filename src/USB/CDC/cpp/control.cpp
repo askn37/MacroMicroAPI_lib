@@ -79,7 +79,6 @@ namespace USB_NAMESPACE {
     }
     else if (bRequest == USB_REQ_SetConfiguration) {  /* 0x09 */
       EP_RES->CNT = 0;
-      // USBSTATE.CONFIG = (uint8_t)USB_SETUP_DATA.wValue;
       listen = cb_set_configuration((uint8_t)USB_SETUP_DATA.wValue);
     }
     else if (bRequest == USB_REQ_GetInterface) {      /* 0x0A */
@@ -182,8 +181,7 @@ namespace USB_NAMESPACE {
       bool listen = true;
       uint8_t bmRequestType = USB_SETUP_DATA.bmRequestType;
       /* This condition indicates that there is a DATA phase packet to be received. */
-      if (bit_is_clear(bmRequestType, USB_REQTYPE_DIRECTION_gp)
-       && USB_SETUP_DATA.wLength > 0) ep_setup_out_listen();
+      if (bit_is_clear(bmRequestType, USB_REQTYPE_DIRECTION_bp)) ep_setup_out_listen();
       bmRequestType &= USB_REQTYPE_TYPE_gm;
       if (bmRequestType == USB_REQTYPE_STANDARD_gc) {
         listen = request_standard(EP_REQ, EP_RES);

@@ -180,24 +180,24 @@ namespace USB_NAMESPACE {
       USBSTATE.RECVCNT = 0;
 
       /* USB_EP_INTR=EP1_IN uses the TRNCOMPL interrupt. */
+      USB_EP_INTR.STATUS  = USB_BUSNAK_bm;
       USB_EP_INTR.CNT     = 0;
       USB_EP_INTR.DATAPTR = (uint16_t)&USB_INTR_BUFFER;
       USB_EP_INTR.MCNT    = 0;
-      USB_EP_INTR.STATUS  = USB_BUSNAK_bm;
       USB_EP_INTR.CTRL    = USB_TYPE_BULKINT_gc | USB_MULTIPKT_bm | USB_AZLP_bm | USB_EP_SIZE_gc(USB_INTR_PK_SIZE);
 
       /* USB_EP_RECV=EP2_OUT does not use the TRNCOMPL interrupt and MULTIPKT. */
+      USB_EP_RECV.STATUS  = USB_BUSNAK_bm;
       USB_EP_RECV.CNT     = 0;
       USB_EP_RECV.DATAPTR = (uint16_t)&USB_RECV_BUFFER;
       USB_EP_RECV.MCNT    = USB_BULK_RECV_MAX;
-      USB_EP_RECV.STATUS  = USB_BUSNAK_bm;
       USB_EP_RECV.CTRL    = USB_TYPE_BULKINT_gc | USB_TCDSBL_bm | USB_EP_SIZE_gc(USB_BULK_RECV_MAX);
 
       /* USB_EP_SEND=EP2_IN does not use the TRNCOMPL interrupt, only MULTIPKT. */
+      USB_EP_SEND.STATUS  = USB_BUSNAK_bm;
       USB_EP_SEND.CNT     = 0;
       USB_EP_SEND.DATAPTR = (uint16_t)&USB_SEND_BUFFER;
       USB_EP_SEND.MCNT    = 0;
-      USB_EP_SEND.STATUS  = USB_BUSNAK_bm;
       USB_EP_SEND.CTRL    = USB_TYPE_BULKINT_gc | USB_MULTIPKT_bm | USB_AZLP_bm | USB_TCDSBL_bm | USB_EP_SIZE_gc(USB_BULK_SEND_MAX);
 
       cb_bus_event_start();
@@ -212,7 +212,7 @@ namespace USB_NAMESPACE {
   void send_serialstate (SerialState_t &_serialstate) {
     ep_interrupt_pending();
     Notification_SerialState_t *p = (Notification_SerialState_t*)&USB_INTR_BUFFER;
-    p->bmRequestType  = USB_REQTYPE_DIRECTION_gm | USB_REQTYPE_CLASS_gc | USB_RECIPIENT_INTERFACE_gc; // 0xA1
+    p->bmRequestType  = USB_REQTYPE_DIRECTION_bm | USB_REQTYPE_CLASS_gc | USB_RECIPIENT_INTERFACE_gc; // 0xA1
     p->bRequest       = CDC_NOTIF_SerialState;  // 0x20
     p->wValue         = 0;
     p->wIndex         = 0;  // Interface#0
