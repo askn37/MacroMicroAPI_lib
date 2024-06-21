@@ -52,7 +52,10 @@ namespace USB::CDC {
 
 ### void cb_bus_event_sof (void)
 
-SOFトークン受信通知。`USB::CDC`実装の内部で使用しているため、再定義はできない。
+SOFトークン受信通知。この割込が有効であれば、少なくとも 1ms に1回以上通知される。
+バルク転送中は 1ms に10回以上発生する場合もある。
+
+ただし`USB::CDC/CDC.h`実装においてはそれが必要な場合しか SOF割込を有効にしないため、これが期待通り動作することはない。
 
 ### void cb_bus_event_suspend (void)
 

@@ -55,6 +55,10 @@ namespace USB_NAMESPACE {
   /* This callback operation is called during enumeration. */
   bool cb_clear_feature (void) { return true; }
 
+  void enable_interrupt_sof (void) { USB0_INTCTRLA |= USB_SOF_bm; }
+
+  void disable_interrupt_sof (void) { USB0_INTCTRLA &= ~USB_SOF_bm; }
+
   /*
    * Endpoint check functions
    */
@@ -117,7 +121,7 @@ namespace USB_NAMESPACE {
     }
     ep_recv_listen();
     ep_recv_pending();
-    D1PRINTF("->%02X\r\n", USB_EP_RECV.STATUS);
+    D1PRINTF("->%02X/%d\r\n", USB_EP_RECV.STATUS, USB_EP_RECV.CNT);
     #if defined(DEBUG) && (DEBUG == 2)
       Serial.print("  RECV=").printHex((uint8_t*)USB_EP_RECV.DATAPTR, (size_t)USB_EP_RECV.CNT, ':').ln();
     #endif
@@ -161,6 +165,7 @@ namespace USB_NAMESPACE {
       /* if the underflow bit is set to avoid blocking from the host side. */
       if (is_recv_ready() && USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
       if (is_send_ready() && USBSTATE.SENDCNT > 0               ) ep_send_flush();
+      disable_interrupt_sof();
     }
   }
 
@@ -294,7 +299,7 @@ namespace USB_NAMESPACE {
   /* Start running the application. */
   void start (void) {
     bus_attach();
-    USB0_INTCTRLA = USB_SOF_bm | USB_SUSPEND_bm | USB_RESUME_bm | USB_RESET_bm | USB_STALLED_bm;
+    USB0_INTCTRLA = USB_SUSPEND_bm | USB_RESUME_bm | USB_RESET_bm | USB_STALLED_bm;
     USB0_INTCTRLB = USB_TRNCOMPL_bm | USB_SETUP_bm;
     bus_reset();
     D1PRINTF("USB0=%02X/S\r\n", USB0_CTRLA);
@@ -341,6 +346,7 @@ namespace USB_NAMESPACE {
       USB_SEND_BUFFER[USBSTATE.SENDCNT++] = _c;
     }
     USBSTATE.SOF = 0;
+    enable_interrupt_sof();
     D2PRINTF(" WB=%d/%d<%02X\r\n", USBSTATE.SENDCNT, USB_BULK_SEND_MAX, _c);
     if (USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) ep_send_flush();
     return 1;
@@ -372,7 +378,12 @@ namespace USB_NAMESPACE {
 
   /* Returns the number of unread characters. */
   size_t read_available (void) {
-    return is_busy() ? 0 : USB_EP_RECV.CNT - USBSTATE.RECVCNT;
+    if (is_busy()) return 0;
+    else {
+      size_t _s = USB_EP_RECV.CNT - USBSTATE.RECVCNT;
+      if (_s == 0) enable_interrupt_sof();
+      return _s;
+    }
   }
 
   /* Returns the last character of the unread buffer. */
