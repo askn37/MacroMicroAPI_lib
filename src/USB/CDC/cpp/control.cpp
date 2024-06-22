@@ -23,6 +23,7 @@ namespace USB_NAMESPACE {
   void bus_reset (void) {
     ep_setup_clear();
     cb_clear_state();
+    bus_attach();
     USB0_CTRLA = USB_ENABLE_bm | USB_FIFOEN_bm | USB_STFRNUM_bm | (USB_ENDPOINTS_MAX - 1);
   }
 
@@ -34,7 +35,7 @@ namespace USB_NAMESPACE {
 
   /* Attempt to resume the USB bus. */
   void bus_resume (void) {
-    if (bit_is_clear(USB0_BUSSTATE, USB_URESUME_bp)) USB0_CTRLB |= USB_URESUME_bm;
+    if (bit_is_set(USB0_BUSSTATE, USB_SUSPENDED_bp)) USB0_CTRLB |= USB_URESUME_bm;
   }
 
   /* Returns true if USB communication is enabled. */

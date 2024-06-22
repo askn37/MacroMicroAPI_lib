@@ -31,7 +31,8 @@ void setup (void) {
 }
 
 void loop (void) {
-  while (Serial.available() > 0) {
+  /* ブロッキングと文字落ちを避けるために、読み書き両方が許可の場合のみ実行 */
+  while (SerialUSB.available() > 0 && SerialUSB.availableForWrite() > 0) {
     int _c = Serial.read();
     Serial.write(_c);
     /* 改行を検出するたびにLED状態をトグルする */
@@ -49,7 +50,7 @@ void loop (void) {
 
 基本的には通常の UART `Serial` クラスと使い方は変わらないので `print()/println()` メソッドも通常通り使用できる。
 
-上記の単純な実演サンプルでは、コードサイズ 2960 byte、メモリ消費 260 byte である。
+上記の単純な実演サンプルでは、コードサイズ 3KiB以下、メモリ消費 0.3KiB以下である。
 
 双方向キャラクタデバイス通信でのスループットは、実効1Mbps 程度まで可能である。
 

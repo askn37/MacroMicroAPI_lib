@@ -64,26 +64,46 @@ namespace USB_NAMESPACE {
    */
 
   /* True if the host is waiting to send. */
-  bool is_recv_ready (void) {
+  bool is_recv_overflow (void) {
     return bit_is_set(USB_EP_RECV.STATUS, USB_UNFOVF_bp);
   }
 
-  /* True if the host is able to receive. */
-  bool is_send_ready (void) {
+  /* True if the host is waiting to receive. */
+  bool is_send_underflow (void) {
     return bit_is_set(USB_EP_SEND.STATUS, USB_UNFOVF_bp);
   }
 
-  /* Wait for the interrupt to complete. */
+  /* True if the receive buffer is readable. */
+  bool is_recv_ready (void) {
+    return bit_is_set(USB_EP_RECV.STATUS, USB_BUSNAK_bp);
+  }
+
+  /* True if the send buffer is writable. */
+  bool is_send_ready (void) {
+    return bit_is_set(USB_EP_SEND.STATUS, USB_BUSNAK_bp);
+  }
+
+  /* True if the receive buffer is read-prohibited. */
+  bool is_recv_busy (void) {
+    return bit_is_clear(USB_EP_RECV.STATUS, USB_BUSNAK_bp);
+  }
+
+  /* True if the send buffer is write protected. */
+  bool is_send_busy (void) {
+    return bit_is_clear(USB_EP_SEND.STATUS, USB_BUSNAK_bp);
+  }
+
+  /* Wait until the interrupt buffer is ready to be written. */
   void ep_interrupt_pending (void) {
     loop_until_bit_is_set(USB_EP_INTR.STATUS, USB_BUSNAK_bp);
   }
 
-  /* Wait for reception to complete. */
+  /* Wait until the receive buffer is available to be read. */
   void ep_recv_pending (void) {
     loop_until_bit_is_set(USB_EP_RECV.STATUS, USB_BUSNAK_bp);
   }
 
-  /* Wait for the transmission to complete. */
+  /* Wait until the send buffer is available to be written. */
   void ep_send_pending (void) {
     loop_until_bit_is_set(USB_EP_SEND.STATUS, USB_BUSNAK_bp);
   }
@@ -113,26 +133,24 @@ namespace USB_NAMESPACE {
   /* This is only possible if BUSNAK is set. */
   /* This will block until the host sends data. */
   void ep_recv_flush (void) {
-    D1PRINTF("  RECV=%02X:%d",
-      USB_EP_RECV.STATUS, USB_EP_RECV.CNT - USBSTATE.RECVCNT);
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USBSTATE.RECVCNT = 0;
       USB_EP_RECV.CNT  = 0;
     }
     ep_recv_listen();
+    #if defined(DEBUG)
     ep_recv_pending();
-    D1PRINTF("->%02X/%d\r\n", USB_EP_RECV.STATUS, USB_EP_RECV.CNT);
+    D1PRINTF("  RECV=%02X/%d\r\n", USB_EP_RECV.STATUS, USB_EP_RECV.CNT);
     #if defined(DEBUG) && (DEBUG == 2)
-      Serial.print("  RECV=").printHex((uint8_t*)USB_EP_RECV.DATAPTR, (size_t)USB_EP_RECV.CNT, ':').ln();
+    Serial.print("  RECV=").printHex((uint8_t*)USB_EP_RECV.DATAPTR, (size_t)USB_EP_RECV.CNT, ':').ln();
+    #endif
     #endif
   }
 
   /* Allow the next reception. */
   /* This is only possible if BUSNAK is set. */
   void ep_send_flush (void) {
-    D1PRINTF("  RECV=%02X:%d SEND=%02X:%d\r\n",
-      USB_EP_RECV.STATUS, USB_EP_RECV.CNT - USBSTATE.RECVCNT,
-      USB_EP_SEND.STATUS, USBSTATE.SENDCNT);
+    D1PRINTF("  SEND=%02X/%d\r\n", USB_EP_SEND.STATUS, USBSTATE.SENDCNT);
     #if defined(DEBUG) && (DEBUG == 2)
       Serial.print("  SEND=").printHex((uint8_t*)USB_EP_SEND.DATAPTR, (size_t)USBSTATE.SENDCNT, ':').ln();
     #endif
@@ -147,7 +165,7 @@ namespace USB_NAMESPACE {
   /* The next interrupt will be allowed. */
   /* This is only possible if BUSNAK is set. */
   void ep_interrupt_send (size_t _size = 0) {
-    D1PRINTF("  INTR=%02X:%d\r\n", USB_EP_INTR.STATUS, _size);
+    D1PRINTF("  INTR=%02X/%d\r\n", USB_EP_INTR.STATUS, _size);
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USB_EP_INTR.CNT  = _size;
       USB_EP_INTR.MCNT = 0;
@@ -163,8 +181,8 @@ namespace USB_NAMESPACE {
     if (0 == (0x3F & (--USBSTATE.SOF))) {
       /* Buffered sends and receives can only be performed */
       /* if the underflow bit is set to avoid blocking from the host side. */
-      if (is_recv_ready() && USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
-      if (is_send_ready() && USBSTATE.SENDCNT > 0               ) ep_send_flush();
+      if (is_send_underflow() && USBSTATE.SENDCNT > 0) ep_send_flush();
+    //if (is_recv_overflow() && USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
       disable_interrupt_sof();
     }
   }
@@ -178,6 +196,9 @@ namespace USB_NAMESPACE {
     if (_config) {
       USBSTATE.SENDCNT = 0;
       USBSTATE.RECVCNT = 0;
+
+      /* USB_EP_NOOP=EP1_OUT is not used. */
+      USB_EP_NOOP.CTRL    = USB_TYPE_DISABLE_gc;
 
       /* USB_EP_INTR=EP1_IN uses the TRNCOMPL interrupt. */
       USB_EP_INTR.STATUS  = USB_BUSNAK_bm;
@@ -213,11 +234,11 @@ namespace USB_NAMESPACE {
     ep_interrupt_pending();
     Notification_SerialState_t *p = (Notification_SerialState_t*)&USB_INTR_BUFFER;
     p->bmRequestType  = USB_REQTYPE_DIRECTION_bm | USB_REQTYPE_CLASS_gc | USB_RECIPIENT_INTERFACE_gc; // 0xA1
-    p->bRequest       = CDC_NOTIF_SerialState;  // 0x20
+    p->bRequest       = CDC_REQ_SerialState;  // 0x20
     p->wValue         = 0;
     p->wIndex         = 0;  // Interface#0
     p->wLength        = 2;
-    p->data           = _serialstate;
+    p->wmSerialState  = _serialstate;
     ep_interrupt_send(sizeof(Notification_SerialState_t));
   }
 
@@ -256,7 +277,7 @@ namespace USB_NAMESPACE {
     else if (bRequest == CDC_REQ_SendBreak) {         /* 0x23 */
       USBSTATE.BREAKCNT = USB_SETUP_DATA.wValue;
       D1PRINTF(" SB=%04X\r\n", USBSTATE.BREAKCNT);
-      if (USB_SETUP_DATA.wValue) {
+      if (USB_SETUP_DATA.wValue > 0) {
         USBSTATE.SerialState.bBreak = true;
         cb_cdc_set_sendbreak(USB_SETUP_DATA.wValue);
       }
@@ -280,8 +301,9 @@ namespace USB_NAMESPACE {
   void cb_endpoint_complete (USB_EP_t* /* EP */, uint8_t EP_ID) {
     if (EP_ID == USB_EP_INTR_IN) {
       ep_interrupt_pending();
+      D2PRINTF("  BREAK=%04X\r\n", USBSTATE.BREAKCNT);
       if (1 < (uint16_t)(USBSTATE.BREAKCNT + 1)) {
-        USBSTATE.BREAKCNT = USBSTATE.BREAKCNT < USB_INTR_INTERVAL ? 0 : USB_INTR_INTERVAL;
+        USBSTATE.BREAKCNT -= USBSTATE.BREAKCNT < USB_INTR_INTERVAL ? USBSTATE.BREAKCNT : USB_INTR_INTERVAL;
         ep_interrupt_send(0);
       }
       else if (USBSTATE.BREAKCNT == 0 && USBSTATE.SerialState.bBreak) {
@@ -316,15 +338,18 @@ namespace USB_NAMESPACE {
   }
 
   /* Wait until the send buffer is cleared. */
+  /* This operation may be blocked if the host is not responding. */
   void write_flush (void) {
     if (is_busy()) return;
     if (USBSTATE.SENDCNT > 0) ep_send_flush();
     ep_send_pending();
   }
 
-  /* Discard the current receive buffer. */
-  /* Wait until NAK is set before writing data. */
+  /* Empties the current receive buffer. */
+  /* If any data is being received, it will be discarded. */
+  /* This operation may be blocked if the host is not responding. */
   void read_clear (void) {
+    if (is_ready()) ep_recv_pending();
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USBSTATE.RECVCNT = 0;
       USB_EP_RECV.CNT = 0;
@@ -336,7 +361,6 @@ namespace USB_NAMESPACE {
    */
 
   /* Sends one character. */
-  /* Wait until NAK is set before writing data. */
   size_t write_byte (const uint8_t _c) {
     if (is_busy()) return 0;
     if (USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) ep_send_flush();
@@ -347,41 +371,45 @@ namespace USB_NAMESPACE {
     }
     USBSTATE.SOF = 0;
     enable_interrupt_sof();
-    D2PRINTF(" WB=%d/%d<%02X\r\n", USBSTATE.SENDCNT, USB_BULK_SEND_MAX, _c);
+    D2PRINTF(" WR=%d/%d<%02X\r\n", USBSTATE.SENDCNT, USB_BULK_SEND_MAX, _c);
     if (USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) ep_send_flush();
     return 1;
   }
 
   /* Returns the number of characters available to write. */
   size_t write_available (void) {
-    return (is_busy() || bit_is_clear(USB_EP_SEND.STATUS, USB_BUSNAK_bp))
-      ? 0 : USB_BULK_SEND_MAX - USBSTATE.SENDCNT;
+    if (is_busy() || is_send_busy()) return 0;
+    if (is_send_underflow() && USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) {
+      ep_send_flush();
+      return 0;
+    }
+    return USB_BULK_SEND_MAX - USBSTATE.SENDCNT;
   }
 
   /* Receives one character. */
   int read_byte (void) {
     int _c = -1;
-    /* If there are no unread characters, a request is made to the host. */
-    /* This will block until the host sends data. */
-    if (USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
-    if (USB_EP_RECV.CNT > USBSTATE.RECVCNT) {
-      D1PRINTF("RA=%02X:%d/%d\r\n",
-        USB_EP_RECV.STATUS, USBSTATE.RECVCNT, USB_EP_RECV.CNT);
-      /* This is only possible if BUSNAK is set. */
-      ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-        _c = USB_RECV_BUFFER[USBSTATE.RECVCNT++];
+    /* It won't work if the receive buffer is unreadable. */
+    if (read_available() > 0) {
+      if (USB_EP_RECV.CNT > USBSTATE.RECVCNT) {
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+          _c = USB_RECV_BUFFER[USBSTATE.RECVCNT++];
+        }
+        D1PRINTF(" RD=%d/%d>%02X\r\n", USBSTATE.RECVCNT, USB_EP_RECV.CNT, _c);
       }
-      D2PRINTF(" RB=%d/%d>%02X\r\n", USBSTATE.RECVCNT, USB_EP_RECV.CNT, _c);
+      /* When it reaches the end, it requests that the buffer be updated. */
+      if (USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
     }
     return _c;
   }
 
   /* Returns the number of unread characters. */
   size_t read_available (void) {
-    if (is_busy()) return 0;
+    if (is_busy() || is_recv_busy()) return 0;
     else {
+      /* When it reaches the end, it requests that the buffer be updated. */
       size_t _s = USB_EP_RECV.CNT - USBSTATE.RECVCNT;
-      if (_s == 0) enable_interrupt_sof();
+      if (_s == 0) ep_recv_flush();
       return _s;
     }
   }

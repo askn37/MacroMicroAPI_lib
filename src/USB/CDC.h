@@ -34,6 +34,7 @@ namespace USB_NAMESPACE {
   void bus_reset (void);
   void bus_detach (void);
   void bus_attach (void);
+  void bus_resume (void);
 
   /*** Application functions ***/
 

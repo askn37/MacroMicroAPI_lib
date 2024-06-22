@@ -15,11 +15,10 @@
 /* Volatile variable for communication with interrupt functions. */
 volatile uint32_t _baud = 0;
 volatile uint16_t _ss = 0;
-volatile bool _le, _ls, _cs;
+volatile bool _le, _cs;
 
 /* Here are some examples of various event callbacks. */
 namespace USB::CDC {
-  void cb_cdc_set_linestate (LineState_t*) { _ls = true; }
   void cb_cdc_set_sendbreak (uint16_t _sendbreak) { _ss = _sendbreak; }
   void cb_cdc_clear_sendbreak (void) { _baud = -1; _cs = true; }
   void cb_cdc_set_lineencoding (LineEncoding_t* _lineencoding) {
@@ -43,12 +42,13 @@ void setup (void) {
   while (!SerialUSB);
   SerialUSB.println(F("<SerialUSB startup>"));
   SerialUSB.print(F("F_CPU=")).println(F_CPU, DEC);
+  SerialUSB.print(F("RevID=")).println(SYSCFG_REVID + 0x90, HEX);
   SerialUSB.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
 }
 
 void loop (void) {
   /* Echo Back Loop */
-  while (SerialUSB.available() > 0) {
+  while (SerialUSB.available() > 0 && SerialUSB.availableForWrite() > 0) {
     int _c = SerialUSB.read();
     SerialUSB.write(_c);
     if (_c == '\n') digitalWrite(LED_BUILTIN, TOGGLE);
@@ -63,12 +63,9 @@ void loop (void) {
     SerialUSB.print(F(" break=")).println(_ss, DEC);
     _ss = 0;
   }
-  if (_ls) {
-    SerialUSB.print(F(" dtr=")).print(SerialUSB.getLineState().bStateDTR, DEC);
-    SerialUSB.print(F(" rts=")).println(SerialUSB.getLineState().bStateRTS, DEC);
-    _ls = false;
-  }
   if (_le) {
+    SerialUSB.print(F(" dtr=")).print(SerialUSB.getLineState().bStateDTR, DEC);
+    SerialUSB.print(F(" rts=")).print(SerialUSB.getLineState().bStateRTS, DEC);
     SerialUSB.print(F(" baud=")).println(_baud, DEC);
     _le = false;
   }

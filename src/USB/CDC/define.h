@@ -124,7 +124,8 @@ namespace USB_NAMESPACE {
   , CDC_REQ_GetLineEncoding         = 0x21
   , CDC_REQ_SetLineState            = 0x22
   , CDC_REQ_SendBreak               = 0x23
-  , CDC_NOTIF_SerialState           = 0x20
+  , CDC_REQ_ResponeAvailable        = 0x00
+  , CDC_REQ_SerialState             = 0x20
 
   /* USB_REQ_GetDescriptor / wValue */
   , USB_DATA_GetDescripter_Device   = (USB_DTYPE_Device          << 8)
@@ -344,7 +345,7 @@ namespace USB_NAMESPACE {
     uint16_t wValue;
     uint16_t wIndex;
     uint16_t wLength;
-    SerialState_t data;
+    SerialState_t wmSerialState;
   } PACKED Notification_SerialState_t;
 
   /* CDC ControlLineState : 1 bytes */

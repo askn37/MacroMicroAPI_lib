@@ -39,7 +39,7 @@
 /* EPFIFO number that identifies the EP */
 #define USB_EP_SETUP_OUT  (0x00)
 #define USB_EP_SETUP_IN   (0x08)
-/* #define USB_EP_INTR_OUT   (0x10) */  /* notused */
+#define USB_EP_INTR_OUT   (0x10)  /* notused */
 #define USB_EP_INTR_IN    (0x18)
 #define USB_EP_BULK_OUT   (0x20)
 #define USB_EP_BULK_IN    (0x28)
@@ -57,6 +57,7 @@
 #define USB_HEADER_DATA (*(Descriptor_Header*)&get_workmem_ptr()->header)
 #define USB_DATA_BUFFER (*(uint8_t*)&get_workmem_ptr()->header)
 
+#define USB_EP_NOOP USB_EP(USB_EP_INTR_OUT)
 #define USB_EP_INTR USB_EP(USB_EP_INTR_IN)
 #define USB_EP_RECV USB_EP(USB_EP_BULK_OUT)
 #define USB_EP_SEND USB_EP(USB_EP_BULK_IN)
