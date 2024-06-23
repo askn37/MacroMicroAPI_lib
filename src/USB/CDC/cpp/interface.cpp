@@ -55,7 +55,7 @@ namespace USB_NAMESPACE {
   /* This callback operation is called during enumeration. */
   bool cb_clear_feature (void) { return true; }
 
-  void enable_interrupt_sof (void) { USB0_INTCTRLA |= USB_SOF_bm; }
+  void enable_interrupt_sof (void) { USBSTATE.SOF = 10; USB0_INTCTRLA |= USB_SOF_bm; }
 
   void disable_interrupt_sof (void) { USB0_INTCTRLA &= ~USB_SOF_bm; }
 
@@ -178,11 +178,10 @@ namespace USB_NAMESPACE {
   void cb_event_class_sof (void) {
     /* Buffer read/write delay processing. */
     /* An attempt is made at least every 64 ms. */
-    if (0 == (0x3F & (--USBSTATE.SOF))) {
+    if (0 == (--USBSTATE.SOF)) {
       /* Buffered sends and receives can only be performed */
       /* if the underflow bit is set to avoid blocking from the host side. */
       if (is_send_underflow() && USBSTATE.SENDCNT > 0) ep_send_flush();
-    //if (is_recv_overflow() && USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
       disable_interrupt_sof();
     }
   }
@@ -363,16 +362,14 @@ namespace USB_NAMESPACE {
   /* Sends one character. */
   size_t write_byte (const uint8_t _c) {
     if (is_busy()) return 0;
-    if (USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) ep_send_flush();
     ep_send_pending();
     /* This is only possible if BUSNAK is set. */
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USB_SEND_BUFFER[USBSTATE.SENDCNT++] = _c;
     }
-    USBSTATE.SOF = 0;
-    enable_interrupt_sof();
     D2PRINTF(" WR=%d/%d<%02X\r\n", USBSTATE.SENDCNT, USB_BULK_SEND_MAX, _c);
     if (USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) ep_send_flush();
+    else enable_interrupt_sof();
     return 1;
   }
 
@@ -391,11 +388,9 @@ namespace USB_NAMESPACE {
     int _c = -1;
     /* It won't work if the receive buffer is unreadable. */
     if (read_available() > 0) {
-      if (USB_EP_RECV.CNT > USBSTATE.RECVCNT) {
-        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-          _c = USB_RECV_BUFFER[USBSTATE.RECVCNT++];
-        }
-        D1PRINTF(" RD=%d/%d>%02X\r\n", USBSTATE.RECVCNT, USB_EP_RECV.CNT, _c);
+      ep_recv_pending();
+      ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        _c = USB_RECV_BUFFER[USBSTATE.RECVCNT++];
       }
       /* When it reaches the end, it requests that the buffer be updated. */
       if (USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
@@ -405,18 +400,18 @@ namespace USB_NAMESPACE {
 
   /* Returns the number of unread characters. */
   size_t read_available (void) {
-    if (is_busy() || is_recv_busy()) return 0;
-    else {
+    size_t _s = 0;
+    if (is_ready() && is_recv_ready()) {
       /* When it reaches the end, it requests that the buffer be updated. */
-      size_t _s = USB_EP_RECV.CNT - USBSTATE.RECVCNT;
+      _s = USB_EP_RECV.CNT - USBSTATE.RECVCNT;
       if (_s == 0) ep_recv_flush();
-      return _s;
     }
+    return _s;
   }
 
   /* Returns the last character of the unread buffer. */
   int peek_byte (void) {
-    return USB_EP_RECV.CNT == USBSTATE.RECVCNT ? -1 : USB_RECV_BUFFER[USBSTATE.RECVCNT - 1];
+    return USB_EP_RECV.CNT == USBSTATE.RECVCNT ? -1 : USB_RECV_BUFFER[USBSTATE.RECVCNT];
   }
 
   /* Fills the given receive buffer until either a timeout occurs or the given character arrives. */

@@ -28,7 +28,7 @@
 
 #define USB_MANUFACTURER   L"Microchip Technology Inc."
 #define USB_PRODUCT        L"USB Serial for AVR-DU series"
-// #define USB_SERIALNUMBER   L"000000"
+// #define USB_SERIALNUMBER   L"123456"
 #define USB_SERIALNUMBER_CHIP       /* Uses the serial number embedded in the chip */
 // #define USB_DEVICENAME     L"VCOM" /* for IAD String */
 

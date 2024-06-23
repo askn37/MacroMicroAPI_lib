@@ -121,9 +121,6 @@ namespace USB_NAMESPACE {
   /* Implementing BUS interrupts handling. */
   void handling_bus_events (void) {
     uint8_t busstate = USB0_INTFLAGSA;
-    if (busstate & (USB_RESUME_bm | USB_RESET_bm)) {
-      bus_reset();
-    }
     /*** Do not allow unnecessary interrupts. ***/
     if (bit_is_set(busstate, USB_SOF_bp)) {
       cb_event_class_sof();
@@ -131,42 +128,47 @@ namespace USB_NAMESPACE {
       USB0_INTFLAGSA |= USB_SOF_bm;
     }
     if (bit_is_set(busstate, USB_STALLED_bp)) {
-      D1PRINTF("<STALLED>\r\n");
+      D2PRINTF("<STALLED>\r\n");
       cb_bus_event_stalled();
       USB0_INTFLAGSA |= USB_STALLED_bm;
     }
     if (bit_is_set(busstate, USB_RESET_bp)) {
-      D1PRINTF("<RESET>\r\n");
+      D2PRINTF("<RESET>\r\n");
       /* A USB bus reset occurred. */
       cb_bus_event_reset();
       /* The current USB address must be discarded and a setup transaction must be awaited. */
       USB0_INTFLAGSA |= USB_RESET_bm;
     }
     if (bit_is_set(busstate, USB_SUSPEND_bp)) {
-      D1PRINTF("<SUSPEND>\r\n");
+      D2PRINTF("<SUSPEND>\r\n");
       /* Suspend requested. */
       cb_bus_event_suspend();
       /* Bus-powered devices must transition quickly to a lower power state. */
       USB0_INTFLAGSA |= USB_SUSPEND_bm;
     }
     if (bit_is_set(busstate, USB_RESUME_bp)) {
-      D1PRINTF("<RESUME>\r\n");
-      /* Resume requested. */
-      bus_attach();
-      bus_resume();
+      D2PRINTF("<RESUME>\r\n");
+      // /* Resume requested. */
+      // bus_attach();
+      // bus_resume();
       cb_bus_event_resume();
       /* The system is then allowed to return to a normal power state. */
       USB0_INTFLAGSA |= USB_RESUME_bm;
     }
     if (bit_is_set(busstate, USB_UNF_bp)) {
       /* Executed if the IN packet is empty. */
+      D2PRINTF("<UNF>\r\n");
       cb_bus_event_underflow();
       USB0_INTFLAGSA |= USB_UNF_bm;
     }
     if (bit_is_set(busstate, USB_OVF_bp)) {
       /* Executed if an OUT packet is not received. */
+      D2PRINTF("<OVF>\r\n");
       cb_bus_event_overflow();
       USB0_INTFLAGSA |= USB_OVF_bm;
+    }
+    if (busstate & (USB_RESUME_bm | USB_RESET_bm)) {
+      bus_reset();
     }
   }
 
