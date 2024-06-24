@@ -64,12 +64,12 @@ namespace USB_NAMESPACE {
    */
 
   /* True if the host is waiting to send. */
-  bool is_recv_overflow (void) {
+  bool is_recv_overrun (void) {
     return bit_is_set(USB_EP_RECV.STATUS, USB_UNFOVF_bp);
   }
 
   /* True if the host is waiting to receive. */
-  bool is_send_underflow (void) {
+  bool is_send_underrun (void) {
     return bit_is_set(USB_EP_SEND.STATUS, USB_UNFOVF_bp);
   }
 
@@ -181,7 +181,7 @@ namespace USB_NAMESPACE {
     if (0 == (--USBSTATE.SOF)) {
       /* Buffered sends and receives can only be performed */
       /* if the underflow bit is set to avoid blocking from the host side. */
-      if (is_send_underflow() && USBSTATE.SENDCNT > 0) ep_send_flush();
+      if (is_send_underrun() && USBSTATE.SENDCNT > 0) ep_send_flush();
       disable_interrupt_sof();
     }
   }
@@ -340,7 +340,7 @@ namespace USB_NAMESPACE {
   /* This operation may be blocked if the host is not responding. */
   void write_flush (void) {
     if (is_busy()) return;
-    if (USBSTATE.SENDCNT > 0) ep_send_flush();
+    if (USBSTATE.SENDCNT > 0 && is_send_ready()) ep_send_flush();
     ep_send_pending();
   }
 
@@ -376,7 +376,7 @@ namespace USB_NAMESPACE {
   /* Returns the number of characters available to write. */
   size_t write_available (void) {
     size_t _s = USB_BULK_SEND_MAX - USBSTATE.SENDCNT;
-    if (_s == 0 && is_ready() && is_send_busy()) ep_send_flush();
+    if (_s == 0 && is_ready() && is_send_ready()) ep_send_flush();
     return _s;
   }
 
