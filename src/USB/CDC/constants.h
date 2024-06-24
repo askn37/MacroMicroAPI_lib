@@ -25,11 +25,11 @@
 #define USB_SETUP_PK_SIZE     64    /* This length cannot be changed. */
 #define USB_DATA_PK_SIZE      64    /* 64 is the maximum allowed by USB 2.0. */
 #define USB_INTR_PK_SIZE      16    /* 16 is enough. */
-
+#define USB_BULK_INTR_MAX     USB_INTR_PK_SIZE
 #define USB_BULK_RECV_MAX     USB_DATA_PK_SIZE  /* Cannot be changed. */
 #define USB_BULK_SEND_MAX     64                /* It can be expanded up to 1023. */
 
-#define USB_DATA_BUFFER_SIZE  (USB_BULK_SEND_MAX + USB_BULK_RECV_MAX + USB_INTR_PK_SIZE - 8)
+#define USB_DATA_BUFFER_SIZE  (USB_BULK_SEND_MAX + USB_BULK_RECV_MAX + USB_BULK_INTR_MAX)
 
 #define USB_EP_SIZE_gc(x)  ((x <= 8 ) ? USB_BUFSIZE_DEFAULT_BUF8_gc :\
                             (x <= 16) ? USB_BUFSIZE_DEFAULT_BUF16_gc:\
@@ -62,7 +62,7 @@
 #define USB_EP_RECV USB_EP(USB_EP_BULK_OUT)
 #define USB_EP_SEND USB_EP(USB_EP_BULK_IN)
 
-#define USB_INTR_BUFFER (get_workmem_ptr()->control)
+#define USB_INTR_BUFFER (get_workmem_ptr()->intr)
 #define USB_RECV_BUFFER (get_workmem_ptr()->recv)
 #define USB_SEND_BUFFER (get_workmem_ptr()->send)
 
@@ -78,15 +78,15 @@ namespace USB_NAMESPACE {
   } PACKED USB_EP_TABLE_t;
 
   union USB_WM_TABLE_t {
-    struct {
-      Setup_Packet      setup;  /* 8 bytes */
-      Descriptor_Header header; /* 2 bytes  */
-      uint8_t data[USB_DATA_BUFFER_SIZE - 2];
-    };
-    struct {
-      uint8_t control[USB_INTR_PK_SIZE];
-      uint8_t recv[USB_BULK_RECV_MAX];
-      uint8_t send[USB_BULK_SEND_MAX];
+    Setup_Packet setup;
+    union {
+      Descriptor_Header header;
+      uint8_t data[USB_DATA_BUFFER_SIZE];
+      struct {
+        uint8_t intr[USB_BULK_INTR_MAX];
+        uint8_t recv[USB_BULK_RECV_MAX];
+        uint8_t send[USB_BULK_SEND_MAX];
+      };
     };
   };
 
@@ -96,7 +96,7 @@ namespace USB_NAMESPACE {
   USB_WM_TABLE_t* get_workmem_ptr (void);     /* 136 bytes */
 
   /* Static descriptor getter */
-  size_t cb_get_descriptor_data (uint16_t _index, uint8_t* _buffer);
+  size_t cb_get_descriptor_data (uint8_t* _buffer, uint16_t _index);
 
   /* Endpoint Setup IN/OUT */
   void ep_setup_clear (void);

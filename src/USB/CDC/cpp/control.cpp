@@ -50,7 +50,7 @@ namespace USB_NAMESPACE {
    * Unsupported requests or callback error will be STALLED.
    * 
    * The following callbacks will be called:
-   *    GetDescriptor     size  = cb_get_descriptor_data(value, &buffer)
+   *    GetDescriptor     size  = cb_get_descriptor_data(&buffer, value)
    *    SetConfiguration  bool  = cb_set_configuration(value)
    *    GetConfiguration  value = cb_get_configuration()
    *    SetInterface      bool  = cb_set_interface(value)
@@ -70,7 +70,7 @@ namespace USB_NAMESPACE {
     }
     else if (bRequest == USB_REQ_GetDescriptor) {     /* 0x06 */
       size_t _length = USB_SETUP_DATA.wLength;
-      size_t _size = cb_get_descriptor_data(USB_SETUP_DATA.wValue, &USB_DATA_BUFFER);
+      size_t _size = cb_get_descriptor_data(&USB_DATA_BUFFER, USB_SETUP_DATA.wValue);
       EP_RES->CNT = (_size > _length) ? _length : _size;
       listen = !!_size;
     }

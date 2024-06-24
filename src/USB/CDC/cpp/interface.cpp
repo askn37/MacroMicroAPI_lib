@@ -375,26 +375,22 @@ namespace USB_NAMESPACE {
 
   /* Returns the number of characters available to write. */
   size_t write_available (void) {
-    if (is_busy() || is_send_busy()) return 0;
-    if (is_send_underflow() && USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) {
-      ep_send_flush();
-      return 0;
-    }
-    return USB_BULK_SEND_MAX - USBSTATE.SENDCNT;
+    size_t _s = USB_BULK_SEND_MAX - USBSTATE.SENDCNT;
+    if (_s == 0 && is_ready() && is_send_busy()) ep_send_flush();
+    return _s;
   }
 
   /* Receives one character. */
   int read_byte (void) {
     int _c = -1;
-    /* It won't work if the receive buffer is unreadable. */
-    if (read_available() > 0) {
-      ep_recv_pending();
+    if (is_recv_ready() && USB_EP_RECV.CNT == USBSTATE.RECVCNT && is_ready()) ep_recv_flush();
+    ep_recv_pending();
+    if (USB_EP_RECV.CNT != USBSTATE.RECVCNT) {
       ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         _c = USB_RECV_BUFFER[USBSTATE.RECVCNT++];
       }
-      /* When it reaches the end, it requests that the buffer be updated. */
-      if (USB_EP_RECV.CNT == USBSTATE.RECVCNT) ep_recv_flush();
     }
+    if (USB_EP_RECV.CNT == USBSTATE.RECVCNT && is_ready()) ep_recv_flush();
     return _c;
   }
 
@@ -411,7 +407,7 @@ namespace USB_NAMESPACE {
 
   /* Returns the last character of the unread buffer. */
   int peek_byte (void) {
-    return USB_EP_RECV.CNT == USBSTATE.RECVCNT ? -1 : USB_RECV_BUFFER[USBSTATE.RECVCNT];
+    return is_recv_ready() && USB_EP_RECV.CNT == USBSTATE.RECVCNT ? -1 : USB_RECV_BUFFER[USBSTATE.RECVCNT];
   }
 
   /* Fills the given receive buffer until either a timeout occurs or the given character arrives. */

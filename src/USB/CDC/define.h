@@ -320,21 +320,21 @@ namespace USB_NAMESPACE {
 
   /* CDC Line Coding : 7 bytes */
   typedef struct {
-    uint32_t dwDTERate;
-    uint8_t  bCharFormat;
-    uint8_t  bParityType;
-    uint8_t  bDataBits;
+    uint32_t dwDTERate   = 9600U;
+    uint8_t  bCharFormat = StopBits_1;
+    uint8_t  bParityType = Parity_None;
+    uint8_t  bDataBits   = 8;   /* 5,6,7,8,16(9) */
   } PACKED LineEncoding_t;
 
   /* CDC SerialState : 2 bytes */
-  typedef struct {
-    bool     bRxCarrier  : 1;
-    bool     bTxCarrier  : 1; /* DSR<-DTR */
+  typedef struct {              /* DTE    DCE       */
+    bool     bRxCarrier  : 1;   /* DCD <- CD        */
+    bool     bTxCarrier  : 1;   /* DSR <- ER or DTR */
     bool     bBreak      : 1;
-    bool     bRingSignal : 1;
-    bool     bFraming    : 1;
-    bool     bParity     : 1;
-    bool     bOverRun    : 1;
+    bool     bRingSignal : 1;   /*  RI <- RI        */
+    bool     bFraming    : 1;   /* Frame Error   */
+    bool     bParity     : 1;   /* Parity Error  */
+    bool     bOverRun    : 1;   /* Overrun Error */
     bool     reserve     : 1;
     uint8_t  reserved;
   } PACKED SerialState_t;
@@ -350,23 +350,21 @@ namespace USB_NAMESPACE {
 
   /* CDC ControlLineState : 1 bytes */
   typedef struct {
-    bool     bStateDTR   : 1;
-    bool     bStateRTS   : 1;
+    bool     bStateDTR   : 1;   /* DTR -> DSR or DCD */
+    bool     bStateRTS   : 1;   /* RTS -> CTS        */
   } PACKED LineState_t;
 
   /* USB InterfaceState : 16 bytes */
   typedef struct {
-    register8_t  CONFIG = 0;
-    register8_t  SOF = 0;
-    register16_t SENDCNT = 0;
-    register16_t RECVCNT = 0;
+    register8_t  CONFIG   = 0;
+    register8_t  SOF      = 0;
+    register16_t SENDCNT  = 0;
+    register16_t RECVCNT  = 0;
     register16_t BREAKCNT = 0;
-    register16_t TIMEOUT = 1000;
+    register16_t TIMEOUT  = 1000;
     SerialState_t SerialState;
     union {
-      LineEncoding_t LineEncoding = {
-        9600UL, StopBits_1, Parity_None, 8
-      };
+      LineEncoding_t LineEncoding = {};
       uint8_t sLineEncoding[sizeof(LineEncoding_t)];
     };
     union {

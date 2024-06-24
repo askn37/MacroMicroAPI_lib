@@ -18,7 +18,6 @@
 #include BUILD_STOP
 #endif
 #include <stddef.h>
-#include "api/String.h"
 
 /* If you fork and create a custom build, you will need to change this name. */
 #define USB_NAMESPACE USB::CDC

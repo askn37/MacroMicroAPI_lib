@@ -23,14 +23,14 @@
  * This USB device information applies only when using Microchip Technology Inc. products.
  * It must be modified when porting to other companies' products.
  */
-#define USB_VENDOR_ID      0x04D8   /* 0x04D8=MCHP VID. */
-#define USB_PRODUCT_ID     0x0B15   /* PID 0x0010-0x002F reserved for testing/non-public demos. */
+#define USB_VENDOR_ID      0x04D8       /* 0x04D8=MCHP VID. */
+#define USB_PRODUCT_ID     0x0B15       /* PID 0x0010-0x002F reserved for testing/non-public demos. */
 
 #define USB_MANUFACTURER   L"Microchip Technology Inc."
-#define USB_PRODUCT        L"USB Serial for AVR-DU series"
-// #define USB_SERIALNUMBER   L"123456"
-#define USB_SERIALNUMBER_CHIP       /* Uses the serial number embedded in the chip */
-// #define USB_DEVICENAME     L"VCOM" /* for IAD String */
+#define USB_PRODUCT        L"USB-CDC for AVR-DU series"
+#define USB_SERIALNUMBER   L"123456"    /* User configuration */
+#define USB_SERIALNUMBER_CHIP           /* Uses the serial number embedded in the chip */
+// #define USB_DEVICENAME     L"VCOM"      /* for IAD String */
 
 using namespace USB_NAMESPACE;
 
@@ -50,7 +50,7 @@ alignas(2) const USB_String_Descriptor PROGMEM product_string = {
 };
 #endif
 
-#ifdef USB_SERIALNUMBER
+#if !defined(USB_SERIALNUMBER_CHIP) && defined(USB_SERIALNUMBER)
 /* If this is enabled, it returns the USB_SERIAL_NUMBER defined value. */
 alignas(2) const USB_String_Descriptor PROGMEM serialnumber_string = {
   .bLength              = sizeof(USB_SERIALNUMBER)
@@ -245,7 +245,7 @@ namespace USB_NAMESPACE {
 
   /* Sets the specified device/configuration descriptor for the endpoint. */
   /* It then returns the payload size. */
-  WEAK size_t cb_get_descriptor_data (uint16_t _index, uint8_t* _buffer) {
+  WEAK size_t cb_get_descriptor_data (uint8_t* _buffer, uint16_t _index) {
     uint8_t* _pgmem = 0;
     size_t   _size = 0;
     if (_index == USB_DATA_GetDescripter_Device) {
@@ -301,7 +301,7 @@ namespace USB_NAMESPACE {
         _pgmem = (uint8_t*)&interface_string;
       }
       #endif
-      if (_pgmem) _size = 2 + pgm_read_byte_near(_pgmem);
+      if (_pgmem) _size = 2 + pgm_read_byte(_pgmem);
     }
     if (_size) memcpy_P(_buffer, _pgmem, _size);
     return _size;
