@@ -26,49 +26,13 @@
 #define USB_VENDOR_ID      0x04D8       /* 0x04D8=MCHP VID. */
 #define USB_PRODUCT_ID     0x0B15       /* PID 0x0010-0x002F reserved for testing/non-public demos. */
 
-#define USB_MANUFACTURER   L"Microchip Technology Inc."
-#define USB_PRODUCT        L"USB-CDC for AVR-DU series"
-#define USB_SERIALNUMBER   L"123456"    /* User configuration */
+#define USB_MANUFACTURER   "Microchip Technology Inc."
+#define USB_PRODUCT        "USB-CDC for AVR-DU series"
+#define USB_SERIALNUMBER   "123456"     /* User configuration */
 #define USB_SERIALNUMBER_CHIP           /* Uses the serial number embedded in the chip */
-// #define USB_DEVICENAME     L"VCOM"      /* for IAD String */
+// #define USB_DEVICENAME     "VCOM"       /* for IAD String */
 
 using namespace USB_NAMESPACE;
-
-#ifdef USB_MANUFACTURER
-alignas(2) const USB_String_Descriptor PROGMEM manufacturer_string = {
-  .bLength              = sizeof(USB_MANUFACTURER)
-, .bDescriptorType      = USB_DTYPE_String
-, USB_MANUFACTURER
-};
-#endif
-
-#ifdef USB_PRODUCT
-alignas(2) const USB_String_Descriptor PROGMEM product_string = {
-  .bLength              = sizeof(USB_PRODUCT)
-, .bDescriptorType      = USB_DTYPE_String
-, USB_PRODUCT
-};
-#endif
-
-#if !defined(USB_SERIALNUMBER_CHIP) && defined(USB_SERIALNUMBER)
-/* If this is enabled, it returns the USB_SERIAL_NUMBER defined value. */
-alignas(2) const USB_String_Descriptor PROGMEM serialnumber_string = {
-  .bLength              = sizeof(USB_SERIALNUMBER)
-, .bDescriptorType      = USB_DTYPE_String
-, USB_SERIALNUMBER
-};
-#endif
-
-#ifdef USB_DEVICENAME
-alignas(2) const USB_String_Descriptor PROGMEM interface_string = {
-  .bLength              = sizeof(USB_DEVICENAME)
-, .bDescriptorType      = USB_DTYPE_String
-, USB_DEVICENAME
-};
-#define USB_DEVICENAME_INDEX 4
-#else
-#define USB_DEVICENAME_INDEX 0
-#endif
 
 #ifdef USB_MANUFACTURER
 #define USB_MANUFACTURER_INDEX 1
@@ -88,19 +52,25 @@ alignas(2) const USB_String_Descriptor PROGMEM interface_string = {
 #define USB_SERIALNUMBER_INDEX 0
 #endif
 
-alignas(2) const USB_String_Descriptor PROGMEM language_string = {
+#ifdef USB_DEVICENAME
+#define USB_DEVICENAME_INDEX 4
+#else
+#define USB_DEVICENAME_INDEX 0
+#endif
+
+const USB_String_Descriptor PROGMEM language_string = {
   .bLength              = 2
 , .bDescriptorType      = USB_DTYPE_String
 , .wString              = {USB_LANGUAGE_EN_US}
 };
 
-alignas(2) const USB_Device_Descriptor PROGMEM device_descriptor = {
+const USB_Device_Descriptor PROGMEM device_descriptor = {
   .bLength              = sizeof(USB_Device_Descriptor)
 , .bDescriptorType      = USB_DTYPE_Device
 , .bcdUSB               = 0x0200    // valid 0x0200 (2.0), 0x0100 (1.0) and 0x0110 (1.1)
-, .bDeviceClass         = 0x02      // CSCP_IADDeviceClass; was 2
-, .bDeviceSubClass      = 0x00      // CSCP_IADDeviceSubclass; was 0
-, .bDeviceProtocol      = 0x00      // CSCP_IADDeviceProtocol; was 0
+, .bDeviceClass         = USB_CSCP_IADDeviceClass
+, .bDeviceSubClass      = USB_CSCP_IADDeviceSubclass
+, .bDeviceProtocol      = USB_CSCP_IADDeviceProtocol
 , .bMaxPacketSize0      = USB_SETUP_PK_SIZE   // EndPoint-0 Max packet size
 , .idVendor             = USB_VENDOR_ID
 , .idProduct            = USB_PRODUCT_ID
@@ -127,7 +97,7 @@ typedef struct USB_General_Configuration_Descriptor {
   USB_Endpoint_Descriptor                   CDC_DataIn_Endpoint;
 } USB_General_Configuration_Descriptor;
 
-alignas(2) const USB_General_Configuration_Descriptor PROGMEM general_configuration_descriptor = {
+const USB_General_Configuration_Descriptor PROGMEM general_configuration_descriptor = {
   .Config = {
     .bLength              = sizeof(USB_Configuration_Descriptor)
   , .bDescriptorType      = USB_DTYPE_Configuration
@@ -143,9 +113,9 @@ alignas(2) const USB_General_Configuration_Descriptor PROGMEM general_configurat
   , .bDescriptorType      = USB_DTYPE_InterfaceAssociation
   , .bFirstInterface      = USB_INTERFACE_ID_CDC_CCI
   , .bInterfaceCount      = 2
-  , .bFunctionClass       = 0x02    // CDC_CSCP_CDCClass
-  , .bFunctionSubClass    = 0x02    // CDC_CSCP_ACMSubclass
-  , .bFunctionProtocol    = 0x01    // CSC_CSCP_ATCommandProtocol
+  , .bFunctionClass       = USB_CSCP_CDCClass
+  , .bFunctionSubClass    = USB_CSCP_ACMSubclass
+  , .bFunctionProtocol    = USB_CSCP_ATCommandProtocol
   , .iFunction            = USB_DEVICENAME_INDEX
   },
   .CDC_CCI_Interface = {
@@ -154,9 +124,9 @@ alignas(2) const USB_General_Configuration_Descriptor PROGMEM general_configurat
   , .bInterfaceNumber     = USB_INTERFACE_ID_CDC_CCI
   , .bAlternateSetting    = 0
   , .bNumEndpoints        = 1       // 1:EP_IN
-  , .bInterfaceClass      = 0x02    // CDC_CSCP_CDCClass
-  , .bInterfaceSubClass   = 0x02    // CDC_CSCP_ACMSubclass
-  , .bInterfaceProtocol   = 0x01    // CDC_CSCP_ATCommandProtocol
+  , .bInterfaceClass      = USB_CSCP_CDCClass
+  , .bInterfaceSubClass   = USB_CSCP_ACMSubclass
+  , .bInterfaceProtocol   = USB_CSCP_ATCommandProtocol
   , .iInterface           = 0
   },
   .CDC_Header_Functional_Descriptor = {
@@ -224,7 +194,7 @@ alignas(2) const USB_General_Configuration_Descriptor PROGMEM general_configurat
   },
 };
 
-alignas(2) const USB_DeviceQualifier_Descriptor PROGMEM devicequalifier_descriptor = {
+const USB_DeviceQualifier_Descriptor PROGMEM devicequalifier_descriptor = {
   /* This descriptor is used when inserted into a USB 3.x port. */
   .bLength                = sizeof(USB_DeviceQualifier_Descriptor)
 , .bDescriptorType        = USB_DTYPE_DeviceQualifier
@@ -260,48 +230,71 @@ namespace USB_NAMESPACE {
       _pgmem = (uint8_t*)&devicequalifier_descriptor;
       _size = sizeof(devicequalifier_descriptor);
     }
+    else if (_index == USB_DATA_GetString_Index_0) {
+      _pgmem = (uint8_t*)&language_string;
+      _size = 4;
+    }
     else {
-      if (_index == USB_DATA_GetString_Index_0) {
-        _pgmem = (uint8_t*)&language_string;
-      }
-      #if USB_MANUFACTURER_INDEX != 0
-      else if (_index == USB_DATA_GetString_Index_1) {
-        _pgmem = (uint8_t*)&manufacturer_string;
-      }
-      #endif
-      #if USB_PRODUCT_INDEX != 0
-      else if (_index == USB_DATA_GetString_Index_2) {
-        _pgmem = (uint8_t*)&product_string;
-      }
-      #endif
-      #if USB_SERIALNUMBER_INDEX != 0
-      else if (_index == USB_DATA_GetString_Index_3) {
-        #ifdef USB_SERIALNUMBER_CHIP
-        /*** Otherwise, get the chip's unique manufacturer number. ***/
-        /*** This function requires a 66-byte buffer. ***/
-        uint8_t *p = (uint8_t*)&SIGROW_SERNUM0;
-        uint8_t *q = _buffer;
-        *q++ = 64;    /* .bLength */
-        *q++ = USB_DTYPE_String;
-        for (uint8_t i = 0; i < 16; i++) {
-          uint8_t c = *p++;
-          *q++ = btoh(c >> 4);  /* High nibble hex */
-          *q++ = 0;             /* Zero padding */
-          *q++ = btoh(c);       /* Low nibble hex */
-          *q++ = 0;             /* Zero padding */
+      switch (_index) {
+        #if USB_MANUFACTURER_INDEX != 0
+        case USB_DATA_GetString_Index_1 : {
+          static const uint8_t _s1[] PROGMEM = USB_MANUFACTURER;
+          _pgmem = (uint8_t*)_s1;
+          _size = sizeof(_s1);
+          break;
         }
-        return 66;
-        #else
-        _pgmem = (uint8_t*)&serialnumber_string;
         #endif
+        #if USB_PRODUCT_INDEX != 0
+        case USB_DATA_GetString_Index_2 : {
+          static const uint8_t _s2[] PROGMEM = USB_PRODUCT;
+          _pgmem = (uint8_t*)_s2;
+          _size = sizeof(_s2);
+          break;
+        }
+        #endif
+        #if USB_SERIALNUMBER_INDEX != 0
+        case USB_DATA_GetString_Index_3 : {
+          #ifdef USB_SERIALNUMBER_CHIP
+          /*** Otherwise, get the chip's unique manufacturer number. ***/
+          /*** This function requires a 66-byte buffer. ***/
+          uint8_t *p = (uint8_t*)&SIGROW_SERNUM0;
+          uint8_t *q = _buffer;
+          *q++ = 64;    /* .bLength */
+          *q++ = USB_DTYPE_String;
+          for (uint8_t i = 0; i < 16; i++) {
+            uint8_t c = *p++;
+            *q++ = btoh(c >> 4);  /* High nibble hex */
+            *q++ = 0;             /* Zero padding */
+            *q++ = btoh(c);       /* Low nibble hex */
+            *q++ = 0;             /* Zero padding */
+          }
+          return 66;
+          #else
+          static const uint8_t _s3[] PROGMEM = USB_SERIALNUMBER;
+          _pgmem = (uint8_t*)_s3;
+          _size = sizeof(_s3);
+          break;
+          #endif
+        }
+        #endif
+        #if USB_DEVICENAME_INDEX != 0
+        case USB_DATA_GetString_Index_4 : {
+          static const uint8_t _s4[] PROGMEM = USB_DEVICENAME;
+          _pgmem = (uint8_t*)_s4;
+          _size = sizeof(_s4);
+          break;
+        }
+        #endif
+        default : return _size;
       }
-      #endif
-      #if USB_DEVICENAME_INDEX != 0
-      else if (_index == USB_DATA_GetString_Index_4) {
-        _pgmem = (uint8_t*)&interface_string;
+      uint8_t *q = _buffer;
+      *q++ = _size << 2;
+      *q++ = USB_DTYPE_String;
+      for (uint8_t _i = 0; _i < _size; _i++) {
+        *q++ = pgm_read_byte(_pgmem + _i);
+        *q++ = 0;
       }
-      #endif
-      if (_pgmem) _size = 2 + pgm_read_byte(_pgmem);
+      return 2 + (_size << 2);
     }
     if (_size) memcpy_P(_buffer, _pgmem, _size);
     return _size;

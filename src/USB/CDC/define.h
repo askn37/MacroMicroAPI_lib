@@ -114,9 +114,12 @@ namespace USB_NAMESPACE {
   , USB_CSCP_VendorSpecificClass    = 0xFF
   , USB_CSCP_VendorSpecificSubclass = 0xFF
   , USB_CSCP_VendorSpecificProtocol = 0xFF
-  , USB_CSCP_IADDeviceClass         = 0xEF
-  , USB_CSCP_IADDeviceSubclass      = 0x02
-  , USB_CSCP_IADDeviceProtocol      = 0x01
+  , USB_CSCP_IADDeviceClass         = 0x02
+  , USB_CSCP_IADDeviceSubclass      = 0x00
+  , USB_CSCP_IADDeviceProtocol      = 0x00
+  , USB_CSCP_CDCClass               = 0x02
+  , USB_CSCP_ACMSubclass            = 0x02
+  , USB_CSCP_ATCommandProtocol      = 0x01
 
   , CDC_REQ_SendEncapsulatedCommand = 0x00
   , CDC_REQ_GetEncapsulatedResponse = 0x01
