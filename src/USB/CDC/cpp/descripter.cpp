@@ -285,14 +285,15 @@ namespace USB_NAMESPACE {
           break;
         }
         #endif
-        default : return _size;
       }
       uint8_t *q = _buffer;
       *q++ = _size << 2;
       *q++ = USB_DTYPE_String;
-      for (uint8_t _i = 0; _i < _size; _i++) {
-        *q++ = pgm_read_byte(_pgmem + _i);
-        *q++ = 0;
+      if (_size) {
+        for (uint8_t _i = 0; _i < _size; _i++) {
+          *q++ = pgm_read_byte(_pgmem + _i);
+          *q++ = 0;
+        }
       }
       return 2 + (_size << 2);
     }
