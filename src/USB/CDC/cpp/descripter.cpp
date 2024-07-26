@@ -287,15 +287,15 @@ namespace USB_NAMESPACE {
         #endif
       }
       uint8_t *q = _buffer;
-      *q++ = _size << 2;
+      *q++ = _size << 1;
       *q++ = USB_DTYPE_String;
       if (_size) {
-        for (uint8_t _i = 0; _i < _size; _i++) {
-          *q++ = pgm_read_byte(_pgmem + _i);
+        for (uint8_t _i = 1; _i < _size; _i++) {
+          *q++ = pgm_read_byte(_pgmem + _i - 1);
           *q++ = 0;
         }
       }
-      return 2 + (_size << 2);
+      return _size << 1;
     }
     if (_size) memcpy_P(_buffer, _pgmem, _size);
     return _size;
