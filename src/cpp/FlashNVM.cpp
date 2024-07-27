@@ -305,7 +305,7 @@ namespace FlashNVM {
 
   __attribute__((naked))
   __attribute__((noinline))
-  void nvm_cmd (uint8_t _nvm_cmd) {
+  void nvm_cmd (uint8_t /* _nvm_cmd */) {
     __asm__ __volatile__ (
       /* R24 <- _nvm_cmd */
       R"#ASM#(
@@ -317,7 +317,7 @@ namespace FlashNVM {
 
   __attribute__((naked))
   __attribute__((noinline))
-  void nvm_write (uint16_t _addr, uint8_t *_data) {
+  void nvm_write (uint16_t /* _addr */, uint8_t* /* _data */) {
     __asm__ __volatile__ (
       /* R24:R25 <- &_addr */
       /* R22:R23 <- &_data */
