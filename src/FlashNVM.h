@@ -75,12 +75,12 @@ namespace FlashNVM {
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size = 1);
   inline bool page_erase_P (const void* _page_addr, size_t _page_size = 1) {
-    return page_erase_PF ((const nvmptr_t)_page_addr, _page_size);
+    return page_erase_PF ((nvmptr_t)_page_addr, _page_size);
   }
 
   bool page_update_PF (const nvmptr_t _page_addr, const void* _data_addr, size_t _save_size);
   inline bool page_update_P (const void* _page_addr, const void* _data_addr, size_t _save_size) {
-    return page_update_PF ((const nvmptr_t)_page_addr, _data_addr, _save_size);
+    return page_update_PF ((nvmptr_t)_page_addr, _data_addr, _save_size);
   }
 
 #ifdef BOOTROW_SIZE

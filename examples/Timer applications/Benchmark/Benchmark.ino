@@ -28,7 +28,7 @@
 static volatile uint32_t _timer_counts;
 ISR(RTC_PIT_vect) {
   RTC_PITINTFLAGS = RTC_PI_bm;
-  _timer_counts++;
+  _timer_counts = _timer_counts + 1;
 }
 
 /* 被テスト関数 : 例えばdelay関数 */

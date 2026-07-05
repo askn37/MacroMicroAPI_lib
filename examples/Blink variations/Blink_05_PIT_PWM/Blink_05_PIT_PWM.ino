@@ -20,7 +20,14 @@ extern "C" void __vector_5 (void);
 void setup (void) {
 
   /* ポート多重化器で LED1=PIN_PA7 を駆動 */
+  #if LED_BUILTIN == PIN_PA7
   PORTMUX_EVSYSROUTEA = PORTMUX_EVOUTA_ALT1_gc;
+  EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;
+
+  /* あるいは ポート多重化器で LED1=PIN_PF2 を駆動 */
+  #elif LED_BUILTIN == PIN_PF2
+  EVSYS_USEREVSYSEVOUTF = EVSYS_USER_CHANNEL0_gc;
+  #endif
 
   /* 事象システムで RTC_PITクロックを LED1 に向ける */
   /* ここは AVR_Ex以降 かそれ以外かで変わる */
@@ -29,7 +36,6 @@ void setup (void) {
   #else
   EVSYS_CHANNEL0 = EVSYS_CHANNEL0_RTC_PIT_DIV2048_gc;
   #endif
-  EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;
 
   /* RTC_PIT有効化 : 1024Hz */
   loop_until_bit_is_clear(RTC_STATUS, RTC_CTRLABUSY_bp);

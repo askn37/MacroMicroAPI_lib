@@ -35,10 +35,10 @@ ReadUART_Class& ReadUART_Class::initiate (const uint16_t _baudrate) {
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     _usart->BAUD = (_baudrate << _baud2x);
     _usart->CTRLA = USART_RXCIE_bm;
-    _usart->CTRLC = USART_CHSIZE_8BIT_gc
-                  | USART_PMODE_DISABLED_gc
-                  | USART_CMODE_ASYNCHRONOUS_gc
-                  | USART_SBMODE_1BIT_gc;
+    _usart->CTRLC =+ USART_CHSIZE_8BIT_gc
+                   | USART_PMODE_DISABLED_gc
+                   | USART_CMODE_ASYNCHRONOUS_gc
+                   | USART_SBMODE_1BIT_gc;
     _usart->CTRLB = _usart_ctrl_b;
   }
   return *this;

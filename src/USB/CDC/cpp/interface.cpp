@@ -178,7 +178,8 @@ namespace USB_NAMESPACE {
   void cb_event_class_sof (void) {
     /* Buffer read/write delay processing. */
     /* An attempt is made at least every 64 ms. */
-    if (0 == (--USBSTATE.SOF)) {
+    USBSTATE.SOF = USBSTATE.SOF - 1;
+    if (0 == (USBSTATE.SOF)) {
       /* Buffered sends and receives can only be performed */
       /* if the underflow bit is set to avoid blocking from the host side. */
       if (is_send_underrun() && USBSTATE.SENDCNT > 0) ep_send_flush();
@@ -365,7 +366,8 @@ namespace USB_NAMESPACE {
     ep_send_pending();
     /* This is only possible if BUSNAK is set. */
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      USB_SEND_BUFFER[USBSTATE.SENDCNT++] = _c;
+      USB_SEND_BUFFER[USBSTATE.SENDCNT] = _c;
+      USBSTATE.SENDCNT = USBSTATE.SENDCNT + 1;
     }
     D2PRINTF(" WR=%d/%d<%02X\r\n", USBSTATE.SENDCNT, USB_BULK_SEND_MAX, _c);
     if (USBSTATE.SENDCNT >= USB_BULK_SEND_MAX) ep_send_flush();
@@ -387,7 +389,8 @@ namespace USB_NAMESPACE {
     ep_recv_pending();
     if (USB_EP_RECV.CNT != USBSTATE.RECVCNT) {
       ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-        _c = USB_RECV_BUFFER[USBSTATE.RECVCNT++];
+        _c = USB_RECV_BUFFER[USBSTATE.RECVCNT];
+        USBSTATE.RECVCNT = USBSTATE.RECVCNT + 1;
       }
     }
     if (USB_EP_RECV.CNT == USBSTATE.RECVCNT && is_ready()) ep_recv_flush();

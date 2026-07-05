@@ -9,10 +9,10 @@
 - megaAVR世代
   - tinyAVR-2系統
 - modernAVR世代
-  - AVR-Dx系統
-  - AVR-Ex系統
+  - AVR-DA/DB/DD系統
 
 > megaAVR-0、tinyAVR-0/1系統は対応しない。
+> DUとEx系統はEVSYSの仕様が異なるため修正が必要。
 
 ## 明るさでLEDの明滅速度を変化させる
 
