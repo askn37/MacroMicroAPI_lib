@@ -14,6 +14,7 @@
 #include <avr/io.h>
 #if defined(__cplusplus) && defined(USB0)
 #include <stddef.h>
+#include "api/macro_api.h"  /* interrupts and ATOMIC_BLOCK */
 
 #define PACKED __attribute__((packed))
 #define WEAK   __attribute__((weak))

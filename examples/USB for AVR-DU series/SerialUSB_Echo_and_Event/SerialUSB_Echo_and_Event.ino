@@ -33,9 +33,16 @@ void setup (void) {
   pinModeMacro(LED_BUILTIN, OUTPUT);
 
   /* Open UART port for debugging. */
+  #if defined(DEBUG)
   Serial.begin(CONSOLE_BAUD);
   Serial.println(F("<startup>"));
   Serial.println(F("This is the UART port for debugging."));
+  Serial.print(F("F_CPU=")).println(F_CPU, DEC);
+  Serial.print(F("RevID=")).println(SYSCFG_REVID + 0x90, HEX);
+  Serial.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
+  Serial.print(F("GPR_GPR0=0x")).println(GPR_GPR0, HEX);
+  Serial.print(F("RAMEND-2=0x")).println(*(uint16_t*)(RAMEND - 1), HEX);
+  #endif
 
   /* Open the USB-CDC character device port. */
   SerialUSB.begin(/* The BAUD parameter is not used so it can be omitted. */);
@@ -44,6 +51,8 @@ void setup (void) {
   SerialUSB.print(F("F_CPU=")).println(F_CPU, DEC);
   SerialUSB.print(F("RevID=")).println(SYSCFG_REVID + 0x90, HEX);
   SerialUSB.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
+  SerialUSB.print(F("GPR_GPR0=0x")).println(GPR_GPR0, HEX);
+  SerialUSB.print(F("RAMEND-2=0x")).println(*(uint16_t*)(RAMEND - 1), HEX);
 }
 
 void loop (void) {

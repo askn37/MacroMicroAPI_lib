@@ -14,7 +14,6 @@
 /* Compilation with anything other than the AVR-DU series will be rejected. */
 #if defined(__cplusplus) && defined(USB0)
 #include <string.h>         /* memcpy */
-#include "api/macro_api.h"  /* interrupts and ATOMIC_BLOCK */
 
 #include "../../CDC.h"
 #include "../constants.h"
@@ -160,6 +159,13 @@ namespace USB_NAMESPACE {
       USBSTATE.SENDCNT = 0;
     }
     ep_send_listen();
+    if (USBSTATE.LineEncoding.dwDTERate == 1200L) {
+      D1PRINTF("  BOOT...\r\n");
+      ep_send_pending();
+      stop();
+      *(uint16_t*)(RAMEND - 1) = 0;
+      _PROTECTED_WRITE(RSTCTRL_SWRR, 1);
+    }
   }
 
   /* The next interrupt will be allowed. */
@@ -261,6 +267,7 @@ namespace USB_NAMESPACE {
       memcpy(&USBSTATE.sLineEncoding, &USB_DATA_BUFFER, sizeof(LineEncoding_t));
       D1PRINTF(" SLE=%ld\r\n", USBSTATE.LineEncoding.dwDTERate);
       cb_cdc_set_lineencoding(&USBSTATE.LineEncoding);
+
       EP_RES->CNT = 0;
     }
     else if (bRequest == CDC_REQ_GetLineEncoding) {   /* 0x21 */
