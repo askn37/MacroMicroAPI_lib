@@ -267,7 +267,6 @@ namespace USB_NAMESPACE {
       memcpy(&USBSTATE.sLineEncoding, &USB_DATA_BUFFER, sizeof(LineEncoding_t));
       D1PRINTF(" SLE=%ld\r\n", USBSTATE.LineEncoding.dwDTERate);
       cb_cdc_set_lineencoding(&USBSTATE.LineEncoding);
-
       EP_RES->CNT = 0;
     }
     else if (bRequest == CDC_REQ_GetLineEncoding) {   /* 0x21 */

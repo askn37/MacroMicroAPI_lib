@@ -27,7 +27,7 @@ void setup (void) {
 }
 
 void loop (void) {
-  while (SerialUSB.available() > 0 && SerialUSB.availableForWrite() > 0) {
+  while (Serial.available() > 0 && Serial.availableForWrite() > 0) {
     int _c = Serial.read();
     Serial.write(_c);
     if (_c == '\n') digitalWrite(LED_BUILTIN, TOGGLE);

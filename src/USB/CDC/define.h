@@ -1,5 +1,5 @@
 /**
- * @file USB/CDC/define,h
+ * @file USB/CDC/define.h
  * @author askn (K.Sato) multix.jp
  * @brief Example of using SerialUSB class
  * @version 0.1

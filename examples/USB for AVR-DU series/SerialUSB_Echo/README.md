@@ -16,6 +16,7 @@
 ```cpp
 #include "SerialUSB.h"
 
+/* Serial マクロを上書きすると UART用の記述の多くをそのまま利用できる */
 #undef Serial
 #define Serial SerialUSB
 
@@ -32,7 +33,7 @@ void setup (void) {
 
 void loop (void) {
   /* ブロッキングと文字落ちを避けるために、読み書き両方が許可の場合のみ実行 */
-  while (SerialUSB.available() > 0 && SerialUSB.availableForWrite() > 0) {
+  while (Serial.available() > 0 && Serial.availableForWrite() > 0) {
     int _c = Serial.read();
     Serial.write(_c);
     /* 改行を検出するたびにLED状態をトグルする */
