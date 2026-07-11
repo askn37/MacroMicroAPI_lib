@@ -27,9 +27,17 @@ public:
   using Print::write; // pull in write(str) and write(buf, size) from Print
 
   inline SerialUSB_Class& begin (void) { USB_NAMESPACE::start(); return *this; }
-  inline SerialUSB_Class& begin (const uint32_t /* unused */) { USB_NAMESPACE::start(); return *this; }
+  inline SerialUSB_Class& begin (const uint32_t /* unused */) {
+    USB_NAMESPACE::start();
+    while (!(USB_NAMESPACE::is_ready() && USB_NAMESPACE::is_send_ready()));
+    return *this;
+  }
   inline SerialUSB_Class& initiate (void) { USB_NAMESPACE::start(); return *this; }
-  inline SerialUSB_Class& initiate (const uint16_t /* unused */) { USB_NAMESPACE::start(); return *this; }
+  inline SerialUSB_Class& initiate (const uint16_t /* unused */) {
+    USB_NAMESPACE::start();
+    while (!(USB_NAMESPACE::is_ready() && USB_NAMESPACE::is_send_ready()));
+    return *this;
+  }
   inline void end (void) { return USB_NAMESPACE::stop(); }
 
   size_t write (const uint8_t _c) { return USB_NAMESPACE::write_byte(_c); }
@@ -42,6 +50,7 @@ public:
   bool find (const uint8_t _c = '\n') { return USB_NAMESPACE::find_byte(_c); }
 
   void setTimeout (uint16_t _timeout) { USB_NAMESPACE::set_timeout(_timeout); }
+  void setUse1200touch (bool _bool) { USB_NAMESPACE::set_use1200touch(_bool); }
   size_t readBytes (void* _buffer, size_t _limit, char _terminate = 0, uint8_t _swevent = 0) {
     return USB_NAMESPACE::read_bytes(_buffer, _limit, _terminate, _swevent);
   }
@@ -53,8 +62,9 @@ public:
 };  /* SerialUSB_Class */
 
 extern "C" {
-  extern SerialUSB_Class SerialUSB;
+  extern SerialUSB_Class SerialUSB0;
 } /* extern "C" */
+#define SerialUSB SerialUSB0
 
 #else
 #error This feature is only available on the AVR-DU series.

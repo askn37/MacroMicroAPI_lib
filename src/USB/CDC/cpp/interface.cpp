@@ -45,6 +45,9 @@ namespace USB_NAMESPACE {
   /* Change the timeout for read_bytes. The default is 1000ms. */
   void set_timeout (uint16_t _timeout) { USBSTATE.TIMEOUT = _timeout; }
 
+  /* Enable Arduino IDE support for `upload.use_1200bps_touch` */
+  void set_use1200touch (bool _bool) { USBSTATE.T1200 = _bool ? 1 : 0; }
+
   /* Clear the USB_STATE structure to its initial values. */
   void cb_clear_state (void) { USBSTATE = (Interface_State){}; }
 
@@ -159,13 +162,6 @@ namespace USB_NAMESPACE {
       USBSTATE.SENDCNT = 0;
     }
     ep_send_listen();
-    if (USBSTATE.LineEncoding.dwDTERate == 1200L) {
-      D1PRINTF("  BOOT...\r\n");
-      ep_send_pending();
-      stop();
-      *(uint16_t*)(RAMEND - 1) = 0;
-      _PROTECTED_WRITE(RSTCTRL_SWRR, 1);
-    }
   }
 
   /* The next interrupt will be allowed. */
@@ -268,6 +264,14 @@ namespace USB_NAMESPACE {
       D1PRINTF(" SLE=%ld\r\n", USBSTATE.LineEncoding.dwDTERate);
       cb_cdc_set_lineencoding(&USBSTATE.LineEncoding);
       EP_RES->CNT = 0;
+
+      /* Enable Arduino IDE support for `upload.use_1200bps_touch` */
+      if (USBSTATE.T1200 && USBSTATE.LineEncoding.dwDTERate == 1200L) {
+        stop();
+        delay_millis(50);
+        *(uint16_t*)(RAMEND - 1) = 0;
+        _PROTECTED_WRITE(RSTCTRL_SWRR, 1);
+      }
     }
     else if (bRequest == CDC_REQ_GetLineEncoding) {   /* 0x21 */
       EP_RES->CNT = sizeof(LineEncoding_t);
@@ -326,6 +330,7 @@ namespace USB_NAMESPACE {
 
   /* Start running the application. */
   void start (void) {
+    if (is_ready()) return;
     bus_attach();
     USB0_INTCTRLA = USB_SUSPEND_bm | USB_RESUME_bm | USB_RESET_bm | USB_STALLED_bm;
     USB0_INTCTRLB = USB_TRNCOMPL_bm | USB_SETUP_bm;
@@ -452,6 +457,13 @@ namespace USB_NAMESPACE {
   }
 
 } /* USB_CDC */
+
+/* Redefine the `MicroAPI` `reboot()` */
+void reboot (void) {
+  USB_NAMESPACE::stop();
+  delay_millis(750);
+  _PROTECTED_WRITE(RSTCTRL_SWRR, 1);
+}
 
 #endif
 // end of code

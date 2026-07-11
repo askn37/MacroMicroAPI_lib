@@ -89,11 +89,7 @@ void loop (void) {
 
   Serial.println(F("<Going reset>"));
   Serial.flush();
-
-  /* Watch Dog Timer delay after reset */
-  loop_until_bit_is_clear(WDT_STATUS, WDT_SYNCBUSY_bp);
-  _PROTECTED_WRITE(WDT_CTRLA, WDT_PERIOD_8CLK_gc);
-  for (;;);
+  reboot();
 }
 
 void task1 (void) {

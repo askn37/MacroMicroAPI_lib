@@ -57,6 +57,7 @@ namespace USB_NAMESPACE {
   size_t read_available (void);
   int peek_byte (void);
   void set_timeout (uint16_t _timeout);
+  void set_use1200touch (bool _bool);
   size_t read_bytes (void* _buffer, size_t _limit, char _terminate = 0, uint8_t _swevent = 0);
   bool find_byte (const uint8_t _c = '\n');
 

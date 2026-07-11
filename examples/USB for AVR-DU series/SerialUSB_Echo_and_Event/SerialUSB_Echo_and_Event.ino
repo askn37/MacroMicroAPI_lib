@@ -33,15 +33,15 @@ void setup (void) {
   pinModeMacro(LED_BUILTIN, OUTPUT);
 
   /* Open UART port for debugging. */
-  #if defined(DEBUG)
-  Serial.begin(CONSOLE_BAUD);
-  Serial.println(F("<startup>"));
-  Serial.println(F("This is the UART port for debugging."));
-  Serial.print(F("F_CPU=")).println(F_CPU, DEC);
-  Serial.print(F("RevID=")).println(SYSCFG_REVID + 0x90, HEX);
-  Serial.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
-  Serial.print(F("GPR_GPR0=0x")).println(GPR_GPR0, HEX);
-  Serial.print(F("RAMEND-2=0x")).println(*(uint16_t*)(RAMEND - 1), HEX);
+  #if defined(DEBUG) && defined(SerialDBG)
+  SerialDBG.begin(CONSOLE_BAUD);
+  SerialDBG.println(F("<startup>"));
+  SerialDBG.println(F("This is the UART port for debugging."));
+  SerialDBG.print(F("F_CPU=")).println(F_CPU, DEC);
+  SerialDBG.print(F("RevID=")).println(SYSCFG_REVID + 0x90, HEX);
+  SerialDBG.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
+  SerialDBG.print(F("GPR_GPR0=0x")).println(GPR_GPR0, HEX);
+  SerialDBG.print(F("RAMEND-2=0x")).println(*(uint16_t*)(RAMEND - 1), HEX);
   #endif
 
   /* Open the USB-CDC character device port. */
@@ -81,8 +81,7 @@ void loop (void) {
 }
 
 /*
-The_quick_brown_fox_jumps_over_the_lazy_dog.
-0123456789ABCDEF0123456789abcdef
+The_quick_brown_fox_jumps_over_the_lazy_dog. 0123456789ABCDEF0123456789abcdef
 */
 
 // end of code

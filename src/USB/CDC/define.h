@@ -21,17 +21,19 @@
 #define RODATA __attribute__((__progmem__))
 #define NOINIT __attribute__((section(".noinit")))
 
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(SerialDBG)
 #include <peripheral.h> /* from Micro_API : inport Serial (Debug) */
-#define D1PRINTF(...) Serial.printf(__VA_ARGS__)
+#define D1PRINTF(...) SerialDBG.printf(__VA_ARGS__)
+#define D1FLUSH(...) SerialDBG.flush()
 #if DEBUG == 2
-#define D2PRINTF(...) Serial.printf(__VA_ARGS__)
+#define D2PRINTF(...) SerialDBG.printf(__VA_ARGS__)
 #else
 #define D2PRINTF(...)
 #endif
 #else
 #define D1PRINTF(...)
 #define D2PRINTF(...)
+#define D1FLUSH(...)
 #endif
 
 namespace USB_NAMESPACE {
@@ -362,6 +364,8 @@ namespace USB_NAMESPACE {
   typedef struct {
     register8_t  CONFIG   = 0;
     register8_t  SOF      = 0;
+    register8_t  T1200    = 1;
+    register8_t  reserve0 = 0;
     register16_t SENDCNT  = 0;
     register16_t RECVCNT  = 0;
     register16_t BREAKCNT = 0;
@@ -372,8 +376,8 @@ namespace USB_NAMESPACE {
       uint8_t sLineEncoding[sizeof(LineEncoding_t)];
     };
     union {
-      register8_t bLineState = 0;
       LineState_t bmLineState;
+      register8_t bLineState = 0;
     };
   } PACKED Interface_State;
 

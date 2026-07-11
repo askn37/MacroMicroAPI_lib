@@ -43,12 +43,8 @@ void setup (void) {
   persistent_save.reset_count++;
   persistent_save.crc16 = crc16(&persistent_save, sizeof(persistent_save) - sizeof(persistent_save.crc16));
 
-  /* software reset */
-  // _PROTECTED_WRITE(RSTCTRL_SWRR, 1);
-
-  /* Watch Dog Timer delay after reset */
-  loop_until_bit_is_clear(WDT_STATUS, WDT_SYNCBUSY_bp);
-  _PROTECTED_WRITE(WDT_CTRLA, WDT_PERIOD_2KCLK_gc);
+  delay_millis(1000);
+  reboot();
 }
 
 void loop (void) {}
