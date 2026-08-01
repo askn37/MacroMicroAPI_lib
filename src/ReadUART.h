@@ -13,6 +13,7 @@
 #pragma once
 #include <avr/io.h>
 #if defined(__cplusplus) && !defined(__AVR_TINY__)
+#include <variant.h>
 #include <api/Portmux.h>
 #include <api/Print.h>
 
@@ -50,11 +51,19 @@ public:
   size_t available (void);
 
   size_t availableForWrite (void) {
+  #if defined(AVR_AVRLX)
+    return bit_is_set(usart->INTFLAGS, USART_DRE_bp) ? 1 : 0;
+  #else
     return bit_is_set(usart->STATUS, USART_DREIF_bp) ? 1 : 0;
+  #endif
   }
 
   void flush (void) {
+  #if defined(AVR_AVRLX)
+    loop_until_bit_is_set(usart->INTFLAGS, USART_TXC_bp);
+  #else
     loop_until_bit_is_set(usart->STATUS, USART_TXCIF_bp);
+  #endif
   }
 
   void interrupt (void);

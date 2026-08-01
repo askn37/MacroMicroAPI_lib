@@ -1,11 +1,11 @@
 /**
  * @file FlashNVM.h
  * @author askn (K.Sato) multix.jp
- * @brief
- * @version 0.3
- * @date 2023-12-03
+ * @brief Non-volatile memory rewrite utility (requires bootloader support)
+ * @version 0.4
+ * @date 2026-08-01
  *
- * @copyright Copyright (c) 2024 askn37 at github.com
+ * @copyright Copyright (c) 2026 askn37 at github.com
  *
  */
 // MIT License : https://askn37.github.io/LICENSE.html
@@ -29,7 +29,7 @@
   #include BUILD_STOP
 #endif
 
-#if (__AVR_ARCH__ == 104)
+#if defined(CPU_RAMPZ)
   /* 128KiB model */
   typedef int32_t nvmptr_t;
 #else
@@ -41,7 +41,7 @@ extern const uint8_t* __vectors;
 
 namespace FlashNVM {
 
-#if (__AVR_ARCH__ == 104)
+#if defined(CPU_RAMPZ)
   /*  AVR_Dx 24bit */
 
   void nvm_stc (uint16_t _addr);                  /* 0x0002: ST Z+, dummy */

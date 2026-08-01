@@ -1,11 +1,11 @@
 /**
  * @file FlashNV.cpp
  * @author askn (K.Sato) multix.jp
- * @brief
- * @version 0.3
- * @date 2023-12-03
+ * @brief Non-volatile memory rewrite utility (requires bootloader support)
+ * @version 0.4
+ * @date 2026-08-01
  *
- * @copyright Copyright (c) 2024 askn37 at github.com
+ * @copyright Copyright (c) 2026 askn37 at github.com
  *
  */
 // MIT License : https://askn37.github.io/LICENSE.html
@@ -78,7 +78,7 @@ namespace FlashNVM {
     );
   }
 
-  #if (__AVR_ARCH__ == 104)
+  #if defined(CPU_RAMPZ)
   /* AVR_Dx 24bit */
 
   /* 24bit version */
@@ -93,7 +93,7 @@ namespace FlashNVM {
         JMP   0x000A        ; SPM Z+
       )#ASM#"
       :
-      : "p" (&RAMPZ)
+      : "p" (&CPU_RAMPZ)
     );
   }
 
@@ -103,27 +103,29 @@ namespace FlashNVM {
   void nvm_write (uint32_t /* _addr */, uint8_t* /* _data */) {
     __asm__ __volatile__ (
       /* R22:R23:R24:R25 <- &_addr */
-      /* R20             <- &_data */
+      /* R20:R21         <- &_data */
       R"#ASM#(
         STS   %0, R24       ; RAMPZ <- (_addr:hh8)
-        MOVW  Z, R22        ; Z <- (_addr:HI:lo8)
-        MOVW  X, R20        ; X <- (_data)
+        LDI   R24, lo8(%1)
+        LDI   R25, hi8(%1)
+        MOVW  Z, R22        ; Z(R26:R27) <- (_addr:HI:lo8)
+        MOVW  X, R20        ; X(R30:R31) <- (_data)
     1:  LD    R0, X+        ; R0 <- (_data)++
         LD    R1, X+        ; R1 <- (_data)++
         CALL  0x000A        ; SPM Z+ ; nvm_spm
-        SBIW  %1, 1         ; (PROGMEM_PAGE_SIZE / 2) -= 1
+        SBIW  R24, 1        ; (PROGMEM_PAGE_SIZE / 2) -= 1
         BRNE  1b            ;
         CLR   __zero_reg__  ;
         RET                 ;
       )#ASM#"
       :
-      : "p" (&RAMPZ)
-      , "w" (PROGMEM_PAGE_SIZE / 2)
-      : "r26", "r27", "r30", "r31"  /* X,Z */
+      : "p" (&CPU_RAMPZ)
+      , "p" (PROGMEM_PAGE_SIZE / 2)
+      : "r20", "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r30", "r31" /* d,V,W,X,Z */
     );
   }
 
-  #else /* (__AVR_ARCH__ != 104) */
+  #else /* CPU_RAMPZ */
   /* AVR_Dx/Ex 16bit */
 
   /* 16bit version */
@@ -165,10 +167,10 @@ namespace FlashNVM {
       : "r26", "r27", "r30", "r31"  /* X,Z */
     );
   }
-  #endif /* leave (__AVR_ARCH__ == 104) */
+  #endif /* leave CPU_RAMPZ */
 
   #if (AVR_NVMCTRL == 3) || (AVR_NVMCTRL == 5)
-  /* AVR_Ex */
+  /* AVR_Ex/Lx */
 
   bool page_erase_PF (const nvmptr_t _page_addr, size_t _page_size) {
     nvmptr_t _page_top = (nvmptr_t)_page_addr;
@@ -206,7 +208,7 @@ namespace FlashNVM {
   }
 
     #ifdef FLASHNVM_BOOTROW
-  /* AVR_EB */
+  /* AVR_EB/LA */
   bool bootrow_clear (void) {
     nvm_wait();
     nvm_cmd(NVMCTRL_CMD_NOCMD_gc);
@@ -253,6 +255,7 @@ namespace FlashNVM {
     size_t _buff_off = (nvmptr_t)_page_addr & (PROGMEM_PAGE_SIZE - 1);
     nvmptr_t _page_top = (nvmptr_t)_page_addr - _buff_off;
     uint8_t buffer[PROGMEM_PAGE_SIZE];
+    nvm_wait();
     while (_save_size) {
       memset(&buffer, 0xFF, PROGMEM_PAGE_SIZE);
       do {
@@ -320,7 +323,7 @@ namespace FlashNVM {
   void nvm_write (uint16_t /* _addr */, uint8_t* /* _data */) {
     __asm__ __volatile__ (
       /* R24:R25 <- &_addr */
-      /* R22:R23 <- &_data */
+      /* R22     <- &_data */
       R"#ASM#(
         MOVW  Z, R24        ; Z <- (_addr:HI:LO)
         MOVW  X, R22        ; X <- (_data)

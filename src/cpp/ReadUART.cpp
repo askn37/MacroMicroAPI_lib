@@ -16,12 +16,20 @@
 #include <util/atomic.h>
 
 ReadUART_Class& ReadUART_Class::initiate (const uint16_t _baudrate) {
-  uint8_t _usart_ctrl_b = USART_RXEN_bm | USART_TXEN_bm;
   uint8_t _baud2x = 0;
+#if defined(AVR_AVRLX)
+  uint8_t _usart_ctrl_c = 0;
+  if (_baudrate <= 63) {
+    _baud2x = 1;
+    _usart_ctrl_c = USART_SAMPR_bm;
+  }
+#else
+  uint8_t _usart_ctrl_b = USART_RXEN_bm | USART_TXEN_bm;
   if (_baudrate <= 63) {
     _baud2x = 1;
     _usart_ctrl_b = USART_RXEN_bm | USART_TXEN_bm | USART_RXMODE_CLK2X_gc;
   }
+#endif
   const UART_portmux_t* _mux = portmux;
   register8_t *_portmux = (register8_t*)pgm_read_ptr(&_mux->portmux_reg);
   *_portmux = (*_portmux & pgm_read_byte(&_mux->portmux_mask))
@@ -34,12 +42,24 @@ ReadUART_Class& ReadUART_Class::initiate (const uint16_t _baudrate) {
   USART_t* _usart = usart;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     _usart->BAUD = (_baudrate << _baud2x);
-    _usart->CTRLA = USART_RXCIE_bm;
+  #if defined(AVR_AVRLX)
+    _usart->INTCTRL |= USART_RXC_bm;
+    _usart->CTRLD =+ USART_CHSIZE_8BIT_gc
+                  | USART_PMODE_DISABLED_gc
+                  | USART_SBMODE_1BIT_gc;
+    _usart->CTRLC = _usart_ctrl_c;
+    _usart->CTRLB =  USART_RXEN_bm | USART_TXEN_bm;
+    _usart->CTRLA =+ USART_CSIG_NORMAL_gc
+                   | USART_CMODE_ASYNCHRONOUS_gc
+                   | USART_ENABLE_bm;
+  #else
+    _usart->CTRLA = 0;
     _usart->CTRLC =+ USART_CHSIZE_8BIT_gc
                    | USART_PMODE_DISABLED_gc
                    | USART_CMODE_ASYNCHRONOUS_gc
                    | USART_SBMODE_1BIT_gc;
     _usart->CTRLB = _usart_ctrl_b;
+  #endif
   }
   return *this;
 }
@@ -49,6 +69,9 @@ void ReadUART_Class::end (void) {
   USART_t* _usart = usart;
   const UART_portmux_t* _mux = portmux;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+  #if defined(AVR_AVRLX)
+    _usart->INTCTRL &= ~USART_RXC_bm;
+  #endif
     _usart->CTRLA = 0;
     _usart->CTRLB = 0;
     (*(PORT_t*)pgm_read_ptr(&_mux->port_reg)).DIRCLR = pgm_read_byte(&_mux->tx_pin);
@@ -58,10 +81,15 @@ void ReadUART_Class::end (void) {
 
 void ReadUART_Class::interrupt (void) {
   USART_t* _usart = usart;
-  while (bit_is_set(_usart->STATUS, USART_RXCIF_bp)) {
+#if defined(AVR_AVRLX)
+  while (bit_is_set(usart->INTFLAGS, USART_RXC_bp))
+#else
+  while (bit_is_set(_usart->STATUS, USART_RXCIF_bp))
+#endif
+  {
     _status = _usart->RXDATAH;
     uint8_t _data = _usart->RXDATAL;
-    if (!(_status & (USART_FERR_bp | USART_BUFOVF_bm | USART_PERR_bm ))) {
+    if (!(_status & (USART_FERR_bm | USART_BUFOVF_bm | USART_PERR_bm ))) {
       size_t __top = _top;
       _work[__top] = _data;
       _last = _data;
@@ -77,8 +105,13 @@ void ReadUART_Class::interrupt (void) {
 }
 
 size_t ReadUART_Class::write (const uint8_t _c) {
+#if defined(AVR_AVRLX)
+  loop_until_bit_is_set(usart->INTFLAGS, USART_DRE_bp);
+  usart->INTFLAGS = USART_TXC_bm;
+#else
   loop_until_bit_is_set(usart->STATUS, USART_DREIF_bp);
   usart->STATUS = USART_TXCIF_bm;
+#endif
   usart->TXDATAL = _c;
   return 1;
 }
@@ -118,9 +151,15 @@ size_t ReadUART_Class::readBytes (void* _buffer, size_t _limit, char _terminate,
   size_t _length = 0;
   do {
     uint16_t _busy = usart->BAUD;
+  #if defined(AVR_AVRLX)
+    while (!available() && bit_is_clear(usart->INTFLAGS, USART_RXC_bp)) {
+      if (--_busy == 0) return _length;
+    }
+  #else
     while (!available() && bit_is_clear(usart->STATUS, USART_RXCIF_bp)) {
       if (--_busy == 0) return _length;
     }
+  #endif
   #if defined(EVSYS_SWEVENTA)
     EVSYS_SWEVENTA = _swevent;
   #elif defined(EVSYS_STROBE)

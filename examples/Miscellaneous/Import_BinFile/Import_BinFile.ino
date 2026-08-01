@@ -2,10 +2,10 @@
  * @file Import_BinFile.ino
  * @author askn (K.Sato) multix.jp
  * @brief
- * @version 0.1
- * @date 2022-11-05
+ * @version 0.2
+ * @date 2026-07-30
  *
- * @copyright Copyright (c) 2024 askn37 at github.com
+ * @copyright Copyright (c) 2026 askn37 at github.com
  *
  */
 // MIT License : https://askn37.github.io/LICENSE.html
@@ -29,6 +29,7 @@ const size_t _sizeof_FooBinDat = (FooBinDat_end - FooBinDat);
 
 void setup (void) {
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
+  Serial.print(F("SKETCH_PATH=")).println(__QUOTE(SKETCH_PATH));
 
   /* PROGMEM空間の場合 */
   Serial.print(F("FooBin_ADDR=0x")).println(pgm_get_far_address(FooBin), HEX);

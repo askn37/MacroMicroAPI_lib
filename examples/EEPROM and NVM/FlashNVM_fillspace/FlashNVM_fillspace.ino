@@ -38,8 +38,8 @@ struct nvm_store_t {
 
   #if (PROGMEM_SIZE > 0x10000)
     /* 128KiB */
-    #define NVM_STORE0 (16 * 1)
-    #define NVM_STORE1 (16 * 62)
+    #define NVM_STORE0 (16 * 4)
+    #define NVM_STORE1 (16 * 61)
   #elif (PROGMEM_SIZE > 0x8000)
     /* 64KiB */
     #define NVM_STORE0 (16 * 1)
@@ -99,7 +99,8 @@ const struct nvm_store_t nvm_store4[NVM_STORE1] PGM_ALIGN NVM = { {0, __DATE__ "
 void setup (void) {
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
   Serial.print(F("F_CPU=")).println(F_CPU, DEC);
-  // Serial.print(F("BAUD=")).println(Serial.is_baud(), DEC);
+  Serial.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
+  Serial.print(F("CONSOLE_BAUD=")).println(CONSOLE_BAUD, DEC);
   Serial.print(F(" MAPPED_PROGMEM_START=0x")).println(MAPPED_PROGMEM_START, HEX);
   Serial.print(F(" MAPPED_PROGMEM_END=0x")).println(MAPPED_PROGMEM_END, HEX);
   Serial.print(F(" PROGMEM_PAGE_SIZE=")).println(PROGMEM_PAGE_SIZE, DEC);
@@ -137,7 +138,7 @@ void setup (void) {
   nvm_buffer.count++;
 
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-  #if defined(HAVE_RAMPZ)
+  #if (__AVR_ARCH__ == 104)
     /* over 17bit address (over 64KiB) */
     if ( FlashNVM::page_erase_PF(pgm_get_far_address(nvm_store0[NVM_STORE0-1]), sizeof(nvm_buffer))
       && FlashNVM::page_update_PF(pgm_get_far_address(nvm_store0[NVM_STORE0-1]), &nvm_buffer, sizeof(nvm_buffer))

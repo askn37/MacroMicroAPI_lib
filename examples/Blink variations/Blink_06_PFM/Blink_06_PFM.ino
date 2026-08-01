@@ -19,7 +19,7 @@
 #elif defined(AVR_TINYAVR_14) || defined(AVR_TINYAVR_20) || defined(AVR_TINYAVR_24)
   #include "Blink_06_PFM_14P.cpp"
 
-#elif defined(AVR_AVREB)
+#elif defined(AVR_AVREB) || defined(AVR_AVRLA)
   #include "Blink_06_PFM_AVREB.cpp"
 
 #elif defined(AVR_MEGAAVR) || defined(AVR_MODERNAVR)

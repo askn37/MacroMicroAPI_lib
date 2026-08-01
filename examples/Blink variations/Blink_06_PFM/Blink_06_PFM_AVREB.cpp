@@ -10,7 +10,7 @@
  */
 // MIT License : https://askn37.github.io/LICENSE.html
 
-#if defined(AVR_AVREB)
+#if defined(AVR_AVREB) || defined(AVR_AVRLA)
 
 #include <math.h>
 
