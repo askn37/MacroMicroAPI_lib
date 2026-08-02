@@ -14,8 +14,7 @@
   - megaAVR-0系統
   - tinyAVR-0/1/2系統
 - modernAVR世代
-  - AVR-Dx系統
-  - AVR-Ex系統
+  - AVR-Dx/Ex/Lx系統
 
 ## Blinkの要件
 
@@ -54,6 +53,14 @@ _PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, CLKCTRL_PDIV_64X_gc | CLKCTRL_PEN_bm);
 
 - これらのレジスタはIO書込保護されているため書込許諾マクロ`_PROTECTED_WRITE()`を使用する
 
+> [!NOTE]
+> AVR Ex/Lx ではレジスタへの設定名称が異なる。
+```cpp
+/* AVR Ex/Lx の場合 */
+_PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, CLKCTRL_CLKSEL_OSC32K_gc);
+_PROTECTED_WRITE(CLKCTRL_MCLKCTRLB, CLKCTRL_PDIV_DIV64_gc | CLKCTRL_PEN_bm);
+```
+
 ## TCA0計時器
 
 `TCA0`計時器の動作は`TCA0_SPLIT`分割動作を選択する。
@@ -89,9 +96,24 @@ TCA0_SPLIT_CTRLA = TCA_SPLIT_CLKSEL_DIV4_gc | TCA_SPLIT_ENABLE_bm;
 
 1. `TCA0`計時器に分割動作を指示する
 1. `WO3`に対応するTOP値設定レジスタ`[HL]PER`に最大値を書く（`HPER`は`WO[456]`で共用）
-1. `WO3`に対応する比較許可ビットを書く
+1. `WO3`ピン出力に対応する比較許可ビットを書く
 1. `WO3`用の比較レジスタに最大値の半分を書く
 1. `CLK_TCA`分周比を1/4とし、計数動作許可ビットと共に書く
+
+## TCE0計時器 - AVR Ex/Lx
+
+AVR Ex/Lx では`TCA0`は除去され、代わりに`TCE0`が搭載された。
+これを`TCA0_SPLIT`同様の動作をさせるには以下のように設定する。
+
+```cpp
+TCE0_PER = UINT8_MAX;
+TCE0_CMP0 = UINT8_MAX / 2;
+TCE0_CTRLB = TCE_WGMODE_SINGLESLOPE_gc;
+TCE0_CTRLA = TCE_ENABLE_bm | TCE_CLKSEL_DIV4_gc;
+```
+
+`TCA0_SPLIT`分割動作に対応する機能がなく`PER`や`CMP0`レジスタが 16-bit分解能となるのが異なる。
+`CMP[012]EN`比較許可ビットは指定しない。指定するとそれに対応する物理ピン（`PA[012]`）への信号出力許可となるが、ここでは比較結果信号`TCE0_WO0`を`CCL`や`EVSYS`に送っているので不要だ。（無論該当ピンに LEDが直結しているなら別）
 
 ## LED_BUILTIN
 
