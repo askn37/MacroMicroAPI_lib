@@ -176,7 +176,7 @@ namespace FlashNVM {
     nvmptr_t _page_top = (nvmptr_t)_page_addr;
     _page_top -= _page_top & (PROGMEM_PAGE_SIZE - 1);
     do {
-      nvm_cmd(NVMCTRL_CMD_NOCMD_gc);
+      nvm_cmd(NVMCTRL_CMD_NOOP_gc);
       nvm_spm(_page_top); /* write dummy byte */
       nvm_cmd(NVMCTRL_CMD_FLPER_gc);
       nvm_wait();
@@ -211,7 +211,7 @@ namespace FlashNVM {
   /* AVR_EB/LA */
   bool bootrow_clear (void) {
     nvm_wait();
-    nvm_cmd(NVMCTRL_CMD_NOCMD_gc);
+    nvm_cmd(NVMCTRL_CMD_NOOP_gc);
     nvm_stc(BOOTROW_START);
     nvm_cmd(NVMCTRL_CMD_FLPERW_gc);
     nvm_wait();
@@ -222,7 +222,7 @@ namespace FlashNVM {
     assert(_save_size > 0);
     assert(_save_size <= BOOTROW_SIZE);
     nvm_wait();
-    nvm_cmd(NVMCTRL_CMD_NOCMD_gc);
+    nvm_cmd(NVMCTRL_CMD_NOOP_gc);
     uint16_t _p = BOOTROW_START;
     uint8_t *_q = (uint8_t*)_data_addr;
     do { nvm_stz(_p++, *(_q++)); } while (--_save_size);
@@ -242,7 +242,7 @@ namespace FlashNVM {
       nvm_cmd(NVMCTRL_CMD_FLPER_gc);
       nvm_spm(_page_top); /* write dummy byte */
       nvm_wait();
-      nvm_cmd(NVMCTRL_CMD_NONE_gc);
+      nvm_cmd(NVMCTRL_CMD_NOOP_gc);
       if (_page_size <= PROGMEM_PAGE_SIZE) break;
       _page_top += PROGMEM_PAGE_SIZE;
       _page_size -= PROGMEM_PAGE_SIZE;
@@ -265,7 +265,7 @@ namespace FlashNVM {
       nvm_cmd(NVMCTRL_CMD_FLWR_gc);
       nvm_write(_page_top, buffer);
       nvm_wait();
-      nvm_cmd(NVMCTRL_CMD_NONE_gc);
+      nvm_cmd(NVMCTRL_CMD_NOOP_gc);
       _page_top += PROGMEM_PAGE_SIZE;
     }
     return nvm_result();
@@ -278,7 +278,7 @@ namespace FlashNVM {
     nvm_cmd(NVMCTRL_CMD_FLPER_gc);
     nvm_stc(BOOTROW_START); /* write dummy byte */
     nvm_wait();
-    nvm_cmd(NVMCTRL_CMD_NONE_gc);
+    nvm_cmd(NVMCTRL_CMD_NOOP_gc);
     return 0 == (NVMCTRL_STATUS & 3);
   }
 
@@ -292,7 +292,7 @@ namespace FlashNVM {
     uint8_t *_q = (uint8_t*)_data_addr;
     do { nvm_stz(_p++, *(_q++)); } while (--_save_size);
     nvm_wait();
-    nvm_cmd(NVMCTRL_CMD_NONE_gc);
+    nvm_cmd(NVMCTRL_CMD_NOOP_gc);
     return 0 == (NVMCTRL_STATUS & 3);
   }
     #endif  /* leave BOOTROW_SIZE */
