@@ -48,6 +48,7 @@ public:
   size_t availableForWrite (void) { return USB_NAMESPACE::write_available(); }
   int peek (void) { return USB_NAMESPACE::peek_byte(); }
   bool find (const uint8_t _c = '\n') { return USB_NAMESPACE::find_byte(_c); }
+  inline uint16_t is_baud (void) { return USB_NAMESPACE::get_line_encoding().dwDTERate; }
 
   void setTimeout (uint16_t _timeout) { USB_NAMESPACE::set_timeout(_timeout); }
   void setUse1200touch (bool _bool) { USB_NAMESPACE::set_use1200touch(_bool); }
