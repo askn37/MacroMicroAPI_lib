@@ -21,13 +21,13 @@ void nvm_cmd (uint8_t _nvm_cmd) {
   _PROTECTED_WRITE_SPM(NVMCTRL_CTRLA, _nvm_cmd);
 }
 
-#if (AVR_NVMCTRL == 2 || AVR_NVMCTRL == 4)
-  /* AVR_Dx */
+#if (AVR_NVMCTRL == 2 || AVR_NVMCTRL == 4 || AVR_NVMCTRL == 6)
+  /* AVR_Dx/Sx */
 
   bool userrow_clear (void) {
     nvm_cmd(NVMCTRL_CMD_FLPER_gc);
     *((uint8_t*)USER_SIGNATURES_START) = 0; /* write dummy byte */
-    nvm_cmd(NVMCTRL_CMD_NONE_gc);
+    nvm_cmd(NVMCTRL_CMD_NOOP_gc);
     nvm_wait();
     return nvm_result();
   }
@@ -44,7 +44,7 @@ void nvm_cmd (uint8_t _nvm_cmd) {
     nvm_wait();
     nvm_cmd(NVMCTRL_CMD_FLWR_gc);
     memcpy((void*)USER_SIGNATURES_START, _data_addr, _save_size);
-    nvm_cmd(NVMCTRL_CMD_NONE_gc);
+    nvm_cmd(NVMCTRL_CMD_NOOP_gc);
     nvm_wait();
     return nvm_result();
   }
@@ -53,7 +53,7 @@ void nvm_cmd (uint8_t _nvm_cmd) {
   /* AVR_Ex */
 
   bool userrow_clear (void) {
-    nvm_cmd(NVMCTRL_CMD_NOCMD_gc);
+    nvm_cmd(NVMCTRL_CMD_NOOP_gc);
     *((uint8_t*)USER_SIGNATURES_START) = 0; /* write dummy byte */
     nvm_cmd(NVMCTRL_CMD_FLPER_gc);
     nvm_wait();
@@ -71,7 +71,7 @@ void nvm_cmd (uint8_t _nvm_cmd) {
     assert(_save_size > 0);
     assert(_save_size <= USER_SIGNATURES_SIZE);
     nvm_wait();
-    nvm_cmd(NVMCTRL_CMD_NOCMD_gc);
+    nvm_cmd(NVMCTRL_CMD_NOOP_gc);
     memcpy((void*)USER_SIGNATURES_START, _data_addr, _save_size);
     nvm_cmd(NVMCTRL_CMD_FLPW_gc);
     nvm_wait();
