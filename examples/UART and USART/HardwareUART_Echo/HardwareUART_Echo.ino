@@ -18,7 +18,6 @@
 
 void setup (void) {
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(SW_BUILTIN, INPUT_PULLUP);
 
   /* Flashes at 0.5 Hz */
   loop_until_bit_is_clear(RTC_PITSTATUS, RTC_CTRLBUSY_bp);
@@ -33,7 +32,10 @@ void setup (void) {
   Serial.print(F(" BUFSIZE=")).println(INTERNAL_SRAM_SIZE / 2, DEC);
   Serial.println(F("# It echoes back the input string. for example;"));
   Serial.println(F("The quick brown fox jumps over the lazy dog."));
+  #ifdef SW_BUILTIN
   Serial.println(F("# Pressing SW0 triggers a reboot.")).ln();
+  pinMode(SW_BUILTIN, INPUT_PULLUP);
+  #endif
 
   _PROTECTED_WRITE(WDT_CTRLA, WDT_PERIOD);
 }
@@ -46,10 +48,12 @@ void loop (void) {
     Serial.write(&buff, length);
     digitalWrite(LED_BUILTIN, TOGGLE);
   }
+  #ifdef SW_BUILTIN
   if (!digitalRead(SW_BUILTIN)) {
     Serial.println(F("<Pressing SW0>"));
     for (;;);
   }
+  #endif
   wdt_reset();
 }
 
