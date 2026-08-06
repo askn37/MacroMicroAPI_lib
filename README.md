@@ -13,6 +13,8 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
 - modernAVR世代
   - AVR-Dx系統
   - AVR-Ex系統
+  - AVR Lx系統
+  - AVR Sx系統
 
 ## パス配置
 
@@ -57,6 +59,20 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
 |Miscellaneous|その他の様々な実演
 
 ## 更新履歴
+
+- 0.4.4 (26/08/05)
+  - __AVR32SD14/20/28/32__ に対応
+  - Microchip.AVR8-atpack を`20260522` に更新
+
+- 0.4.3 (26/07/30)
+  - __AVR32LA14/20/28/32__ に対応
+
+- 0.4.2 (26/07/12)
+  - ドキュメントとスケッチの更新
+
+- 0.4.1 (26/07/09)
+  - `euboot@3.72.49`アップデート
+  - *AVR DU with USB Bootloader* で実験的な自動リセット付きスケッチアップロードに対応（Arduino Leonard/Pro Micro/Every Nano と同様の挙動）
 
 - 0.4.0 (26/07/05)
   - ドキュメント修正
