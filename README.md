@@ -60,6 +60,9 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
 
 ## 更新履歴
 
+- 0.4.6 (26/08/28)
+  - [Timer applications] にサンプルスケッチ [GPIOキャプチャによる簡易ロジックアナライザー] を追加
+
 - 0.4.4 (26/08/05)
   - __AVR32SD14/20/28/32__ に対応
   - Microchip.AVR8-atpack を`20260522` に更新
