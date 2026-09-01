@@ -20,14 +20,19 @@ void setup (void) {
   uint8_t periodic = sqrt((F_CPU / 1024.0) * (1.0 / BLINK_HZ)) - 0.5;
   uint8_t harfperi = periodic >> 1;
 
+#if defined(PIN_PA7) && (LED_BUILTIN == PIN_PA7)
   PORTMUX_EVSYSROUTEA = PORTMUX_EVOUTA_ALT1_gc;             // PIN_PA7 <-- EVOUTA
-  EVSYS_CHANNEL0 = EVSYS_CHANNEL_CCL_LUT0_gc;               // <-- LUT0OUT
+  EVSYS_CHANNEL0 = EVSYS_CHANNEL_CCL_LUT1_gc;               // <-- LUT1OUT
   EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;           // --> EVOUTA
+  #define LED_PC3 (0)
+#else
+  #define LED_PC3 (CCL_OUTEN_bm)
+#endif
 
-  CCL_TRUTH0 = CCL_TRUTH_1_bm | CCL_TRUTH_2_bm;
-  CCL_LUT0CTRLB = CCL_INSEL0_TCE0_gc | CCL_INSEL1_TCB1_gc;  // <-- WOA0 XOR WOB1
-  CCL_LUT0CTRLA = CCL_ENABLE_bm;
-  CCL_CTRLA = CCL_ENABLE_bm;                                // --> LUT0OUT
+  CCL_TRUTH1 = CCL_TRUTH_1_bm | CCL_TRUTH_2_bm;
+  CCL_LUT1CTRLB = CCL_INSEL0_TCE0_gc | CCL_INSEL1_TCB1_gc;  // <-- WOA0 XOR WOB1
+  CCL_LUT1CTRLA = CCL_ENABLE_bm | LED_PC3;                  // --> LUT1OUT
+  CCL_CTRLA = CCL_ENABLE_bm;
 
   TCE0_PER = periodic - 1;
   TCE0_CMP0 = harfperi;

@@ -12,14 +12,14 @@
 /*
  * Set of ports to visualize.
  */
-#define CPATURE_GPIN PIN_PC0
-#define CAPTURE_MASK (PIN1_bm|PIN0_bm)
+#define CPATURE_GPIN PIN_PC3
+#define CAPTURE_MASK (PIN3_bm|PIN2_bm|PIN1_bm|PIN0_bm)
 #define CAPTURE_TRIGER (PIN1_bm|PIN0_bm)
 
 /*
  * Maximum number of captures (depends on the amount of SRAM implemented)
  */
-#define CAPTURE_MAX (RAMSIZE / 5 - 250)
+#define CAPTURE_MAX (RAMSIZE / 5 - 150)
 
 /*
  * Other macro constants.
@@ -101,11 +101,13 @@ void loop (void) {
   _time[1] = 0;
   uint32_t _total = 0, _temp;
   for (uint16_t _idx = 0; _idx < _cmax; _idx += 1) {
-    Serial.print(_idx, DEC, 5).print(F(": "));
+    Serial.print(_idx, DEC, 5);
+    Serial.write(' ');
     _temp = _time[_idx];
     _total += _temp;
     time_print(_total);
     time_print(_temp);
+    Serial.write(' ');
     Serial.print(_capt[_idx] & CAPTURE_MASK, ZBIN, 8).ln();
   }
   Serial.println(F("<Press the Enter key to the next capture>\r\n"));
@@ -114,9 +116,9 @@ void loop (void) {
 }
 
 void time_print (uint32_t _time) {
-  Serial.print((uint16_t)(_time / USEC_COUNT), DEC, 7);
+  Serial.print((uint32_t)(_time / USEC_COUNT), DEC, 10);
   Serial.write('.');
-  Serial.print((uint16_t)(_time % USEC_COUNT), ZDEC, 3);
+  Serial.print((uint32_t)(_time % USEC_COUNT), ZDEC, 3);
   Serial.write(' ');
 }
 
@@ -143,10 +145,10 @@ ISR(portIntrruptVector(CPATURE_GPIN)) {
 ISR(RTC_PIT_vect) {
   RTC_PITINTFLAGS |= RTC_PI_bm;
   if (TCB1_CNT > TIMEOUT_SEC) {
+    uint8_t _d = vportRegister(CPATURE_GPIN).IN;
     EVSYS_SWEVENTA = EVSYS_SWEVENTA_4_bm;
-    GPR_GPR2 = vportRegister(CPATURE_GPIN).IN;
     _cmax += 1;
-    _capt[_cmax] = GPR_GPR2;
+    _capt[_cmax] = _d;
     _CAPS32(_time[_cmax])->words[0] = TCB0_CCMP;
     _CAPS32(_time[_cmax])->words[1] = TCB1_CCMP;
     RTC_PITINTCTRL &= ~RTC_PI_bm;

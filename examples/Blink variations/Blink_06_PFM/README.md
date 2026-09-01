@@ -13,13 +13,13 @@
   - tinyAVR-0/1/2系統 14pin以上
   - tinyAVR-0/1系統 8pin
 - modernAVR世代
-  - AVR-Dx/Ex/Lx系統
+  - AVR-Dx/Ex/Lx/Sx系統
 
 以下の記述にある周辺機能の説明は 28pin以上を対象に書かれている。\
 14pin/20pin品種については周辺機能割当が異なる。\
 __AVR_Ex/Lx__ 系統では`TCA`に代えて`TCE`計数器を使用する。
 
-LEDはPA7（そのピンがない場合はPD7）に繋がれているものとしている。\
+LEDは**PA7**（さもなければ**PC3**、8P品種では PA3）に繋がれているものとしている。\
 CURIOSITYのような完成品ボードでは追加のLEDを備える必要がある。
 
 > `スケッチ.ino`は実際には該当品種別に書かれた`.cpp`を読み込むラッパーになっている。
@@ -152,18 +152,18 @@ AVR内部でこの信号合成を行うには`CCL`周辺機能が利用できる
 `CCL`周辺機能はルックアップテーブルを参照して、
 最大3入力からひとつの論理合成出力を得る機能だ。
 
-ここでは LUT0テーブルにて
+ここでは LUT1テーブルにて
 `TCA0`の`WOA0`PWM信号と、
 `TCB1`の`WOB1`PWM信号を論理合成する。
 
 ```c
-CCL_TRUTH0 = CCL_TRUTH_1_bm | CCL_TRUTH_2_bm;
-CCL_LUT0CTRLB = CCL_INSEL0_TCA0_gc | CCL_INSEL1_TCB1_gc; // <-- WOA0 XOR WOB1
-CCL_LUT0CTRLA = CCL_ENABLE_bm;
-CCL_CTRLA = CCL_ENABLE_bm;                               // --> LUT1OUT
+CCL_TRUTH1 = CCL_TRUTH_1_bm | CCL_TRUTH_2_bm;
+CCL_LUT1CTRLB = CCL_INSEL0_TCA0_gc | CCL_INSEL1_TCB1_gc;  // <-- WOA0 XOR WOB1
+CCL_LUT1CTRLA = CCL_ENABLE_bm /* | CCL_OUTEN_bm */;       // --> LUT1OUT
+CCL_CTRLA = CCL_ENABLE_bm;                               
 ```
 
-LUT0は次のように構成した。
+LUT1は次のように構成した。
 単なる2入力XOR演算である。\
 OUTが1になる組み合わせのビットフラグを
 `CCL_TRUTHn`レジスタに書く。
@@ -304,7 +304,7 @@ LED点滅にフリッカーを感じるだろうことも見て取れる。
 
 ## EVSYS
 
-`LUT0_OUT`は`EVSYS`に（外部ポートへの出力を有効にしなくとも）
+`LUT1_OUT`は`EVSYS`に（外部ポートへの出力を有効にしなくとも）
 直接分配されているので、そのまま他の事象入力に流し込むことが出来る。
 `LED_BUILTIN == PIN_PA7 == EVOUTA_ALT1`へ配給するには次のようにする。
 
@@ -319,7 +319,8 @@ EVSYS_USEREVSYSEVOUTA = EVSYS_USER_CHANNEL0_gc;     // --> EVOUTA
 `EVSYS_USER*`を設定すると該当出力先は強制的に`OUTPUT`方向となる。
 - 逆に`EVSYS`は入力側の外部ポート設定を自動では`INPUT`許可とはしない。
 
-> tinyAVR-0/1/2の 14pin/20pin品種では`LUT1_OUT == LED_BUILTIN`なのでこの項に該当しない。
+> tinyAVR-0/1/2の 14pin/20pin品種では`LUT1_OUT == LED_BUILTIN(PA7)`なのでこの項に該当しない。<br/>
+> それ以外の品種では`LUT1_OUT == PC3`になる。このピンはAVR-Dx以降の14Pを含む全品種が常備している。<br/>
 
 ## 信号出力補足
 

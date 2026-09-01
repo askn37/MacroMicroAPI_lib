@@ -11,10 +11,9 @@
   - tinyAVR-0/1系統
   - tinyAVR-2系統
 - modernAVR世代
-  - AVR-Dx系統
-  - AVR-Ex系統
+  - AVR-Dx/Ex/Lx/Sx系統
 - reduceAVR
-  - ATtiny10
+  - ATtiny4/5/9/10/20/40/102/104
 
 ## Blinkの要件
 
