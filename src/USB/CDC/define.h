@@ -16,8 +16,8 @@
 #include <stddef.h>
 #include "api/macro_api.h"  /* interrupts and ATOMIC_BLOCK */
 
-#define PACKED __attribute__((packed))
-#define WEAK   __attribute__((weak))
+#define PACKED __attribute__((__packed__))
+#define WEAK   __attribute__((__weak__))
 #define RODATA __attribute__((__progmem__))
 #define NOINIT __attribute__((section(".noinit")))
 
