@@ -27,11 +27,13 @@ void setup (void) {
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
   Serial.print(F("F_CPU=")).println(F_CPU, DEC);
   Serial.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
+  #ifdef DEBUG
   Serial.print(F("CONSOLE_BAUD=")).println(CONSOLE_BAUD, DEC);
   Serial.print(F(" RATE=")).print(Serial.is_baud(), DEC);
   Serial.print(F(" BUFSIZE=")).println(INTERNAL_SRAM_SIZE / 2, DEC);
   Serial.println(F("# It echoes back the input string. for example;"));
   Serial.println(F("The quick brown fox jumps over the lazy dog."));
+  #endif
   #ifdef SW_BUILTIN
   Serial.println(F("# Pressing SW0 triggers a reboot.")).ln();
   pinMode(SW_BUILTIN, INPUT_PULLUP);

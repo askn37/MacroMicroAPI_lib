@@ -43,8 +43,8 @@ namespace USB_NAMESPACE {
   , USB_LANGUAGE_JA_JP              = 0x0411
 
   /* bInterfaceNumber */
-  , USB_INTERFACE_ID_CDC_CCI        = 0
-  , USB_INTERFACE_ID_CDC_DCI        = 1
+  , USB_INTERFACE_ID_CDC_CCI        = 1
+  , USB_INTERFACE_ID_CDC_DCI        = 2
 
   /* bEndpointAddress */
   , USB_EP_DESCRIPTOR_DIR_IN_bm     = (1 << 7)

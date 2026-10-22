@@ -60,7 +60,7 @@ namespace USB_NAMESPACE {
   bool request_standard (USB_EP_t* EP_REQ, USB_EP_t* EP_RES) {
     bool listen = true;
     uint8_t bRequest = USB_SETUP_DATA.bRequest;
-    D1PRINTF("SR=%02X:%04X:%02X:%02X:%04X:%04X:%04X\r\n",
+    D1PRINTF("RQ=%02X:%04X:%02X:%02X:%04X:%04X:%04X\r\n",
       EP_REQ->STATUS, EP_REQ->CNT, USB_SETUP_DATA.bmRequestType, USB_SETUP_DATA.bRequest,
       USB_SETUP_DATA.wValue, USB_SETUP_DATA.wIndex, USB_SETUP_DATA.wLength);
     if (bRequest == USB_REQ_GetStatus) {              /* 0x00 */
@@ -111,6 +111,12 @@ namespace USB_NAMESPACE {
     else {
       listen = cb_request_standard_other(EP_REQ, EP_RES);
     }
+    #if defined(DEBUG) && defined(SerialDBG)
+    if (EP_RES->CNT) {
+      SerialDBG.print(F(" D="));
+      SerialDBG.printHex(&USB_DATA_BUFFER, EP_RES->CNT, ':', 16, "\r\n   ").ln();
+    }
+    #endif
     return listen;
   }
 
