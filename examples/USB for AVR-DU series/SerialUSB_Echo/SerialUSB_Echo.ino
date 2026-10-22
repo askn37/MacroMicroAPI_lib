@@ -18,6 +18,11 @@
 void setup (void) {
   pinModeMacro(LED_BUILTIN, OUTPUT);
 
+#if defined(DEBUG) && defined(SerialDBG)
+  SerialDBG.begin(CONSOLE_BAUD);
+  SerialDBG.println(F("<SerialDBG startup>"));
+#endif
+
   /* Open the USB-CDC character device port. */
   Serial.begin(/* The BAUD parameter is not used so it can be omitted. */);
   while (!Serial);
