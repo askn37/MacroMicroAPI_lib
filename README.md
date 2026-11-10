@@ -60,8 +60,13 @@ AVR-GCC / AVR-LIBC 専用。__Arduino互換API用ではない。__
 
 ## 更新履歴
 
+- 0.4.12 (26/11/10)
+  - (lib) 一部関数の属性変更
+  - (lib) USB/Utils 追加
+  - (lib) USB/CDC 修正
+
 - 0.4.11 (26/10/22)
-  - (lib) USB/CDC修正
+  - (lib) USB/CDC 修正
 
 - 0.4.10 (26/09/17)
   - (core) 連携修正

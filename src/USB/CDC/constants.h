@@ -20,7 +20,7 @@
 /* CDC-ACM general specs */
 #define USB_ENDPOINTS_MAX     3     /* fixed value */
 #define USB_BULK_INTERVAL     0     /* As large as possible */
-#define USB_INTR_INTERVAL     5     /* As large as possible */
+#define USB_INTR_INTERVAL     4     /* As large as possible */
 
 #define USB_SETUP_PK_SIZE     64    /* This length cannot be changed. */
 #define USB_DATA_PK_SIZE      64    /* 64 is the maximum allowed by USB 2.0. */

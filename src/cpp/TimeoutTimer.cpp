@@ -20,14 +20,14 @@
 #include <api/capsule.h>
 
 #if !defined(NOTUSED_INITIALIZE_TIMEOUTTIMER)
-void __init_timer (void)
-  __attribute__ ((naked,weak,used,section (".init8")));
+__attribute__((__naked__,__weak__,__used__,section(".init8")))
 void __init_timer (void) { TimeoutTimer::begin(); }
 #endif
 
 namespace TimeoutTimer {
   TimeoutTimer_work_t __worker = {0, nullptr};
 
+  __attribute__((__noinline__,__used__))
   void __setup (uint16_t __ticks, jmp_buf *__return, volatile TimeoutTimer_work_t &__before) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       if (RTC_INTCTRL & RTC_CMP_bm) {
@@ -42,6 +42,7 @@ namespace TimeoutTimer {
     }
   }
 
+  __attribute__((__noinline__,__used__))
   void __cleanup (volatile TimeoutTimer_work_t *__before) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       while (RTC_STATUS != 0);
@@ -67,6 +68,7 @@ namespace TimeoutTimer {
     }
   }
 
+  __attribute__((__noinline__,__used__))
   void abort (void) {
     jmp_buf* _restore = TimeoutTimer::__worker.context;
     longjmp(*_restore, 1);
