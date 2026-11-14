@@ -33,13 +33,16 @@ void setup (void) {
   pinModeMacro(LED_BUILTIN, OUTPUT);
 
   /* Open UART port for debugging. */
+  #ifndef SerialDBG
+    #define SerialDBG Serial1C
+  #endif
   #if defined(DEBUG) && defined(SerialDBG)
+  delay_millis(800);
   SerialDBG.begin(CONSOLE_BAUD);
-  SerialDBG.println(F("<startup>"));
-  SerialDBG.println(F("This is the UART port for debugging."));
+  SerialDBG.println(F("\r<debug startup>"));
   SerialDBG.print(F("F_CPU=")).println(F_CPU, DEC);
+  SerialDBG.println(F(_AVR_IOXXX_H_));
   SerialDBG.print(F("RevID=")).println(SYSCFG_REVID + 0x90, HEX);
-  SerialDBG.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
   SerialDBG.print(F("GPR_GPR0=0x")).println(GPR_GPR0, HEX);
   SerialDBG.print(F("RAMEND-2=0x")).println(*(uint16_t*)(RAMEND - 1), HEX);
   #endif
@@ -49,8 +52,8 @@ void setup (void) {
   while (!SerialUSB);
   SerialUSB.println(F("<SerialUSB startup>"));
   SerialUSB.print(F("F_CPU=")).println(F_CPU, DEC);
+  SerialUSB.println(F(_AVR_IOXXX_H_));
   SerialUSB.print(F("RevID=")).println(SYSCFG_REVID + 0x90, HEX);
-  SerialUSB.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
   SerialUSB.print(F("GPR_GPR0=0x")).println(GPR_GPR0, HEX);
   SerialUSB.print(F("RAMEND-2=0x")).println(*(uint16_t*)(RAMEND - 1), HEX);
 }

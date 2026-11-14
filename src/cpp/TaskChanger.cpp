@@ -16,9 +16,11 @@
 #include "../TaskChanger.h"
 
 namespace TaskChanger {
+  __attribute__((__used__))
   volatile TaskChanger_work_t __worker = {0, (char*)-1, (char*)-1, (char*)-1, 0};
 
-  __attribute__((naked,used)) void yield (void) {
+  __attribute__((__noinline__,__naked__,__used__))
+  void yield (void) {
     __asm__ __volatile__ ( R"#ASM#(
         PUSH    R1              ; enter function
         IN      R1, __SREG__    ; load SREG
@@ -138,6 +140,7 @@ __TaskChanger_detach_task:
    * param: その大きさ
    * param: タスク開始関数
    */
+  __attribute__((__noinline__))
   void attach_task (uint8_t __task_index, volatile char __local_stack[], size_t __local_stack_size, void (*__start_task)()) {
     assert(1 <= __task_index && __task_index <= 3);
     assert(64 <= __local_stack_size);
@@ -165,16 +168,19 @@ __TaskChanger_detach_task:
     }
   }
 
+  __attribute__((__noinline__))
   bool joined_task (uint8_t __task_index) {
     return ((uint16_t)(__worker.stack[__task_index]) & 0x8000);
   }
 
+  __attribute__((__noinline__))
   void detach_task (uint8_t __task_index) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       _CAPS16(__worker.stack[__task_index])->bytes[1] = 0x80;
     }
   }
 
+  __attribute__((__noinline__))
   size_t remaining_stack (uint8_t __task_index, volatile char __local_stack[]) {
     return (size_t)__worker.stack[__task_index] - (size_t)__local_stack;
   }

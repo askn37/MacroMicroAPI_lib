@@ -18,8 +18,7 @@ namespace FlashNVM {
   bool nvm_result (void) { return NVMCTRL_STATUS == 0; }
   void nvm_wait (void) { while (NVMCTRL_STATUS & 3); }
 
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   void nvm_stc (uint16_t /* _addr */) {
     __asm__ __volatile__ (
       /* Z <- R24:R25 <- &_addr */
@@ -39,8 +38,7 @@ namespace FlashNVM {
       (pgm_read_dword(PROGMEM_START + 2) == 0x95089361L);
   }
 
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   void nvm_stz (uint16_t /* _addr */, uint8_t /* _data */) {
     __asm__ __volatile__ (
       /* Z   <- R24:R25 <- &_addr */
@@ -53,8 +51,7 @@ namespace FlashNVM {
     );
   }
 
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   uint8_t nvm_ldz (uint16_t /* _addr */) {
     __asm__ __volatile__ (
       /* Z <- R24:R25 <- &_addr */
@@ -66,8 +63,7 @@ namespace FlashNVM {
     );
   }
 
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   void nvm_cmd (uint8_t /* _nvm_cmd */) {
     __asm__ __volatile__ (
       /* R24 <- _nvm_cmd */
@@ -82,8 +78,7 @@ namespace FlashNVM {
   /* AVR_Dx 24bit */
 
   /* 24bit version */
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   void nvm_spm (uint32_t /* _addr */) {
     /* R22:R23:R24:R25 <- &_addr */
     __asm__ __volatile__ (
@@ -98,8 +93,7 @@ namespace FlashNVM {
   }
 
   /* 24bit version */
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   void nvm_write (uint32_t /* _addr */, uint8_t* /* _data */) {
     __asm__ __volatile__ (
       /* R22:R23:R24:R25 <- &_addr */
@@ -129,8 +123,7 @@ namespace FlashNVM {
   /* AVR_Dx/Ex 16bit */
 
   /* 16bit version */
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   void nvm_spm (uint16_t /* _addr */) {
     __asm__ __volatile__ (
       /* Z <- R24:R25 <- &_addr */
@@ -143,8 +136,7 @@ namespace FlashNVM {
   }
 
   /* 16bit version */
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   void nvm_write (uint16_t /* _addr */, uint8_t* /* _data */) {
     __asm__ __volatile__ (
       /* R24:R25 <- &_addr */
@@ -273,7 +265,7 @@ namespace FlashNVM {
 
     #ifdef FLASHNVM_BOOTROW
   /* AVR_DU */
-  __attribute__((noinline))
+  __attribute__((__noinline__))
   bool bootrow_clear (void) {
     nvm_cmd(NVMCTRL_CMD_FLPER_gc);
     nvm_stc(BOOTROW_START); /* write dummy byte */
@@ -282,7 +274,7 @@ namespace FlashNVM {
     return 0 == (NVMCTRL_STATUS & 3);
   }
 
-  __attribute__((noinline))
+  __attribute__((__noinline__))
   bool bootrow_save (const void* _data_addr, size_t _save_size) {
     assert(_save_size > 0);
     assert(_save_size <= BOOTROW_SIZE);
@@ -306,8 +298,7 @@ namespace FlashNVM {
       (*((uint32_t*)(MAPPED_PROGMEM_START + 2)) == 0x95089361L);
   }
 
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   void nvm_cmd (uint8_t /* _nvm_cmd */) {
     __asm__ __volatile__ (
       /* R24 <- _nvm_cmd */
@@ -318,8 +309,7 @@ namespace FlashNVM {
     );
   }
 
-  __attribute__((naked))
-  __attribute__((noinline))
+  __attribute__((__naked__,__noinline__))
   void nvm_write (uint16_t /* _addr */, uint8_t* /* _data */) {
     __asm__ __volatile__ (
       /* R24:R25 <- &_addr */
@@ -377,7 +367,7 @@ namespace FlashNVM {
 #endif  /* leave (AVR_NVMCTRL == 0) */
 
 #ifdef FLASHNVM_BOOTROW
-  __attribute__((noinline))
+  __attribute__((__noinline__))
   void bootrow_load (void* _data_addr, size_t _save_size) {
     assert(_save_size > 0);
     assert(_save_size <= BOOTROW_SIZE);
@@ -397,7 +387,7 @@ namespace FlashNVM {
     );
   }
 
-  __attribute__((noinline))
+  __attribute__((__noinline__))
   bool bootrow_verify (const void* _data_addr, size_t _save_size) {
     assert(_save_size > 0);
     assert(_save_size <= BOOTROW_SIZE);

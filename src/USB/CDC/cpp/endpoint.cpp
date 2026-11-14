@@ -1,18 +1,17 @@
 /**
  * @file USB/CDC/cpp/endpoint.cpp
  * @author askn (K.Sato) multix.jp
- * @brief Example of using SerialUSB class
- * @version 0.1
- * @date 2024-06-16
- *
- * @copyright Copyright (c) 2024 askn37 at github.com
- *
+ * @brief Implementation sample for the USB-CDC-ACM class.
+ * @version 0.4.12
+ * @date 2026-11-13
+ * @copyright Copyright (c) 2026 askn37 at github.com
+ * @link Product Potal : https://askn37.github.io/
+ *         MIT License : https://askn37.github.io/LICENSE.html
  */
-// MIT License : https://askn37.github.io/LICENSE.html
 
 #include <avr/io.h>
+/* Compilation with anything other than the AVR-DU series will be rejected. */
 #if defined(__cplusplus) && defined(USB0)
-
 #include "../../CDC.h"
 #include "../constants.h"
 
@@ -70,10 +69,7 @@ namespace USB_NAMESPACE {
   }
 
   WEAK void ep_setup_stalled (void) {
-    loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
-    USB_EP_STATUS_SET(USB_EP_SETUP_IN) = USB_STALLED_bm;
-    loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
-    USB_EP_STATUS_SET(USB_EP_SETUP_OUT) = USB_STALLED_bm;
+    bit_set(USB_EP_RES.CTRL, USB_DOSTALL_bp);
   }
 
 } /* USB_CDC */
