@@ -1,7 +1,7 @@
 /**
  * @file Descriptor_CDC.cpp
  * @author askn (K.Sato) multix.jp
- * @brief 
+ * @brief USB Descriptor Sample
  * @version 0.1
  * @date 2026-11-10
  * @copyright Copyright (c) 2026 askn37 at github.com
@@ -33,7 +33,7 @@ namespace {
   // #define USB_DESC_MEM 0
 
   #ifndef USB_DESC_MEM
-    #if (PROGMEM_SIZE <= 32768UL)
+    #if (__AVR_ARCH__ == 103)
       #define USB_DESC_MEM 1
     #else
       #define USB_DESC_MEM 0
@@ -231,11 +231,11 @@ namespace {
     , {0, 4, bDescriptorType_STRING}, {wLANG_EN_US}
   };
 
+  extern "C" {
   // const uint8_t* USB_DescriptorSet = (uint8_t*)&USB_Descriptor + USB_DESC_ADDR;
   // const size_t   USB_DescriptorSetSize = sizeof(USB_Descriptor);
   // const uint8_t  USB_DescriptorSetSection = USB_DESC_ADDR;
 
-  extern "C" {
     extern const uint8_t* USB_Descriptor_CDC_Set;
     extern const size_t   USB_Descriptor_CDC_SetSize;
     extern const uint8_t  USB_Descriptor_CDC_SetSection;

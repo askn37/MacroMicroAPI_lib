@@ -26,7 +26,7 @@ void setup (void) {
 
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
   Serial.print(F("F_CPU=")).println(F_CPU, DEC);
-  Serial.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
+  Serial.print(F("_AVR_IOXXX_H_=")).println(F(_AVR_IOXXX_H_));
   #ifdef DEBUG
   Serial.print(F("CONSOLE_BAUD=")).println(CONSOLE_BAUD, DEC);
   Serial.print(F(" RATE=")).print(Serial.is_baud(), DEC);

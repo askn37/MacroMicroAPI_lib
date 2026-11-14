@@ -116,7 +116,7 @@ size_t get_auto_generate_serial_number_string (uint8_t* _buffer, uint8_t _check_
   uint32_t _sn[2];
   _sn[0] = 0xCEA1031A;
   _sn[1] = ((User_EEP_t*)EEPROM_START)->dwSerialNumber;
-  if (_check_eeprom && !(_sn[1] + 1)) _sn[1] = crc32((uint8_t*)SIGNATURES_START, 32);
+  if (!_check_eeprom && !(_sn[1] + 1)) _sn[1] = crc32((uint8_t*)SIGNATURES_START, 32);
   uint8_t* _p = (uint8_t*)&_sn;
   *_buffer++ = *_p++;
   *_buffer++ = *_p++;

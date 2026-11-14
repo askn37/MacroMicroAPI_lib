@@ -1,7 +1,7 @@
 /**
  * @file USB_Descriptor_Build.ino
  * @author askn (K.Sato) multix.jp
- * @brief 
+ * @brief USB Descriptor Sample
  * @version 0.1
  * @date 2026-11-10
  * @copyright Copyright (c) 2026 askn37 at github.com
