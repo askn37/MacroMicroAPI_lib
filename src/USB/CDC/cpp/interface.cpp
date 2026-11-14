@@ -1,20 +1,18 @@
 /**
  * @file USB/CDC/cpp/interface.cpp
  * @author askn (K.Sato) multix.jp
- * @brief Example of using SerialUSB class
- * @version 0.1
- * @date 2024-06-16
- *
- * @copyright Copyright (c) 2024 askn37 at github.com
- *
+ * @brief Implementation sample for the USB-CDC-ACM class.
+ * @version 0.4.12
+ * @date 2026-11-13
+ * @copyright Copyright (c) 2026 askn37 at github.com
+ * @link Product Potal : https://askn37.github.io/
+ *         MIT License : https://askn37.github.io/LICENSE.html
  */
-// MIT License : https://askn37.github.io/LICENSE.html
 
 #include <avr/io.h>
 /* Compilation with anything other than the AVR-DU series will be rejected. */
 #if defined(__cplusplus) && defined(USB0)
 #include <string.h>         /* memcpy */
-
 #include "../../CDC.h"
 #include "../constants.h"
 
@@ -144,7 +142,7 @@ namespace USB_NAMESPACE {
     ep_recv_pending();
     D1PRINTF("  RECV=%02X/%d\r\n", USB_EP_RECV.STATUS, USB_EP_RECV.CNT);
     #if defined(DEBUG) && (DEBUG == 2)
-    Serial.print("  RECV=").printHex((uint8_t*)USB_EP_RECV.DATAPTR, (size_t)USB_EP_RECV.CNT, ':').ln();
+    SerialDBG.printHex((uint8_t*)USB_EP_RECV.DATAPTR, (size_t)USB_EP_RECV.CNT, ':', 16).ln();
     #endif
     #endif
   }
@@ -154,7 +152,7 @@ namespace USB_NAMESPACE {
   void ep_send_flush (void) {
     D1PRINTF("  SEND=%02X/%d\r\n", USB_EP_SEND.STATUS, USBSTATE.SENDCNT);
     #if defined(DEBUG) && (DEBUG == 2)
-      Serial.print("  SEND=").printHex((uint8_t*)USB_EP_SEND.DATAPTR, (size_t)USBSTATE.SENDCNT, ':').ln();
+      SerialDBG.printHex((uint8_t*)USB_EP_SEND.DATAPTR, (size_t)USBSTATE.SENDCNT, ':', 16).ln();
     #endif
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
       USB_EP_SEND.CNT = USBSTATE.SENDCNT;
@@ -257,8 +255,8 @@ namespace USB_NAMESPACE {
     if (bRequest == CDC_REQ_SetLineEncoding) {        /* 0x20 */
       /* Wait for a DATA phase packet to arrive. */
       ep_setup_out_pending();
-      #if defined(DEBUG) && (DEBUG == 2)
-        Serial.print("  DATA=").printHex((uint8_t*)EP_REQ->DATAPTR, (size_t)EP_REQ->CNT, ':').ln();
+      #if defined(DEBUG) && (DEBUG == 1)
+        SerialDBG.print(F(" <")).printHex((uint8_t*)EP_REQ->DATAPTR, (size_t)EP_REQ->CNT, ':', 16, "\r\n  ").ln();
       #endif
       memcpy(&USBSTATE.sLineEncoding, &USB_DATA_BUFFER, sizeof(LineEncoding_t));
       D1PRINTF(" SLE=%ld\r\n", USBSTATE.LineEncoding.dwDTERate);

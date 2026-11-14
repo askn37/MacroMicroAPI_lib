@@ -1,9 +1,9 @@
 /**
  * @file USB/Utils.cpp
  * @author askn (K.Sato) multix.jp
- * @brief 
- * @version 0.1
- * @date 2026-08-19
+ * @brief A collection of functions for USB devices.
+ * @version 0.4.12
+ * @date 2026-11-13
  * @copyright Copyright (c) 2026 askn37 at github.com
  * @link Product Potal : https://askn37.github.io/
  *         MIT License : https://askn37.github.io/LICENSE.html
@@ -13,6 +13,7 @@
 #include <avr/pgmspace.h>   /* memcpy_P PROGMEM */
 #include <string.h>         /* memcpy */
 #include "api/btools.h"     /* btoh crc32 */
+#include "api/capsule.h"
 #include "Utils.h"
 #include "Descriptor.h"
 
@@ -104,7 +105,7 @@ size_t get_descriptor_copy (uint8_t* _buffer, const uint16_t _wValue, const uint
 
 __attribute__((__noinline__))
 __attribute__((section(".text")))
-size_t get_auto_generate_serial_number_string (uint8_t* _buffer, uint8_t _use_eeprom) {
+size_t get_auto_generate_serial_number_string (uint8_t* _buffer, uint8_t _check_eeprom) {
   /*
     * NOTE: Serial Number String Generation
     *
@@ -112,15 +113,14 @@ size_t get_auto_generate_serial_number_string (uint8_t* _buffer, uint8_t _use_ee
     * than 0xFFFF:FFFF, use them, otherwise generate a 32-bit random
     * serial number using CRC32 from the factory information.
     */
-  uint32_t _sn = ((User_EEP_t*)EEPROM_START)->dwSerialNumber;
-  if (!_use_eeprom && !(_sn + 1)) _sn = crc32((uint8_t*)SIGNATURES_START, 32);
+  uint32_t _sn[2];
+  _sn[0] = 0xCEA1031A;
+  _sn[1] = ((User_EEP_t*)EEPROM_START)->dwSerialNumber;
+  if (_check_eeprom && !(_sn[1] + 1)) _sn[1] = crc32((uint8_t*)SIGNATURES_START, 32);
   uint8_t* _p = (uint8_t*)&_sn;
-  *_buffer++ = 26;  *_buffer++ = bDescriptorType_STRING;
-  *_buffer++ = 'A'; *_buffer++ = 0;
-  *_buffer++ = '1'; *_buffer++ = 0;
-  *_buffer++ = 'C'; *_buffer++ = 0;
-  *_buffer++ = 'E'; *_buffer++ = 0;
-  for (uint8_t _i = 0; _i < 4; _i++) {
+  *_buffer++ = *_p++;
+  *_buffer++ = *_p++;
+  for (uint8_t _i = 0; _i < 6; _i++) {
     uint8_t _c = *_p++;
     *_buffer++ = btoh(_c >> 4); *_buffer++ = 0;
     *_buffer++ = btoh(_c     ); *_buffer++ = 0;

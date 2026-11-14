@@ -1,9 +1,9 @@
 /**
  * @file Descriptor_CDC.cpp
  * @author askn (K.Sato) multix.jp
- * @brief 
- * @version 0.1
- * @date 2026-11-10
+ * @brief Implementation sample for the USB-CDC-ACM class.
+ * @version 0.4.12
+ * @date 2026-11-13
  * @copyright Copyright (c) 2026 askn37 at github.com
  * @link Product Potal : https://askn37.github.io/
  *         MIT License : https://askn37.github.io/LICENSE.html
@@ -58,18 +58,6 @@ namespace {
     , .iProduct             = 2         // sProduct
     , .iSerialNumber        = 0xFF      // automatic generation
     , .bNumConfigurations   = 1
-  };
-
-  const USB_Device_Qualifier_Descriptor_t USB_Device_Qualifier_Descriptor USB_DESC_ATTR = {
-      .bLength              = sizeof(USB_Device_Qualifier_Descriptor_t)
-    , .bDescriptorType      = bDescriptorType_DEVICE_QUALIFIER
-    , .bcdUSB               = bcdUSB_2
-    , .bDeviceClass         = bClassCode_Miscellaneous
-    , .bDeviceSubClass      = bSubClassCode_Common
-    , .bDeviceProtocol      = bProtocolCode_Interface_Association
-    , .bMaxPacketSize0      = USB_SETUP_PK_SIZE
-    , .bNumConfigurations   = 1
-    , .bReserved            = 0
   };
 
   /* A structure template is required to determine */
@@ -133,20 +121,20 @@ namespace {
         .bLength                = sizeof(USB_ACM_Functional_Descriptor_t)
       , .bDescriptorType        = bDescriptorType_CS_INTERFACE
       , .bDescriptorSubtype     = bDescriptorSubtype_Abstract_Control_Management
-      , .bmCapabilities         = bmACM_SEND_BREAK | bmACM_SERIAL_STATE
+      , .bmCapabilities         = bmACM_SERIAL_STATE
     },
     .USB_Union_Functional_Descriptor_1 = {
         .bLength                = sizeof(USB_Union_Functional_Descriptor_t) + 1
       , .bDescriptorType        = bDescriptorType_CS_INTERFACE
       , .bDescriptorSubtype     = bDescriptorSubtype_Union
-      , .bControlInterface      = 1     // length
+      , .bControlInterface      = 1     // length bSubordinateInterface[]
     },
-    .bSubordinateInterface_1 = {2},     // USB_Interface_Descriptor_2
+    .bSubordinateInterface_1 = {2},     // to USB_Interface_Descriptor_2
     .USB_Call_Management_Functional_Descriptor_1 = {
         .bLength                = sizeof(USB_Call_Management_Functional_Descriptor_t)
       , .bDescriptorType        = bDescriptorType_CS_INTERFACE
       , .bDescriptorSubtype     = bDescriptorSubtype_Call_Management
-      , .bmCapabilities         = 0     // or 3
+      , .bmCapabilities         = 3     // or 3
       , .bDataInterface         = 2     // to USB_Interface_Descriptor_2
     },
     .USB_Endpoint_Descriptor_81 = {
@@ -162,7 +150,7 @@ namespace {
       , .bDescriptorType        = bDescriptorType_INTERFACE
       , .bInterfaceNumber       = 2     // Interface#2
       , .bAlternateSetting      = 0     // not used
-      , .bNumEndpoints          = 2     // 0x83 + 0x03
+      , .bNumEndpoints          = 2     // 0x82 + 0x02
       , .bInterfaceClass        = bClassCode_Communications_Data
       , .bInterfaceSubClass     = bSubClassCode_Composite
       , .bInterfaceProtocol     = bProtocolCode_Composite
@@ -194,7 +182,6 @@ namespace {
     uint8_t head_0[3];    uint8_t body_0[sizeof(USB_DESC_STRS)];  // end null is head_1[1]
   /*uint8_t head_1[1];*/  USB_Device_Descriptor_t body_1;
     uint8_t head_2[1];    USB_Genelal_Configuration_Descriptor_0_t body_2;
-    uint8_t head_3[1];    USB_Device_Qualifier_Descriptor_t body_3;
     uint8_t string_1[4];
     uint8_t string_2[4];
     uint8_t string_3[4];
@@ -212,7 +199,6 @@ namespace {
     ,      USB_Device_Descriptor
     /* Configuration */
     , {0}, USB_Genelal_Configuration_Descriptor_0
-    , {0}, USB_Device_Qualifier_Descriptor
     /* Strings */
     , {1,  sizeof(USB_STR_1)-1, bDescriptorType_STRING, 3}
     , {2,  sizeof(USB_STR_2)-1, bDescriptorType_STRING, 3 + sizeof(USB_STR_1)-1}

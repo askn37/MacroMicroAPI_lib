@@ -13,7 +13,7 @@
 #ifdef AVR_AVRSX
   #define WDT_PERIOD WDT_PERIOD_8KCLK_gc
 #else
-  #define WDT_PERIOD WDT_PERIOD_256CLK_gc
+  #define WDT_PERIOD WDT_PERIOD_512CLK_gc
 #endif
 
 void setup (void) {

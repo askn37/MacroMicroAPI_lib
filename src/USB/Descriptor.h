@@ -1,9 +1,9 @@
 /**
  * @file USB/descriptor.h
  * @author askn (K.Sato) multix.jp
- * @brief 
- * @version 0.1
- * @date 2026-11-08
+ * @brief A collection of USB descriptor definitions.
+ * @version 0.4.12
+ * @date 2026-11-13
  * @copyright Copyright (c) 2026 askn37 at github.com
  * @link Product Potal : https://askn37.github.io/
  *         MIT License : https://askn37.github.io/LICENSE.html
@@ -33,6 +33,7 @@ enum USB_bDescriptorType_enum {
   , bDescriptorType_OTHER_SPEED_CONFIGURATION   = 0x07	
   , bDescriptorType_INTERFACE_POWER             = 0x08
   , bDescriptorType_OTG                         = 0x09
+  , bDescriptorType_DEBUG                       = 0x0A
   , bDescriptorType_INTERFACE_ASSOCIATION       = 0x0B
   , bDescriptorType_BOS                         = 0x0D
   , bDescriptorType_DEVICE_CAPABILITY           = 0x10
@@ -240,6 +241,12 @@ typedef struct {
 } USB_Endpoint_Descriptor_t;
 
 /* USB_Device_Qualifier_Descriptor (6:DQD) : 10 bytes */
+/*
+ * NOTE: For this descriptor, USB 2.0 Full-Speed-only devices must always
+ * respond with a STALL (rejection). Failure to do so will cause an error
+ * in Linux. On other operating systems, a 0x07:QSCD request will not be
+ * issued, provided the configuration is the same as that for Full-Speed.
+ */
 typedef struct {
   uint8_t  bLength;             /* sizeof(USB_Device_Qualifier_Descriptor_t) */
   uint8_t  bDescriptorType;     /* 0x06 bDescriptorType_DEVICE_QUALIFIER */
@@ -253,6 +260,11 @@ typedef struct {
 } USB_Device_Qualifier_Descriptor_t;
 
 /* USB_Other_Speed_Configuration_Descriptor (7:QSCD) : 9 bytes */
+/*
+ * NOTE: When responding to a 0x06:DQD on Linux, a 0x07:QSCD is required
+ * even for non-High-Speed ​​devices. Furthermore,
+ * if any issues arise, a 0x0A:DEBUG will be requested.
+ */
 typedef struct {
   uint8_t  bLength;             /* sizeof(USB_Other_Speed_Configuration_Descriptor_t) */
   uint8_t  bDescriptorType;     /* 0x07 bDescriptorType_SPEED_CONFIGURATION */
@@ -263,6 +275,14 @@ typedef struct {
   uint8_t  bmAttributes;        /* see USB_bmAttributes_enum */
   uint8_t  bMaxPower;           /* x 2mA */
 } USB_Other_Speed_Configuration_Descriptor_t;
+
+/* USB_Debug_Descriptor (0x0A:DEBUG) : 4 bytes */
+typedef struct {
+  uint8_t  bLength;             /* sizeof(USB_Debug_Descriptor_t) */
+  uint8_t  bDescriptorType;     /* 0x0A bDescriptorType_DEBUG */
+  uint8_t  bDebugInEndpoint;
+  uint8_t  bDebugOutEndpoint;
+} USB_Debug_Descriptor_t;
 
 /* USB_Interface_Association_Descriptor (0x0B:IAD) : 8 bytes */
 typedef struct {
@@ -299,9 +319,11 @@ typedef struct {
  * USB HID Report Macro
  */
 
+/* Only the key report items are defined here.*/
 #define   HR_bUsage_Page(N)       0x05,N&0xFF
 #define   HR_wUsage_Page(N)       0x06,N&0xFF,N>>8
 #define   HR_bUsage(N)            0x09,N&0xFF
+#define   HR_wUsage(N)            0x0A,N&0xFF,N>>8
 #define   HR_bLogical_Minimum_0   0x14
 #define   HR_bLogical_Minimum(N)  0x15,N&0xFF
 #define   HR_wLogical_Minimum(N)  0x16,N&0xFF,N>>8
@@ -313,12 +335,18 @@ typedef struct {
 #define   HR_bUsage_Maximum(N)    0x29,N&0xFF
 #define   HR_wUsage_Maximum(N)    0x2A,N&0xFF,N>>8
 #define   HR_bReport_Size(N)      0x75,N&0xFF
+#define   HR_wReport_Size(N)      0x76,N&0xFF,N>>8
 #define   HR_bReport_ID(N)        0x85,N&0xFF
+#define   HR_wReport_ID(N)        0x86,N&0xFF,N>>8
 #define   HR_bInput(N)            0x81,N&0xFF
+#define   HR_wInput(N)            0x82,N&0xFF,N>>8
 #define   HR_bOutput(N)           0x91,N&0xFF
+#define   HR_wOutput(N)           0x92,N&0xFF,N>>8
 #define   HR_bReport_Count(N)     0x95,N&0xFF
+#define   HR_wReport_Count(N)     0x96,N&0xFF,N>>8
 #define   HR_bCollection(N)       0xA1,N&0xFF
 #define   HR_bFeature(N)          0xB1,N&0xFF
+#define   HR_wFeature(N)          0xB2,N&0xFF,N>>8
 #define   HR_EndCollection        0xC0
 
 /*

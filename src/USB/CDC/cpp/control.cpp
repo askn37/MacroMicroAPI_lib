@@ -1,19 +1,21 @@
 /**
  * @file USB/CDC/cpp/control.cpp
  * @author askn (K.Sato) multix.jp
- * @brief Example of using SerialUSB class
- * @version 0.1
- * @date 2024-06-16
- *
- * @copyright Copyright (c) 2024 askn37 at github.com
- *
+ * @brief Implementation sample for the USB-CDC-ACM class.
+ * @version 0.4.12
+ * @date 2026-11-13
+ * @copyright Copyright (c) 2026 askn37 at github.com
+ * @link Product Potal : https://askn37.github.io/
+ *         MIT License : https://askn37.github.io/LICENSE.html
  */
-// MIT License : https://askn37.github.io/LICENSE.html
 
 #include <avr/io.h>
+/* Compilation with anything other than the AVR-DU series will be rejected. */
 #if defined(__cplusplus) && defined(USB0)
 #include <string.h>         /* memcpy */
-
+#include <avr/pgmspace.h>   /* PROGMEM memcpy_P */
+#include "../../Descriptor.h"
+#include "../../Utils.h"
 #include "../../CDC.h"
 #include "../constants.h"
 
@@ -44,6 +46,21 @@ namespace USB_NAMESPACE {
   /* Returns false if USB communication is enabled. */
   bool is_busy (void) { return !(USBSTATE.CONFIG && cb_bus_check()); }
 
+  /*
+   * Configuration callback Methods
+   */
+
+  /* Sets the specified device/configuration descriptor for the endpoint. */
+  /* It then returns the payload size. */
+  WEAK size_t cb_get_descriptor_data (uint8_t* _buffer, uint16_t _index) {
+    if (_index == 0x03FF) {
+      return get_auto_generate_serial_number_string(_buffer, false);
+    }
+    else {
+      return get_descriptor_copy_P(_buffer, _index, USB_DescriptorSet);
+    }
+  }
+
   /* 
    * Standard Request Enumeration Process
    * 
@@ -71,7 +88,7 @@ namespace USB_NAMESPACE {
     else if (bRequest == USB_REQ_GetDescriptor) {     /* 0x06 */
       size_t _length = USB_SETUP_DATA.wLength;
       size_t _size = cb_get_descriptor_data(&USB_DATA_BUFFER, USB_SETUP_DATA.wValue);
-      EP_RES->CNT = (_size > _length) ? _length : _size;
+      EP_RES->CNT = constrain(_size, (size_t)0, _length);
       listen = !!_size;
     }
     else if (bRequest == USB_REQ_GetConfiguration) {  /* 0x08 */
@@ -127,51 +144,49 @@ namespace USB_NAMESPACE {
   /* Implementing BUS interrupts handling. */
   void handling_bus_events (void) {
     uint8_t busstate = USB0_INTFLAGSA;
+    USB0_INTFLAGSA = busstate;
     /*** Do not allow unnecessary interrupts. ***/
+    if (bit_is_set(busstate, USB_STALLED_bp)) {
+      loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
+      bit_clear(USB_EP_RES.CTRL, USB_DOSTALL_bp);
+      USB_EP_STATUS_CLR(USB_EP_SETUP_IN) = 0;
+      USB_EP_STATUS_CLR(USB_EP_SETUP_OUT) = 0;
+      D1PRINTF("<STALLED>");
+      cb_bus_event_stalled();
+    }
     if (bit_is_set(busstate, USB_SOF_bp)) {
       cb_event_class_sof();
       cb_bus_event_sof();
-      USB0_INTFLAGSA |= USB_SOF_bm;
-    }
-    if (bit_is_set(busstate, USB_STALLED_bp)) {
-      D2PRINTF("<STALLED>\r\n");
-      cb_bus_event_stalled();
-      USB0_INTFLAGSA |= USB_STALLED_bm;
     }
     if (bit_is_set(busstate, USB_RESET_bp)) {
       D2PRINTF("<RESET>\r\n");
       /* A USB bus reset occurred. */
       cb_bus_event_reset();
       /* The current USB address must be discarded and a setup transaction must be awaited. */
-      USB0_INTFLAGSA |= USB_RESET_bm;
     }
     if (bit_is_set(busstate, USB_SUSPEND_bp)) {
       D2PRINTF("<SUSPEND>\r\n");
       /* Suspend requested. */
       cb_bus_event_suspend();
       /* Bus-powered devices must transition quickly to a lower power state. */
-      USB0_INTFLAGSA |= USB_SUSPEND_bm;
     }
     if (bit_is_set(busstate, USB_RESUME_bp)) {
-      D2PRINTF("<RESUME>\r\n");
+      D2PRINTF("<RESUME>");
       // /* Resume requested. */
       // bus_attach();
       // bus_resume();
       cb_bus_event_resume();
       /* The system is then allowed to return to a normal power state. */
-      USB0_INTFLAGSA |= USB_RESUME_bm;
     }
     if (bit_is_set(busstate, USB_UNF_bp)) {
       /* Executed if the IN packet is empty. */
-      D2PRINTF("<UNF>\r\n");
+      D2PRINTF("<UNF>");
       cb_bus_event_underflow();
-      USB0_INTFLAGSA |= USB_UNF_bm;
     }
     if (bit_is_set(busstate, USB_OVF_bp)) {
       /* Executed if an OUT packet is not received. */
-      D2PRINTF("<OVF>\r\n");
+      D2PRINTF("<OVF>");
       cb_bus_event_overflow();
-      USB0_INTFLAGSA |= USB_OVF_bm;
     }
     if (busstate & (USB_RESUME_bm | USB_RESET_bm)) {
       bus_reset();
@@ -204,15 +219,12 @@ namespace USB_NAMESPACE {
         listen = cb_request_vender(EP_REQ, EP_RES);
       }
       */
-      if (listen) {
-        ep_setup_in_listen();
-        ep_setup_out_listen();
-      }
-      else {
-        D1PRINTF("[STALLED]\r\n");
-        ep_setup_stalled();
+      if (!listen) {
         cb_request_setup_stalled(EP_REQ, EP_RES);
+        ep_setup_stalled();
       }
+      ep_setup_in_listen();
+      ep_setup_out_listen();
       USB0_INTFLAGSB |= USB_SETUP_bm;
     }
     while (bit_is_set(USB0_INTFLAGSB, USB_TRNCOMPL_bp)) {

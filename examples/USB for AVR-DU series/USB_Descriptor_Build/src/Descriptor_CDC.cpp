@@ -84,18 +84,6 @@ namespace {
     , .bNumConfigurations   = 1
   };
 
-  const USB_Device_Qualifier_Descriptor_t USB_Device_Qualifier_Descriptor USB_DESC_ATTR = {
-      .bLength              = sizeof(USB_Device_Qualifier_Descriptor_t)
-    , .bDescriptorType      = bDescriptorType_DEVICE_QUALIFIER
-    , .bcdUSB               = bcdUSB_2
-    , .bDeviceClass         = bClassCode_Miscellaneous
-    , .bDeviceSubClass      = bSubClassCode_Common
-    , .bDeviceProtocol      = bProtocolCode_Interface_Association
-    , .bMaxPacketSize0      = 64
-    , .bNumConfigurations   = 1
-    , .bReserved            = 0
-  };
-
   /* A structure template is required to determine */
   /* the total length of the General Configuration Set. */
 
@@ -218,7 +206,6 @@ namespace {
     uint8_t head_0[3];    uint8_t body_0[sizeof(USB_DESC_STRS)];  // end null is head_1[1]
   /*uint8_t head_1[1];*/  USB_Device_Descriptor_t body_1;
     uint8_t head_2[1];    USB_Genelal_Configuration_Descriptor_0_t body_2;
-    uint8_t head_3[1];    USB_Device_Qualifier_Descriptor_t body_3;
     uint8_t string_1[4];
     uint8_t string_2[4];
     uint8_t string_3[4];
@@ -236,7 +223,6 @@ namespace {
     ,      USB_Device_Descriptor
     /* Configuration */
     , {0}, USB_Genelal_Configuration_Descriptor_0
-    , {0}, USB_Device_Qualifier_Descriptor
     /* Strings */
     , {1,  sizeof(USB_STR_1)-1, bDescriptorType_STRING, 3}
     , {2,  sizeof(USB_STR_2)-1, bDescriptorType_STRING, 3 + sizeof(USB_STR_1)-1}
