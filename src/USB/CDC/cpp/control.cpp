@@ -147,10 +147,7 @@ namespace USB_NAMESPACE {
     USB0_INTFLAGSA = busstate;
     /*** Do not allow unnecessary interrupts. ***/
     if (bit_is_set(busstate, USB_STALLED_bp)) {
-      loop_until_bit_is_clear(USB0_INTFLAGSB, USB_RMWBUSY_bp);
       bit_clear(USB_EP_RES.CTRL, USB_DOSTALL_bp);
-      USB_EP_STATUS_CLR(USB_EP_SETUP_IN) = 0;
-      USB_EP_STATUS_CLR(USB_EP_SETUP_OUT) = 0;
       D1PRINTF("<STALLED>");
       cb_bus_event_stalled();
     }

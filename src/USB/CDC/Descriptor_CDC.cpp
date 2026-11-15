@@ -10,6 +10,7 @@
  */
 
 #include <avr/io.h>
+#if defined(__cplusplus) && defined(USB0)
 #include "../Descriptor.h"
 #include "constants.h"
 
@@ -215,4 +216,5 @@ namespace {
 
 } // anonymous namespace
 
+#endif
 // end of code

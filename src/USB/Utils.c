@@ -24,7 +24,7 @@ size_t get_descriptor_copy_P (uint8_t* _buffer, const uint16_t _wValue, const ui
   uint8_t _index = _wValue;
   uint8_t _hint, _type, _size;
   uint8_t* _pgmem = (uint8_t*)_descriptor_set;
-  do {
+  while (1) {
     _hint = pgm_read_byte(_pgmem++);
     _size = pgm_read_byte(&_pgmem[0]);
     _type = pgm_read_byte(&_pgmem[1]);
@@ -36,11 +36,12 @@ size_t get_descriptor_copy_P (uint8_t* _buffer, const uint16_t _wValue, const ui
     if (_type == _request && _hint == _index) {
       if (_type == bDescriptorType_STRING && _index != 0) {
         uint8_t* _src = (uint8_t*)_descriptor_set + pgm_read_byte(&_pgmem[2]);
-        uint8_t* _dst = _buffer;
         uint8_t _len = ++_size << 1;
-        *_dst++ = _len; *_dst++ = bDescriptorType_STRING;
+        *_buffer++ = _len;
+        *_buffer++ = bDescriptorType_STRING;
         while (--_size > 0) {
-          *_dst++ = pgm_read_byte(_src++); *_dst++ = 0;
+          *_buffer++ = pgm_read_byte(_src++);
+          *_buffer++ = 0;
         }
         return _len;
       }
@@ -52,11 +53,12 @@ size_t get_descriptor_copy_P (uint8_t* _buffer, const uint16_t _wValue, const ui
       memcpy_P(_buffer, _pgmem, _size);
       return _size;
     }
-    else if (_type == bDescriptorType_STRING && _hint != 0) {
+    else if (_type == bDescriptorType_STRING) {
+      if (_hint == 0) break;
       _size = 3;
     }
     _pgmem += _size;
-  } while (!(_type == bDescriptorType_STRING && _hint == 0));
+  }
   return 0;
 }
 
@@ -67,7 +69,7 @@ size_t get_descriptor_copy (uint8_t* _buffer, const uint16_t _wValue, const uint
   uint8_t _index = _wValue;
   uint8_t _hint, _type, _size;
   uint8_t* _pgmem = (uint8_t*)_descriptor_set;
-  do {
+  while (1) {
     _hint = *_pgmem++;
     _size = _pgmem[0];
     _type = _pgmem[1];
@@ -79,11 +81,12 @@ size_t get_descriptor_copy (uint8_t* _buffer, const uint16_t _wValue, const uint
     if (_type == _request && _hint == _index) {
       if (_type == bDescriptorType_STRING && _index != 0) {
         uint8_t* _src = (uint8_t*)_descriptor_set + _pgmem[2];
-        uint8_t* _dst = _buffer;
         uint8_t _len = ++_size << 1;
-        *_dst++ = _len; *_dst++ = bDescriptorType_STRING;
+        *_buffer++ = _len;
+        *_buffer++ = bDescriptorType_STRING;
         while (--_size > 0) {
-          *_dst++ = *_src++; *_dst++ = 0;
+          *_buffer++ = *_src++;
+          *_buffer++ = 0;
         }
         return _len;
       }
@@ -95,11 +98,12 @@ size_t get_descriptor_copy (uint8_t* _buffer, const uint16_t _wValue, const uint
       memcpy(_buffer, _pgmem, _size);
       return _size;
     }
-    else if (_type == bDescriptorType_STRING && _hint != 0) {
+    else if (_type == bDescriptorType_STRING) {
+      if (_hint == 0) break;
       _size = 3;
     }
     _pgmem += _size;
-  } while (!(_type == bDescriptorType_STRING && _hint == 0));
+  }
   return 0;
 }
 
