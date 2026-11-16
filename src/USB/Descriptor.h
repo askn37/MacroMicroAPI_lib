@@ -404,14 +404,6 @@ enum USB_bmCapabilities_enum {
   , bmACM_COMM_FEATURE        = 0x01
 };
 
-/*
- * List-up Descriptor workspace
- */
-
-extern const uint8_t* USB_DescriptorSet;
-extern const size_t   USB_DescriptorSetSize;
-extern const uint8_t  USB_DescriptorSetSection;
-
 #ifdef __cplusplus
 }
 #endif

@@ -11,10 +11,11 @@
 
 #include <avr/io.h>
 #if defined(__cplusplus) && defined(USB0)
+#include "../CDC.h"
 #include "../Descriptor.h"
 #include "constants.h"
 
-namespace {
+namespace USB_NAMESPACE {
 
   /*** WARNING ***
    * This USB device information applies only when using Microchip Technology Inc. products.
@@ -26,7 +27,7 @@ namespace {
   /* All strings are concatenated and written in ASCIIZ format. */
   /* It is dynamically converted to UTF16-LE format. */
   #define USB_STR_1 "Microchip Technology Inc."
-  #define USB_STR_2 "USB-CDC-ACM-VCP for AVR-DU series"
+  #define USB_STR_2 "CDC-ACM-VCP for AVR-DU series"
   #define USB_DESC_STRS USB_STR_1 USB_STR_2
 
   /* We decide which NVM to place the generated results in. */
@@ -203,18 +204,14 @@ namespace {
     /* Strings */
     , {1,  sizeof(USB_STR_1)-1, bDescriptorType_STRING, 3}
     , {2,  sizeof(USB_STR_2)-1, bDescriptorType_STRING, 3 + sizeof(USB_STR_1)-1}
-    , {3,                   11, bDescriptorType_STRING, 3 + sizeof(USB_STR_1)-1 + 4}  // "CDC-ACM-VCP"
+    , {3,                   11, bDescriptorType_STRING, 3 + sizeof(USB_STR_1)-1}  // "CDC-ACM-VCP"
     /* Strings LANGID's : Table Terminator */
     , {0, 4, bDescriptorType_STRING}, {wLANG_EN_US}
   };
 
-  extern "C" {
-    const uint8_t* USB_DescriptorSet = (uint8_t*)&USB_Descriptor + USB_DESC_ADDR;
-    const size_t   USB_DescriptorSetSize = sizeof(USB_Descriptor);
-    const uint8_t  USB_DescriptorSetSection = USB_DESC_ADDR;
-  }
+  uint8_t* get_descriptor_ptr (void) { return (uint8_t*)&USB_Descriptor + USB_DESC_ADDR; }
 
-} // anonymous namespace
+} /* USB_CDC */
 
 #endif
 // end of code

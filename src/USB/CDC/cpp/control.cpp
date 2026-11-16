@@ -14,10 +14,9 @@
 #if defined(__cplusplus) && defined(USB0)
 #include <string.h>         /* memcpy */
 #include <avr/pgmspace.h>   /* PROGMEM memcpy_P */
-#include "../../Descriptor.h"
-#include "../../Utils.h"
 #include "../../CDC.h"
 #include "../constants.h"
+#include "../../Utils.h"
 
 namespace USB_NAMESPACE {
 
@@ -57,7 +56,7 @@ namespace USB_NAMESPACE {
       return get_auto_generate_serial_number_string(_buffer, false);
     }
     else {
-      return get_descriptor_copy_P(_buffer, _index, USB_DescriptorSet);
+      return get_descriptor_copy_P(_buffer, _index, get_descriptor_ptr());
     }
   }
 

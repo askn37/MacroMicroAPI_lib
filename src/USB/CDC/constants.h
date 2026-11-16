@@ -96,6 +96,7 @@ namespace USB_NAMESPACE {
 
   /* Static descriptor getter */
   size_t cb_get_descriptor_data (uint8_t* _buffer, uint16_t _index);
+  uint8_t* get_descriptor_ptr (void);
 
   /* Endpoint Setup IN/OUT */
   void ep_setup_clear (void);
