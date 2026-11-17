@@ -13,7 +13,7 @@
 #ifdef AVR_AVRSX
   #define WDT_PERIOD WDT_PERIOD_8KCLK_gc
 #else
-  #define WDT_PERIOD WDT_PERIOD_256CLK_gc
+  #define WDT_PERIOD WDT_PERIOD_512CLK_gc
 #endif
 
 void setup (void) {
@@ -26,7 +26,7 @@ void setup (void) {
 
   Serial.begin(CONSOLE_BAUD).println(F("\r<startup>"));
   Serial.print(F("F_CPU=")).println(F_CPU, DEC);
-  Serial.print(F("_AVR_IOXXX_H_=")).println(_AVR_IOXXX_H_);
+  Serial.print(F("_AVR_IOXXX_H_=")).println(F(_AVR_IOXXX_H_));
   #ifdef DEBUG
   Serial.print(F("CONSOLE_BAUD=")).println(CONSOLE_BAUD, DEC);
   Serial.print(F(" RATE=")).print(Serial.is_baud(), DEC);
